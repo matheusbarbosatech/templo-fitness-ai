@@ -2,6 +2,8 @@
 
 Aplicativo completo de musculação, performance esportiva, disciplina e saúde integral com fundamento bíblico (**1 Coríntios 6:19-20 — O corpo como Templo do Espírito Santo**). Desenvolvido em **Python + Flet**, com banco de dados **SQLite local (Offline-First)** e integração com a **API DevWorld**.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/matheusbarbosatech/templo-fitness-ai)
+
 ---
 
 ## 🌟 Principais Funcionalidades

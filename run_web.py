@@ -34,5 +34,6 @@ if __name__ == "__main__":
         main,
         view=app_view,
         port=port,
-        host=host
+        host=host,
+        assets_dir="assets"
     )

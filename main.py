@@ -30,7 +30,7 @@ from views.goal_setting_dialog import GoalSettingDialog
 
 def main(page: ft.Page):
     # 1. Configurações Globais da Janela e Tema
-    page.title = f"{AppConfig.APP_NAME} - {AppConfig.APP_SUBTITLE}"
+    page.title = f"{AppConfig.APP_ICON} {AppConfig.APP_NAME} - {AppConfig.APP_SUBTITLE}"
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = SportColors.BG_DARK
     page.padding = 0
@@ -99,8 +99,9 @@ def main(page: ft.Page):
 
         page.appbar = ft.AppBar(
             leading=ft.Container(
-                content=ft.Icon(Icons.BOLT, color=SportColors.PRIMARY_NEON, size=24),
-                padding=AppPadding.only(left=12)
+                content=ft.Text(AppConfig.APP_ICON, size=24),
+                padding=AppPadding.only(left=12),
+                alignment=ft.alignment.center if hasattr(ft, "alignment") else None
             ),
             title=ft.Row([
                 ft.Text(AppConfig.APP_NAME, size=15, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),

@@ -16,6 +16,7 @@ UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 class AppConfig:
+    APP_ICON = "🏛️"
     APP_NAME = "TEMPLO FITNESS AI"
     APP_SUBTITLE = "Mordomia do Templo, Disciplina & Força Integral"
     VERSION = "2.0.0"

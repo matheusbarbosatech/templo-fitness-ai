@@ -190,7 +190,7 @@ class HomeDashboardView:
             content=ft.Column([
                 ft.Row([
                     ft.Row([
-                        ft.Icon(Icons.LOCAL_FIRE_DEPARTMENT, color=SportColors.AMBER_ALERT, size=20),
+                        ft.Text("🏛️", size=20),
                         ft.Text("TEMPLO DO ESPÍRITO SANTO", size=12, weight=ft.FontWeight.BOLD, color=SportColors.AMBER_ALERT),
                     ], spacing=6),
                     SportStyles.badge("1 Coríntios 6:19-20", SportColors.AMBER_ALERT)
@@ -203,7 +203,7 @@ class HomeDashboardView:
                 ),
                 ft.Row([
                     ft.Text("🛡️ Treino com Propósito & Força Consagrada", size=11, color=SportColors.TEXT_SECONDARY),
-                    SportStyles.badge("Templo AI", SportColors.PRIMARY_NEON)
+                    SportStyles.badge("🏛️ Templo AI", SportColors.PRIMARY_NEON)
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
             ], spacing=6),
             bgcolor=SportColors.BG_SURFACE,

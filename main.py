@@ -20,6 +20,7 @@ from services.db_service import DBService
 from views.personal_hub_view import PersonalHubView
 from views.nutrition_hub_view import NutritionHubView
 from views.photos_evolution_view import PhotosEvolutionView
+from views.login_view import LoginView
 
 def main(page: ft.Page):
     # 1. Configurações Globais da Janela e Tema
@@ -43,22 +44,44 @@ def main(page: ft.Page):
     except Exception as err:
         print(f"[DB INIT ERROR]: {err}")
 
-    # 3. Gerenciamento das Telas e Navegação (3 Seções: Personal, Nutrição e Evolução)
+    # 3. Estado de Autenticação e Navegação
+    is_logged_in = False
     current_index = 0
     content_container = ft.Container(expand=True)
 
-    personal_hub = PersonalHubView(page)
-    nutrition_hub = NutritionHubView(page)
-    photos_evolution = PhotosEvolutionView(page)
+    personal_hub = None
+    nutrition_hub = None
+    photos_evolution = None
 
-    views = [
-        lambda: personal_hub.build(),
-        lambda: nutrition_hub.build(),
-        lambda: photos_evolution.build(),
-    ]
+    def on_login_success():
+        nonlocal is_logged_in, personal_hub, nutrition_hub, photos_evolution
+        is_logged_in = True
+        personal_hub = PersonalHubView(page)
+        nutrition_hub = NutritionHubView(page)
+        photos_evolution = PhotosEvolutionView(page)
+        render_app()
 
-    def render_view():
+    def on_logout():
+        nonlocal is_logged_in
+        is_logged_in = False
+        page.navigation_bar = None
+        render_login()
+
+    def render_login():
+        page.appbar = None
+        page.navigation_bar = None
+        content_container.content = LoginView(page, on_login_success=on_login_success).build()
+        page.update()
+
+    def render_app():
+        views = [
+            lambda: personal_hub.build(),
+            lambda: nutrition_hub.build(),
+            lambda: photos_evolution.build(),
+        ]
         content_container.content = views[current_index]()
+        update_app_bar()
+        page.navigation_bar = nav_bar
         page.update()
 
     def navigate_to(index: int):
@@ -66,27 +89,58 @@ def main(page: ft.Page):
         current_index = index
         if nav_bar:
             nav_bar.selected_index = index
-        render_view()
+        render_app()
 
-    # 4. Barra Superior (AppBar) Totalmente Limpa (Apenas Logo e Título)
-    page.appbar = ft.AppBar(
-        leading=ft.Container(
-            content=ft.Text(AppConfig.APP_ICON, size=24),
-            padding=AppPadding.only(left=12),
-            alignment=ft.alignment.center if hasattr(ft, "alignment") else None
-        ),
-        title=ft.Row([
-            ft.Text(AppConfig.APP_NAME, size=15, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-            ft.Container(
-                content=ft.Text("PRO", size=10, weight=ft.FontWeight.BOLD, color=SportColors.BG_DARK),
-                bgcolor=SportColors.PRIMARY_NEON,
-                padding=AppPadding.symmetric(horizontal=6, vertical=2),
-                border_radius=4
-            )
-        ], spacing=6, alignment=ft.MainAxisAlignment.START),
-        bgcolor=SportColors.BG_SURFACE,
-        elevation=0
-    )
+    # 4. Barra Superior (AppBar) com Identificação do Atleta e Troca de Perfil
+    def update_app_bar():
+        active_u = DBService.get_active_user()
+        u_name = active_u.get("name", "Atleta").split()[0]
+        u_color = active_u.get("color_hex", SportColors.PRIMARY_NEON)
+
+        page.appbar = ft.AppBar(
+            leading=ft.Container(
+                content=ft.Text(AppConfig.APP_ICON, size=24),
+                padding=AppPadding.only(left=12),
+                alignment=ft.alignment.center if hasattr(ft, "alignment") else None
+            ),
+            title=ft.Row([
+                ft.Text(AppConfig.APP_NAME, size=15, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                ft.Container(
+                    content=ft.Text("PRO", size=10, weight=ft.FontWeight.BOLD, color=SportColors.BG_DARK),
+                    bgcolor=SportColors.PRIMARY_NEON,
+                    padding=AppPadding.symmetric(horizontal=6, vertical=2),
+                    border_radius=4
+                )
+            ], spacing=6, alignment=ft.MainAxisAlignment.START),
+            actions=[
+                ft.Container(
+                    content=ft.Row([
+                        ft.CircleAvatar(
+                            radius=11,
+                            bgcolor=f"{u_color}33",
+                            content=ft.Icon(Icons.PERSON, color=u_color, size=13)
+                        ),
+                        ft.Text(u_name, size=11, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                    ], spacing=4),
+                    bgcolor=SportColors.BG_SURFACE_ALT,
+                    padding=AppPadding.symmetric(horizontal=8, vertical=4),
+                    border_radius=12,
+                    border=AppBorder.all(1, u_color),
+                    tooltip=f"Atleta Conectado: {active_u.get('name')}",
+                    on_click=lambda _: on_logout()
+                ),
+                ft.IconButton(
+                    icon=Icons.LOGOUT,
+                    icon_color=SportColors.TEXT_MUTED,
+                    icon_size=18,
+                    tooltip="Trocar Atleta / Sair",
+                    on_click=lambda _: on_logout()
+                ),
+                ft.Container(width=4)
+            ],
+            bgcolor=SportColors.BG_SURFACE,
+            elevation=0
+        )
 
     # 5. Barra Inferior Enxuta (Personal Trainer, Nutricionista & Evolução)
     nav_bar = ft.NavigationBar(
@@ -112,11 +166,10 @@ def main(page: ft.Page):
         ],
         on_change=lambda e: navigate_to(e.control.selected_index)
     )
-    page.navigation_bar = nav_bar
 
-    # 6. Montagem Inicial
+    # 6. Montagem Inicial (Inicia na Tela de Login / Seleção de Perfil)
     page.add(content_container)
-    render_view()
+    render_login()
 
 if __name__ == "__main__":
     ft.run(main)

@@ -133,6 +133,11 @@ class MentalView:
                         on_click=lambda _: self._stop_box_breathing(),
                         width=100
                     ),
+                ], spacing=10)
+            ], spacing=10),
+            padding=16
+        )
+
         # 3. Consagração do Templo & Oração Pré-Treino
         prayer_card = SportStyles.card_container(
             content=ft.Column([

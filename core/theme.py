@@ -94,11 +94,11 @@ class AppBorderRadius:
 
 class SportStyles:
     @staticmethod
-    def card_container(content, border_color=SportColors.BORDER_DEFAULT, padding=16, radius=14, on_click=None):
+    def card_container(content, border_color=SportColors.BORDER_DEFAULT, padding=16, radius=14, on_click=None, bgcolor=SportColors.BG_SURFACE):
         pad = AppPadding.all(padding) if isinstance(padding, (int, float)) else padding
         return ft.Container(
             content=content,
-            bgcolor=SportColors.BG_SURFACE,
+            bgcolor=bgcolor,
             border_radius=radius,
             padding=pad,
             border=AppBorder.all(1, border_color),

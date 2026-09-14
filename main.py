@@ -19,10 +19,11 @@ from services.db_service import DBService
 # Views Centrais Enxutas
 from views.personal_hub_view import PersonalHubView
 from views.nutrition_hub_view import NutritionHubView
+from views.photos_evolution_view import PhotosEvolutionView
 
 def main(page: ft.Page):
     # 1. Configurações Globais da Janela e Tema
-    page.title = f"{AppConfig.APP_ICON} {AppConfig.APP_NAME} - Personal & Nutricionista"
+    page.title = f"{AppConfig.APP_ICON} {AppConfig.APP_NAME} - Personal, Nutrição & Evolução"
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = SportColors.BG_DARK
     page.padding = 0
@@ -42,16 +43,18 @@ def main(page: ft.Page):
     except Exception as err:
         print(f"[DB INIT ERROR]: {err}")
 
-    # 3. Gerenciamento das Telas e Navegação (Apenas 2 Seções Principais)
+    # 3. Gerenciamento das Telas e Navegação (3 Seções: Personal, Nutrição e Evolução)
     current_index = 0
     content_container = ft.Container(expand=True)
 
     personal_hub = PersonalHubView(page)
     nutrition_hub = NutritionHubView(page)
+    photos_evolution = PhotosEvolutionView(page)
 
     views = [
         lambda: personal_hub.build(),
         lambda: nutrition_hub.build(),
+        lambda: photos_evolution.build(),
     ]
 
     def render_view():
@@ -85,7 +88,7 @@ def main(page: ft.Page):
         elevation=0
     )
 
-    # 5. Barra Inferior Enxuta (Apenas Personal Trainer & Nutricionista)
+    # 5. Barra Inferior Enxuta (Personal Trainer, Nutricionista & Evolução)
     nav_bar = ft.NavigationBar(
         selected_index=0,
         bgcolor=SportColors.BG_SURFACE,
@@ -94,12 +97,17 @@ def main(page: ft.Page):
             NavigationDestination(
                 icon=Icons.FITNESS_CENTER_OUTLINED,
                 selected_icon=Icons.FITNESS_CENTER,
-                label="Personal Trainer"
+                label="Personal"
             ),
             NavigationDestination(
                 icon=Icons.RESTAURANT_OUTLINED,
                 selected_icon=Icons.RESTAURANT,
                 label="Nutricionista"
+            ),
+            NavigationDestination(
+                icon=Icons.PHOTO_CAMERA_OUTLINED,
+                selected_icon=Icons.PHOTO_CAMERA,
+                label="Evolução"
             ),
         ],
         on_change=lambda e: navigate_to(e.control.selected_index)

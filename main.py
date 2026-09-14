@@ -46,6 +46,7 @@ def main(page: ft.Page):
 
     # 3. Estado de Autenticação e Navegação
     is_logged_in = False
+    active_user_id = 1
     current_index = 0
     content_container = ft.Container(expand=True)
 
@@ -53,17 +54,31 @@ def main(page: ft.Page):
     nutrition_hub = None
     photos_evolution = None
 
-    def on_login_success():
-        nonlocal is_logged_in, personal_hub, nutrition_hub, photos_evolution
+    def on_login_success(user_id=None):
+        nonlocal is_logged_in, personal_hub, nutrition_hub, photos_evolution, active_user_id
+        if user_id:
+            active_user_id = user_id
+            DBService.switch_user(user_id)
+            try:
+                page.client_storage.set("logged_user_id", user_id)
+            except Exception:
+                pass
+        else:
+            active_user_id = DBService.get_active_user_id()
+
         is_logged_in = True
-        personal_hub = PersonalHubView(page)
-        nutrition_hub = NutritionHubView(page)
-        photos_evolution = PhotosEvolutionView(page)
+        personal_hub = PersonalHubView(page, user_id=active_user_id)
+        nutrition_hub = NutritionHubView(page, user_id=active_user_id)
+        photos_evolution = PhotosEvolutionView(page, user_id=active_user_id)
         render_app()
 
     def on_logout():
         nonlocal is_logged_in
         is_logged_in = False
+        try:
+            page.client_storage.remove("logged_user_id")
+        except Exception:
+            pass
         page.navigation_bar = None
         render_login()
 
@@ -93,7 +108,7 @@ def main(page: ft.Page):
 
     # 4. Barra Superior (AppBar) com Identificação do Atleta e Troca de Perfil
     def update_app_bar():
-        active_u = DBService.get_active_user()
+        active_u = DBService.get_active_user(user_id=active_user_id)
         u_name = active_u.get("name", "Atleta").split()[0]
         u_color = active_u.get("color_hex", SportColors.PRIMARY_NEON)
 
@@ -167,8 +182,24 @@ def main(page: ft.Page):
         on_change=lambda e: navigate_to(e.control.selected_index)
     )
 
-    # 6. Montagem Inicial (Inicia na Tela de Login / Seleção de Perfil)
+    # 6. Montagem Inicial e Auto-Login
     page.add(content_container)
+
+    saved_uid = None
+    try:
+        saved_uid = page.client_storage.get("logged_user_id")
+    except Exception:
+        pass
+
+    if saved_uid:
+        try:
+            valid_ids = [u["id"] for u in DBService.list_users()]
+            if saved_uid in valid_ids:
+                on_login_success(saved_uid)
+                return
+        except Exception:
+            pass
+
     render_login()
 
 if __name__ == "__main__":

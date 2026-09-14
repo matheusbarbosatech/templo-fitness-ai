@@ -2,15 +2,17 @@
 Componente Reutilizável de Chat Especialista com IA - Templo Fitness AI.
 Suporta consultas em tempo real com o Treinador Márcio (Personal) e Dra. Camila (Nutricionista).
 """
+from typing import Optional
 import flet as ft
 from core.theme import SportColors, Icons, AppPadding, AppBorder, AppBorderRadius
 from services.db_service import DBService
 from services.devworld_ai_service import DevWorldAIService, PERSONA_CONFIGS
 
 class SpecialistChatComponent:
-    def __init__(self, page: ft.Page, persona_key: str):
+    def __init__(self, page: ft.Page, persona_key: str, user_id: Optional[int] = None):
         self.page = page
         self.persona_key = persona_key
+        self.user_id = user_id
         self.p_info = PERSONA_CONFIGS.get(persona_key, PERSONA_CONFIGS["personal"])
         
         self.messages_column = ft.Column(spacing=12, scroll=ft.ScrollMode.AUTO)
@@ -125,7 +127,8 @@ class SpecialistChatComponent:
 
     def _reload_messages(self):
         self.messages_column.controls.clear()
-        history = DBService.get_chat_history(self.persona_key, limit=30)
+        uid = self.user_id or DBService.get_active_user_id()
+        history = DBService.get_chat_history(self.persona_key, limit=30, user_id=uid)
 
         if not history:
             welcome_text = f"Olá! Sou {self.p_info['name']} ({self.p_info['title']}). Estou conectado aos seus dados de treino e saúde. Como posso te orientar hoje?"
@@ -195,7 +198,8 @@ class SpecialistChatComponent:
         if self.page:
             self.page.update()
 
-        bot_response = DevWorldAIService.send_message(self.persona_key, user_text)
+        uid = self.user_id or DBService.get_active_user_id()
+        bot_response = DevWorldAIService.send_message(self.persona_key, user_text, user_id=uid)
         
         self.messages_column.controls.remove(typing_indicator)
         self.messages_column.controls.append(
@@ -207,8 +211,8 @@ class SpecialistChatComponent:
     def _clear_chat(self):
         try:
             with DBService.get_connection() as conn:
-                u_id = DBService.get_active_user().get("id", "user_default")
-                conn.execute("DELETE FROM chat_messages WHERE persona = ? AND user_id = ?", (self.persona_key, u_id))
+                u_id = self.user_id or DBService.get_active_user_id()
+                conn.execute("DELETE FROM ai_chat_history WHERE persona = ? AND user_id = ?", (self.persona_key, u_id))
                 conn.commit()
         except Exception:
             pass

@@ -8,13 +8,15 @@ from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
 from services.db_service import DBService
 
 class GoalSettingDialog:
-    def __init__(self, page: ft.Page, on_saved: Optional[Callable] = None):
+    def __init__(self, page: ft.Page, on_saved: Optional[Callable] = None, user_id: Optional[int] = None):
         self.page = page
         self.on_saved = on_saved
+        self.user_id = user_id
         self.dialog: Optional[ft.AlertDialog] = None
 
     def show(self):
-        profile = DBService.get_athlete_profile()
+        uid = self.user_id or DBService.get_active_user_id()
+        profile = DBService.get_athlete_profile(user_id=uid)
 
         goal_drop = ft.Dropdown(
             label="Objetivo Principal",
@@ -198,6 +200,7 @@ class GoalSettingDialog:
         self.page.update()
 
     def _save_and_apply(self, goal, target_w, target_weeks, days, time_m, exp, pain, diet):
+        uid = self.user_id or DBService.get_active_user_id()
         calc = DBService.save_goals(
             goal=goal or "hipertrofia",
             target_weight=float(target_w or 75.0),
@@ -206,11 +209,12 @@ class GoalSettingDialog:
             session_mins=int(time_m or 60),
             experience=exp or "intermediario",
             joint_pain=pain or "nenhuma",
-            diet_strategy=diet or "equilibrada"
+            diet_strategy=diet or "equilibrada",
+            user_id=uid
         )
         # Se for PPL ou UpperLower, aplica a rotina prescrita
         rec_routine = calc.get("recommended_routine", "ABC")
-        DBService.apply_coach_routine_preset(rec_routine)
+        DBService.apply_coach_routine_preset(rec_routine, user_id=uid)
 
         self._close()
         if self.page:

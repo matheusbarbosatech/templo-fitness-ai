@@ -68,11 +68,12 @@ Ensine o(a) atleta a treinar com sabedoria sem sobrecarregar as articulações."
 
 class DevWorldAIService:
     @classmethod
-    def get_athlete_context(cls) -> str:
+    def get_athlete_context(cls, user_id: Optional[int] = None) -> str:
         """Gera um resumo do prontuário do atleta para alimentar a IA."""
-        profile = DBService.get_athlete_profile()
-        nutrition = DBService.get_daily_nutrition()
-        wellness = DBService.get_today_wellness()
+        target_uid = user_id or DBService.get_active_user_id()
+        profile = DBService.get_athlete_profile(user_id=target_uid)
+        nutrition = DBService.get_daily_nutrition(user_id=target_uid)
+        wellness = DBService.get_today_wellness(user_id=target_uid)
         
         context = f"""
 [PRONTUÁRIO ATUAL DO ATLETA]:
@@ -86,20 +87,21 @@ class DevWorldAIService:
         return context
 
     @classmethod
-    def send_message(cls, persona_key: str, user_message: str) -> str:
+    def send_message(cls, persona_key: str, user_message: str, user_id: Optional[int] = None) -> str:
         """Envia mensagem para a API DevWorld ou retorna resposta inteligente com base no contexto."""
         if persona_key not in PERSONA_CONFIGS:
             persona_key = "personal"
 
+        target_uid = user_id or DBService.get_active_user_id()
         persona_info = PERSONA_CONFIGS[persona_key]
-        profile = DBService.get_athlete_profile()
+        profile = DBService.get_athlete_profile(user_id=target_uid)
         
         # Salva mensagem do usuário no banco
-        DBService.add_chat_message(persona_key, "user", user_message)
+        DBService.add_chat_message(persona_key, "user", user_message, user_id=target_uid)
 
         # Prepara contexto e histórico
-        context_prompt = cls.get_athlete_context()
-        history = DBService.get_chat_history(persona_key, limit=10)
+        context_prompt = cls.get_athlete_context(user_id=target_uid)
+        history = DBService.get_chat_history(persona_key, limit=10, user_id=target_uid)
         
         system_content = f"{persona_info['system_prompt']}\n\n{context_prompt}"
         
@@ -128,7 +130,7 @@ class DevWorldAIService:
                 if response.status_code == 200:
                     data = response.json()
                     bot_text = data["choices"][0]["message"]["content"]
-                    DBService.add_chat_message(persona_key, "assistant", bot_text)
+                    DBService.add_chat_message(persona_key, "assistant", bot_text, user_id=target_uid)
                     return bot_text
                 else:
                     print(f"[DevWorld API Error]: Status {response.status_code} - {response.text}")
@@ -136,8 +138,8 @@ class DevWorldAIService:
                 print(f"[DevWorld Connection Exception]: {err}")
 
         # Resposta de Motor Especialista Integrado (Fallback Inteligente)
-        fallback_reply = cls._generate_smart_fallback(persona_key, user_message, profile, wellness=DBService.get_today_wellness())
-        DBService.add_chat_message(persona_key, "assistant", fallback_reply)
+        fallback_reply = cls._generate_smart_fallback(persona_key, user_message, profile, wellness=DBService.get_today_wellness(user_id=target_uid))
+        DBService.add_chat_message(persona_key, "assistant", fallback_reply, user_id=target_uid)
         return fallback_reply
 
     @classmethod

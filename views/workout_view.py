@@ -9,10 +9,12 @@ from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
 from services.db_service import DBService
 
 class WorkoutView:
-    def __init__(self, page: ft.Page, on_view_exercise_guide=None):
+    def __init__(self, page: ft.Page, on_view_exercise_guide=None, user_id=None):
         self.page = page
         self.on_view_exercise_guide = on_view_exercise_guide
-        self.routines = DBService.get_routines()
+        self.user_id = user_id
+        uid = self.user_id or DBService.get_active_user_id()
+        self.routines = DBService.get_routines(user_id=uid)
         self.selected_routine_index = 0
         
         self.is_active_session = False
@@ -29,12 +31,16 @@ class WorkoutView:
         self.exercise_cards_column = ft.Column(spacing=10)
 
     def build(self) -> ft.Control:
+        uid = self.user_id or DBService.get_active_user_id()
+        self.routines = DBService.get_routines(user_id=uid)
         if not self.routines:
             return ft.Container(
                 content=ft.Text("Nenhuma rotina cadastrada.", color=SportColors.TEXT_WHITE),
                 padding=AppPadding.all(20)
             )
 
+        if self.selected_routine_index >= len(self.routines):
+            self.selected_routine_index = 0
         current_routine = self.routines[self.selected_routine_index]
         
         # 1. Seletor de Rotinas e Botão de Prescrições do Personal
@@ -364,12 +370,14 @@ class WorkoutView:
             return
 
         total_vol = sum(s["weight_kg"] * s["reps"] for s in self.completed_sets)
+        uid = self.user_id or DBService.get_active_user_id()
         session_id = DBService.save_workout_session(
             routine_name=routine_name,
             duration_min=45,
             total_volume=total_vol,
             sets=self.completed_sets,
-            notes="Treino executado com sucesso e excelente cadência."
+            notes="Treino executado com sucesso e excelente cadência.",
+            user_id=uid
         )
 
         dialog = ft.AlertDialog(
@@ -495,7 +503,8 @@ class WorkoutView:
         success = DBService.swap_routine_exercise(routine_id, old_ex, new_ex)
         self._close_dialog(dialog)
         if success:
-            self.routines = DBService.get_routines()
+            uid = self.user_id or DBService.get_active_user_id()
+            self.routines = DBService.get_routines(user_id=uid)
             if self.page:
                 self.page.snack_bar = ft.SnackBar(
                     content=ft.Text(f"Exercício trocado com sucesso para: {new_ex}!", color=SportColors.TEXT_WHITE),
@@ -561,9 +570,10 @@ class WorkoutView:
         self.page.update()
 
     def _apply_preset(self, dialog, preset_key: str):
-        DBService.apply_coach_routine_preset(preset_key)
+        uid = self.user_id or DBService.get_active_user_id()
+        DBService.apply_coach_routine_preset(preset_key, user_id=uid)
         self._close_dialog(dialog)
-        self.routines = DBService.get_routines()
+        self.routines = DBService.get_routines(user_id=uid)
         self.selected_routine_index = 0
         if self.page:
             self.page.snack_bar = ft.SnackBar(

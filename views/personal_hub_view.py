@@ -11,13 +11,17 @@ from views.workout_view import WorkoutView
 from views.exercise_catalog_view import ExerciseCatalogView
 from views.specialist_chat_component import SpecialistChatComponent
 
+from typing import Optional
+from services.db_service import DBService
+
 class PersonalHubView:
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page, user_id: Optional[int] = None):
         self.page = page
+        self.user_id = user_id or DBService.get_active_user_id()
         self.current_sub_tab = 0  # 0: Treino, 1: Chat Personal IA, 2: Guia de Exercícios
         
-        self.workout_view = WorkoutView(self.page, on_view_exercise_guide=self._on_guide_requested)
-        self.chat_component = SpecialistChatComponent(self.page, persona_key="personal")
+        self.workout_view = WorkoutView(self.page, on_view_exercise_guide=self._on_guide_requested, user_id=self.user_id)
+        self.chat_component = SpecialistChatComponent(self.page, persona_key="personal", user_id=self.user_id)
         self.catalog_view = ExerciseCatalogView(self.page)
         
         self.content_area = ft.Container(expand=True)

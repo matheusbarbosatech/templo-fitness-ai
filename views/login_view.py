@@ -169,8 +169,7 @@ class LoginView:
                 duration=1500
             )
             self.page.snack_bar.open = True
-            self.page.update()
-        self.on_login_success()
+        self.on_login_success(user_id)
 
     def _create_and_enter(self):
         name = (self.name_field.value or "").strip()

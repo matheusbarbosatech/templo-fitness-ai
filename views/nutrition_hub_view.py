@@ -9,13 +9,17 @@ from core.theme import SportColors, Icons, AppPadding, AppBorder
 from views.nutrition_view import NutritionView
 from views.specialist_chat_component import SpecialistChatComponent
 
+from typing import Optional
+from services.db_service import DBService
+
 class NutritionHubView:
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page, user_id: Optional[int] = None):
         self.page = page
+        self.user_id = user_id or DBService.get_active_user_id()
         self.current_sub_tab = 0  # 0: Dieta & Macros, 1: Chat Nutri IA
         
-        self.nutrition_view = NutritionView(self.page)
-        self.chat_component = SpecialistChatComponent(self.page, persona_key="nutri")
+        self.nutrition_view = NutritionView(self.page, user_id=self.user_id)
+        self.chat_component = SpecialistChatComponent(self.page, persona_key="nutri", user_id=self.user_id)
         
         self.content_area = ft.Container(expand=True)
 

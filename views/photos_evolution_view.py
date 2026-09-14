@@ -8,13 +8,17 @@ from datetime import date
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder, AppAlignment
 from services.db_service import DBService
 
+from typing import Optional
+
 class PhotosEvolutionView:
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page, user_id: Optional[int] = None):
         self.page = page
+        self.user_id = user_id
 
     def build(self) -> ft.Control:
-        profile = DBService.get_athlete_profile()
-        logs = DBService.get_evolution_logs()
+        uid = self.user_id or DBService.get_active_user_id()
+        profile = DBService.get_athlete_profile(user_id=uid)
+        logs = DBService.get_evolution_logs(user_id=uid)
 
         latest_weight = logs[0]["weight_kg"] if logs and logs[0].get("weight_kg") else profile.get("weight_kg", 78.5)
         
@@ -233,6 +237,7 @@ class PhotosEvolutionView:
             self.page.update()
 
     def _save_log(self, dialog, angle, weight, chest, arm, waist, photo_path, notes):
+        uid = self.user_id or DBService.get_active_user_id()
         DBService.add_evolution_log(
             angle=angle or "Frente",
             photo_path=photo_path or "",
@@ -241,7 +246,8 @@ class PhotosEvolutionView:
             arm=float(arm or 0),
             waist=float(waist or 0),
             thigh=0.0,
-            notes=notes or "Registro regular de evolução."
+            notes=notes or "Registro regular de evolução.",
+            user_id=uid
         )
         self._close_dialog(dialog)
         if self.page:

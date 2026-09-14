@@ -7,14 +7,18 @@ import flet as ft
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
 from core.health_math import HealthMath
 from services.db_service import DBService
+from views.goal_setting_dialog import GoalSettingDialog
+from typing import Optional
 
 class NutritionView:
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page, user_id: Optional[int] = None):
         self.page = page
+        self.user_id = user_id
 
     def build(self) -> ft.Control:
-        profile = DBService.get_athlete_profile()
-        nutrition = DBService.get_daily_nutrition()
+        uid = self.user_id or DBService.get_active_user_id()
+        profile = DBService.get_athlete_profile(user_id=uid)
+        nutrition = DBService.get_daily_nutrition(user_id=uid)
         
         tmb = HealthMath.calculate_tmb_mifflin(
             float(profile.get("weight_kg", 78.5)),
@@ -47,7 +51,22 @@ class NutritionView:
         # 1. Card de Macros Principais
         macros_card = SportStyles.card_container(
             content=ft.Column([
-                SportStyles.section_header("BALANÇO DE MACROS DO DIA", f"Foco: {profile.get('goal', 'Hipertrofia').upper()}", icon=Icons.PIE_CHART),
+                SportStyles.section_header(
+                    "BALANÇO DE MACROS DO DIA",
+                    f"Foco: {profile.get('goal', 'Hipertrofia').upper()} ({profile.get('weight_kg', 78.5)}kg)",
+                    icon=Icons.PIE_CHART,
+                    action_button=ft.ElevatedButton(
+                        "🎯 Ajustar Metas",
+                        icon=Icons.TRACK_CHANGES,
+                        style=ft.ButtonStyle(
+                            bgcolor=SportColors.BG_SURFACE_ALT,
+                            color=SportColors.AMBER_GOLD,
+                            text_style=ft.TextStyle(size=11, weight=ft.FontWeight.BOLD)
+                        ),
+                        height=30,
+                        on_click=lambda _: GoalSettingDialog(self.page, on_saved=self._on_goals_saved, user_id=uid).show()
+                    )
+                ),
                 
                 ft.Container(
                     content=ft.Row([
@@ -197,8 +216,14 @@ class NutritionView:
             expand=True
         )
 
+    def _on_goals_saved(self):
+        self.build()
+        if self.page:
+            self.page.update()
+
     def _save_preset(self, name: str, kcal: float, prot: float, carbs: float, fat: float):
-        DBService.add_meal(name, kcal, prot, carbs, fat)
+        uid = self.user_id or DBService.get_active_user_id()
+        DBService.add_meal(name, kcal, prot, carbs, fat, user_id=uid)
         if self.page:
             self.page.snack_bar = ft.SnackBar(
                 content=ft.Text(f"✅ Refeição '{name}' adicionada!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
@@ -210,7 +235,8 @@ class NutritionView:
             self.page.update()
 
     def _add_water(self, amount: int):
-        DBService.add_water(amount)
+        uid = self.user_id or DBService.get_active_user_id()
+        DBService.add_water(amount, user_id=uid)
         if self.page:
             self.page.snack_bar = ft.SnackBar(
                 content=ft.Text(f"💧 +{amount}ml de água registrados!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
@@ -256,12 +282,14 @@ class NutritionView:
     def _save_custom_meal(self, dialog, name, kcal, prot, carbs, fat):
         if not name:
             name = "Refeição"
+        uid = self.user_id or DBService.get_active_user_id()
         DBService.add_meal(
             name,
             float(kcal or 0),
             float(prot or 0),
             float(carbs or 0),
-            float(fat or 0)
+            float(fat or 0),
+            user_id=uid
         )
         self._close_dialog(dialog)
         if self.page:

@@ -1,5 +1,6 @@
 """
-Apollo Fitness AI - Super-App Oficial de Saúde Esportiva, Musculação & IA Multidisciplinar.
+Apollo Fitness AI / Templo Fitness AI - Super-App Oficial de Saúde Esportiva & Musculação.
+Foco exclusivo e enxuto: Personal Trainer & Nutricionista com IA Integrada.
 Tecnologias: Python Flet, SQLite Local (Offline-First), API DevWorld.
 """
 import sys
@@ -15,22 +16,18 @@ from core.config import AppConfig
 from core.theme import SportColors, Icons, NavigationDestination, AppPadding, AppBorder
 from services.db_service import DBService
 
-# Views
-from views.home_dashboard_view import HomeDashboardView
-from views.workout_view import WorkoutView
-from views.exercise_catalog_view import ExerciseCatalogView
-from views.ai_team_view import AITeamView
-from views.nutrition_view import NutritionView
-from views.mental_view import MentalView
-from views.photos_evolution_view import PhotosEvolutionView
-from views.settings_view import SettingsView
+# Views Centrais Enxutas
+from views.personal_hub_view import PersonalHubView
+from views.nutrition_hub_view import NutritionHubView
 
+# Modais
 from views.auth_dialog import AuthDialog
 from views.goal_setting_dialog import GoalSettingDialog
+from views.settings_dialog import SettingsDialog
 
 def main(page: ft.Page):
     # 1. Configurações Globais da Janela e Tema
-    page.title = f"{AppConfig.APP_ICON} {AppConfig.APP_NAME} - {AppConfig.APP_SUBTITLE}"
+    page.title = f"{AppConfig.APP_ICON} {AppConfig.APP_NAME} - Personal & Nutricionista"
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = SportColors.BG_DARK
     page.padding = 0
@@ -50,19 +47,16 @@ def main(page: ft.Page):
     except Exception as err:
         print(f"[DB INIT ERROR]: {err}")
 
-    # 3. Gerenciamento das Telas e Navegação
+    # 3. Gerenciamento das Telas e Navegação (Apenas 2 Seções Principais)
     current_index = 0
     content_container = ft.Container(expand=True)
 
+    personal_hub = PersonalHubView(page)
+    nutrition_hub = NutritionHubView(page)
+
     views = [
-        lambda: HomeDashboardView(page, on_navigate_callback=navigate_to).build(),
-        lambda: WorkoutView(page, on_view_exercise_guide=open_exercise_in_catalog).build(),
-        lambda: ExerciseCatalogView(page).build(),
-        lambda: AITeamView(page).build(),
-        lambda: NutritionView(page).build(),
-        lambda: MentalView(page).build(),
-        lambda: PhotosEvolutionView(page).build(),
-        lambda: SettingsView(page).build(),
+        lambda: personal_hub.build(),
+        lambda: nutrition_hub.build(),
     ]
 
     def render_view():
@@ -77,24 +71,19 @@ def main(page: ft.Page):
             nav_bar.selected_index = index
         render_view()
 
-    def open_exercise_in_catalog(exercise_name: str):
-        nonlocal current_index
-        current_index = 2 # Catálogo
-        if nav_bar:
-            nav_bar.selected_index = 2
-        render_view()
-
     def open_auth_dialog():
         AuthDialog(page, on_user_changed=render_view).show()
 
     def open_goals_dialog():
         GoalSettingDialog(page, on_saved=render_view).show()
 
-    # 4. Barra Superior (AppBar) com Suporte Multi-Usuário
+    def open_settings_dialog():
+        SettingsDialog(page, on_saved=render_view).show()
+
+    # 4. Barra Superior (AppBar) Limpa e Funcional
     def update_app_bar():
         active_u = DBService.get_active_user()
         u_name = active_u.get("name", "Atleta").split()[0]
-        u_role = active_u.get("role", "aluno")
         u_col = active_u.get("color_hex", SportColors.PRIMARY_NEON)
 
         page.appbar = ft.AppBar(
@@ -106,7 +95,7 @@ def main(page: ft.Page):
             title=ft.Row([
                 ft.Text(AppConfig.APP_NAME, size=15, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                 ft.Container(
-                    content=ft.Text("360° AI", size=10, weight=ft.FontWeight.BOLD, color=SportColors.BG_DARK),
+                    content=ft.Text("PRO", size=10, weight=ft.FontWeight.BOLD, color=SportColors.BG_DARK),
                     bgcolor=SportColors.PRIMARY_NEON,
                     padding=AppPadding.symmetric(horizontal=6, vertical=2),
                     border_radius=4
@@ -116,7 +105,7 @@ def main(page: ft.Page):
                 ft.IconButton(
                     icon=Icons.TRACK_CHANGES,
                     icon_color=SportColors.CYAN_ELECTRIC,
-                    tooltip="Definição de Objetivos & Metas 360°",
+                    tooltip="Definição de Objetivos & Metas",
                     on_click=lambda _: open_goals_dialog()
                 ),
                 ft.Container(
@@ -138,8 +127,8 @@ def main(page: ft.Page):
                 ft.IconButton(
                     icon=Icons.SETTINGS,
                     icon_color=SportColors.TEXT_SECONDARY,
-                    tooltip="Configurações & API",
-                    on_click=lambda _: navigate_to(7)
+                    tooltip="Configurações & Chave de API",
+                    on_click=lambda _: open_settings_dialog()
                 ),
                 ft.Container(width=4)
             ],
@@ -147,20 +136,22 @@ def main(page: ft.Page):
             elevation=0
         )
 
-    # 5. Barra Inferior de Navegação (NavigationBar)
+    # 5. Barra Inferior Enxuta (Apenas Personal Trainer & Nutricionista)
     nav_bar = ft.NavigationBar(
         selected_index=0,
         bgcolor=SportColors.BG_SURFACE,
         indicator_color=f"{SportColors.PRIMARY_NEON}33",
         destinations=[
-            NavigationDestination(icon=Icons.HOME_OUTLINED, selected_icon=Icons.HOME, label="Início"),
-            NavigationDestination(icon=Icons.FITNESS_CENTER_OUTLINED, selected_icon=Icons.FITNESS_CENTER, label="Treino"),
-            NavigationDestination(icon=Icons.MENU_BOOK_OUTLINED, selected_icon=Icons.MENU_BOOK, label="Catálogo"),
-            NavigationDestination(icon=Icons.GROUPS_OUTLINED, selected_icon=Icons.GROUPS, label="IA Team"),
-            NavigationDestination(icon=Icons.RESTAURANT_OUTLINED, selected_icon=Icons.RESTAURANT, label="Nutrição"),
-            NavigationDestination(icon=Icons.PSYCHOLOGY_OUTLINED, selected_icon=Icons.PSYCHOLOGY, label="Mente"),
-            NavigationDestination(icon=Icons.PHOTO_CAMERA_OUTLINED, selected_icon=Icons.PHOTO_CAMERA, label="Evolução"),
-            NavigationDestination(icon=Icons.SETTINGS_OUTLINED, selected_icon=Icons.SETTINGS, label="Ajustes"),
+            NavigationDestination(
+                icon=Icons.FITNESS_CENTER_OUTLINED,
+                selected_icon=Icons.FITNESS_CENTER,
+                label="Personal Trainer"
+            ),
+            NavigationDestination(
+                icon=Icons.RESTAURANT_OUTLINED,
+                selected_icon=Icons.RESTAURANT,
+                label="Nutricionista"
+            ),
         ],
         on_change=lambda e: navigate_to(e.control.selected_index)
     )

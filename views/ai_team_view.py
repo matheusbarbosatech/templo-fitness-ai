@@ -1,5 +1,5 @@
 """
-Sala da Junta Técnica Multidisciplinar com IA (DevWorld) - Apollo Fitness AI.
+Sala da Junta Técnica Multidisciplinar com IA (DevWorld) - Templo Fitness AI.
 Permite alternar entre os 4 Especialistas em Ciências do Esporte e conversar em tempo real.
 """
 import flet as ft

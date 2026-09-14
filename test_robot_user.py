@@ -1,5 +1,5 @@
 """
-🤖 ROBÔ DE TESTES AUTOMATIZADO DE USUÁRIO REAL - APOLLO FITNESS AI
+🤖 ROBÔ DE TESTES AUTOMATIZADO DE USUÁRIO REAL - TEMPLO FITNESS AI
 Simula todas as ações de um usuário real de ponta a ponta:
 1. Autenticação, Login & Alternância Multi-Usuário
 2. Formulário de Definição de Metas, Anamnese & Cálculo de Macros

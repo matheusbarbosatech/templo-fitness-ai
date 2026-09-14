@@ -1,5 +1,5 @@
 """
-Tela de Configurações, Perfil do Atleta e Chaves de API DevWorld - Apollo Fitness AI.
+Tela de Configurações, Perfil do Atleta e Chaves de API DevWorld - Templo Fitness AI.
 """
 import flet as ft
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder

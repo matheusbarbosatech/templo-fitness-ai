@@ -1,5 +1,5 @@
 """
-Executador Web do Apollo Fitness AI com suporte a deploy em nuvem (Render, Railway, Fly.io, etc.).
+Executador Web do Templo Fitness AI com suporte a deploy em nuvem (Render, Railway, Fly.io, etc.).
 """
 import os
 import sys

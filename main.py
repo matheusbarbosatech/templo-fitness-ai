@@ -1,5 +1,5 @@
 """
-Apollo Fitness AI / Templo Fitness AI - Super-App Oficial de Saúde Esportiva & Musculação.
+Templo Fitness AI - Super-App Oficial de Treino, Força & Mordomia do Templo.
 Foco exclusivo e enxuto: Personal Trainer & Nutricionista com IA Integrada.
 Tecnologias: Python Flet, SQLite Local (Offline-First), API DevWorld.
 """

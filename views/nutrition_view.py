@@ -1,5 +1,5 @@
 """
-Módulo de Nutrição, Macros e Hidratação - Apollo Fitness AI.
+Módulo de Nutrição, Macros e Hidratação - Templo Fitness AI.
 Controle diário de calorias, proteínas, carboidratos, gorduras, registro de refeições
 e contador interativo de água.
 """

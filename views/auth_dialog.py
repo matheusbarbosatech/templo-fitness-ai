@@ -1,5 +1,5 @@
 """
-Modal de Autenticação e Alternância Multi-Usuário (Alunos & Personal Trainer) - Apollo Fitness AI.
+Modal de Autenticação e Alternância Multi-Usuário (Alunos & Personal Trainer) - Templo Fitness AI.
 Permite alternar perfis em 1 clique e cadastrar novos alunos/atletas.
 """
 import flet as ft

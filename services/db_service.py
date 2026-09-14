@@ -1,5 +1,5 @@
 """
-Serviço de Banco de Dados Local SQLite (Offline-First) - Apollo Fitness AI.
+Serviço de Banco de Dados Local SQLite (Offline-First) - Templo Fitness AI.
 Gerencia o armazenamento persistente de perfis, treinos, biblioteca de 50+ exercícios,
 nutrição, saúde mental, fotos de evolução e histórico das IAs.
 """

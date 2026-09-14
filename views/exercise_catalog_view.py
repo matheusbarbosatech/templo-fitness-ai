@@ -1,5 +1,5 @@
 """
-Catálogo Visual de Exercícios, Máquinas e Biomecânica - Apollo Fitness AI.
+Catálogo Visual de Exercícios, Máquinas e Biomecânica - Templo Fitness AI.
 Permite buscar exercícios, filtrar por grupos musculares e estudar a execução correta,
 dicas biomecânicas e erros comuns a evitar.
 """

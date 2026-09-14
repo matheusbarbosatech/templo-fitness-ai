@@ -25,7 +25,7 @@ Este guia passo a passo ensina exatamente como subir o código para o seu **GitH
 5. Clique em **"Create repository"**.
 
 ### 2. Enviar o Código pelo Terminal
-Abra o seu terminal na pasta do projeto (`c:\Users\matheus\Desktop\app-treino-ia`) e execute os comandos:
+Abra o seu terminal na pasta do projeto (`c:\Users\matheus\Desktop\templo-fitness-ai`) e execute os comandos:
 
 ```bash
 git remote add origin https://github.com/matheusbarbosatech/templo-fitness-ai.git
@@ -35,7 +35,7 @@ git push -u origin main
 
 *(Se o comando `git remote add origin` disser que origin já existe, use `git remote set-url origin https://github.com/matheusbarbosatech/templo-fitness-ai.git` e depois rode o `git push -u origin main`).*
 
-> 💡 **Nota de Segurança:** O arquivo `apollo_fitness_ai.apk` (141MB) está protegido no `.gitignore` e não será enviado, evitando rejeição pelo limite de 100MB do GitHub.
+> 💡 **Nota de Segurança:** O arquivo `templo_fitness_ai.apk` (141MB) está protegido no `.gitignore` e não será enviado, evitando rejeição pelo limite de 100MB do GitHub.
 
 ---
 

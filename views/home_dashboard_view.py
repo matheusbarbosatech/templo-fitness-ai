@@ -1,5 +1,5 @@
 """
-Dashboard Principal 360° - Apollo Fitness AI (Estilo Minimalista Apple Fitness+ / Whoop).
+Dashboard Principal 360° - Templo Fitness AI (Estilo Minimalista Apple Fitness+ / Whoop).
 Apresenta o resumo holístico diário do atleta com design limpo, legibilidade perfeita e tons elegantes.
 """
 import flet as ft

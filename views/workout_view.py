@@ -1,5 +1,5 @@
 """
-Módulo de Execução de Treino em Tempo Real - Apollo Fitness AI (Estilo Apple Fitness+ / Whoop).
+Módulo de Execução de Treino em Tempo Real - Templo Fitness AI (Estilo Apple Fitness+ / Whoop).
 """
 import flet as ft
 import time

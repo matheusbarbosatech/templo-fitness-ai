@@ -1,5 +1,5 @@
 """
-Executador Local do Super-App Apollo Fitness AI para Teste Instantâneo no PC.
+Executador Local do Super-App Templo Fitness AI para Teste Instantâneo no PC.
 """
 import os
 import sys

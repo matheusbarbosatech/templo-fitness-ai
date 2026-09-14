@@ -1,5 +1,5 @@
 """
-Formulário de Definição de Objetivos, Anamnese & Metas 360° - Apollo Fitness AI.
+Formulário de Definição de Objetivos, Anamnese & Metas 360° - Templo Fitness AI.
 Calcula necessidades metabólicas (TMB, TDEE), metas de macros e calibra a divisão de treino ideal.
 """
 import flet as ft

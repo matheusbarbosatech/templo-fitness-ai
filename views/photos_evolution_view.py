@@ -1,5 +1,5 @@
 """
-Módulo de Evolução Corporal & Galeria de Fotos - Apollo Fitness AI.
+Módulo de Evolução Corporal & Galeria de Fotos - Templo Fitness AI.
 Acompanhamento fotográfico (Frente, Costas, Lado), medição de circunferências,
 comparativo visual Antes & Depois e histórico de pesagem. 100% compatível com Web e Desktop.
 """

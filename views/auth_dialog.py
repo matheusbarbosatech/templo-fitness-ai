@@ -98,7 +98,7 @@ class AuthDialog:
             ], spacing=8),
             content=ft.Container(
                 content=ft.ListView([
-                    ft.Text("Selecione qual atleta está usando o Apollo Fitness AI:", size=12, color=SportColors.TEXT_SECONDARY),
+                    ft.Text("Selecione qual atleta está usando o Templo Fitness AI:", size=12, color=SportColors.TEXT_SECONDARY),
                     ft.Column(user_cards, spacing=8),
                     ft.Divider(color=SportColors.BORDER_DEFAULT, height=1),
                     create_panel

@@ -23,7 +23,7 @@ LOGS_DIR.mkdir(exist_ok=True)
 
 def main():
     print("=" * 60)
-    print("🚀 INICIANDO APOLLO FITNESS AI - SUPER-APP 360°")
+    print("🚀 INICIANDO TEMPLO FITNESS AI - SUPER-APP CRISTÃO 360°")
     print("=" * 60)
     print(f"📁 Diretório: {ROOT_DIR}")
     print("🧠 Conselho de IA: Treinador Márcio, Dra. Camila, Dr. Gabriel, Dr. Rafael")

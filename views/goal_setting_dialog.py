@@ -166,7 +166,7 @@ class GoalSettingDialog:
             ], spacing=8),
             content=ft.Container(
                 content=ft.ListView([
-                    ft.Text("Responda às questões abaixo para que o Apollo calibre seu treino e nutrição com precisão científica:", size=12, color=SportColors.TEXT_SECONDARY),
+                    ft.Text("Responda às questões abaixo para que o Templo Fitness AI calibre seu treino e mordomia com precisão científica:", size=12, color=SportColors.TEXT_SECONDARY),
                     goal_drop,
                     ft.Row([target_weight_in, target_weeks_in], spacing=8),
                     days_drop,

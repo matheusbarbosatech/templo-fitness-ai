@@ -24,7 +24,7 @@ if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
     
     print("=" * 60)
-    print("🌐 INICIANDO APOLLO FITNESS AI - SERVIDOR WEB / PWA")
+    print("🌐 INICIANDO TEMPLO FITNESS AI - SERVIDOR WEB / PWA")
     print(f"👉 Porta: {port} | Host: {host}")
     print(f"👉 Local: http://localhost:{port}")
     print("=" * 60)

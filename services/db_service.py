@@ -260,6 +260,37 @@ class DBService:
                     cursor.execute(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}")
                 except Exception:
                     pass
+
+            # Migração de índice antigo do daily_wellness (para permitir multi-usuário)
+            try:
+                cursor.execute("PRAGMA index_list(daily_wellness)")
+                idx_list = cursor.fetchall()
+                has_autoindex = any("autoindex" in str(idx[1]).lower() for idx in idx_list)
+                if has_autoindex:
+                    cursor.execute("""
+                    CREATE TABLE daily_wellness_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER DEFAULT 1,
+                        log_date DATE NOT NULL,
+                        mood_score INTEGER DEFAULT 4,
+                        stress_score INTEGER DEFAULT 2,
+                        sleep_hours REAL DEFAULT 7.5,
+                        energy_score INTEGER DEFAULT 4,
+                        soreness_notes TEXT DEFAULT '',
+                        reflection_text TEXT DEFAULT '',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """)
+                    cursor.execute("""
+                    INSERT INTO daily_wellness_new (id, user_id, log_date, mood_score, stress_score, sleep_hours, energy_score, soreness_notes, reflection_text, created_at)
+                    SELECT id, COALESCE(user_id, 1), log_date, mood_score, stress_score, sleep_hours, energy_score, soreness_notes, reflection_text, created_at
+                    FROM daily_wellness
+                    """)
+                    cursor.execute("DROP TABLE daily_wellness")
+                    cursor.execute("ALTER TABLE daily_wellness_new RENAME TO daily_wellness")
+            except Exception:
+                pass
+
             conn.commit()
 
     @classmethod

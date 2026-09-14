@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: apollo-fitness-ai
+    name: templo-fitness-ai
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt

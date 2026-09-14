@@ -1,8 +1,8 @@
 @echo off
-title APOLLO FITNESS AI - Super-App de Saúde 360
+title TEMPLO FITNESS AI - Super-App Cristão de Treino 360
 cls
 echo ============================================================
-echo   APOLLO FITNESS AI - SUPER-APP DE SAUDE & MUSCULACAO 360
+echo   TEMPLO FITNESS AI - MORDOMIA DO TEMPLO & FORCA 360
 echo ============================================================
 echo.
 echo [1/2] Verificando dependencias...

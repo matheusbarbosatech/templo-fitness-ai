@@ -12,55 +12,57 @@ from services.db_service import DBService
 PERSONA_CONFIGS = {
     "personal": {
         "name": "Treinador Márcio",
-        "title": "Personal Trainer & Cinesiologista",
+        "title": "Guardião da Força & Personal Cinesiologista",
         "avatar_icon": "fitness_center",
         "color": "#FF3366", # Crimson Neon
-        "system_prompt": """Você é o Treinador Márcio, um Personal Trainer de elite e especialista em Cinesiologia, Biomecânica e Hipertrofia/Força do app Apollo Fitness AI.
-Seu tom é motivador, enérgico, técnico e direto ao ponto.
+        "system_prompt": """Você é o Treinador Márcio, Guardião da Força e Personal Trainer do app TEMPLO FITNESS AI.
+Sua filosofia é a união da ciência biomecânica de ponta com a mordomia do corpo como Templo do Espírito Santo (1 Coríntios 6:19-20).
+Seu tom é firme, motivador, bíblico, enérgico e focado em disciplina e domínio próprio (1 Coríntios 9:27) tanto para homens quanto para mulheres.
 Seus pilares:
-1. Sobrecarga progressiva, cadência de repetição (ex: 2s excêntrica, 1s concêntrica) e RPE/RIR (repetições na reserva).
-2. Se o atleta disser que uma máquina está ocupada ou que sente dor, substitua imediatamente por uma variação biomecanicamente equivalente.
-3. Use o contexto do atleta (peso, objetivo, sono e dores) para dar respostas precisas.
-Responda de forma clara e visual com listas, tópicos e dicas de pegada/postura."""
+1. Treino com propósito: O corpo é um instrumento sagrado dado por Deus para servir a família e cumprir a vocação, não para culto à vaidade vazia.
+2. Sobrecarga progressiva, cadência de repetição controlada e RPE/RIR.
+3. Se o(a) atleta disser que uma máquina está ocupada ou sente dor articular, substitua imediatamente por uma variação biomecanicamente equivalente.
+4. Lembre o(a) atleta: "O homem e a mulher sábios consolidam a sua força no Senhor (Provérbios 24:5)"."""
     },
     "nutri": {
         "name": "Dra. Camila",
-        "title": "Nutricionista Esportiva & Suplementação",
+        "title": "Nutrição da Criação & Mordomia",
         "avatar_icon": "restaurant",
         "color": "#FFB800", # Amber Gold
-        "system_prompt": """Você é a Dra. Camila, Nutricionista Esportiva especializada em timing de nutrientes, composição corporal (hipertrofia e cutting) e suplementação de alta performance no app Apollo Fitness AI.
-Seu tom é científico, prático, acolhedor e focado em adesão sustentável.
+        "system_prompt": """Você é a Dra. Camila, Nutricionista Especialista em Composição Corporal e Mordomia Alimentar do app TEMPLO FITNESS AI.
+Sua filosofia: "Quer comais, quer bebais ou façais qualquer outra coisa, fazei tudo para a glória de Deus (1 Coríntios 10:31)".
+Seu tom é acolhedor, científico, prático e focado no domínio próprio contra a compulsão e o desleixo.
 Seus pilares:
-1. Cálculo e distribuição de macronutrientes (Proteínas, Carboidratos, Gorduras e Hidratação).
-2. Timing de refeições pré e pós-treino para síntese proteica e glicogênio muscular.
-3. Uso seguro de suplementos comprovados (Creatina, Whey, Cafeína, Beta-Alanina, Eletrólitos).
-Sugira ideias práticas de refeições rápidas e saborosas adaptadas ao objetivo do atleta."""
+1. Nutrição com comida de verdade, alimentos naturais da criação divina e distribuição equilibrada de macros (Proteínas, Carboidratos e Gorduras).
+2. Hidratação abundante e timing de refeições para manter o templo energizado e saudável.
+3. Uso seguro e consciente de suplementos (Creatina, Whey, Minerais).
+Ajude o(a) atleta a nutrir seu templo para ter vitalidade diária."""
     },
     "mente": {
         "name": "Dr. Gabriel",
-        "title": "Psicólogo do Esporte & Mindset",
+        "title": "Mente, Disciplina & Fé",
         "avatar_icon": "psychology",
         "color": "#9D4EDD", # Purple Mind
-        "system_prompt": """Você é o Dr. Gabriel, Psicólogo do Esporte e Neurocientista focado em disciplina, foco e conexão mente-músculo no app Apollo Fitness AI.
-Seu tom é empático, inspirador, focado em alta performance e superação de limites.
+        "system_prompt": """Você é o Dr. Gabriel, Mentor de Mindset Cristão, Foco e Disciplina do app TEMPLO FITNESS AI.
+Sua missão é combater a preguiça, a procrastinação e a ansiedade através da renovação da mente (Romanos 12:2).
 Seus pilares:
-1. Quebra de autosabotagem, preguiça e construção de hábitos inegociáveis.
-2. Foco durante a série pesada e visualização do movimento.
-3. Manejo de estresse, ansiedade pré-treino e autocuidado mental.
-4. Uso de respiração diafragmática para regulação do sistema nervoso autônomo."""
+1. Quebra da autosabotagem: O corpo deve obedecer ao espírito fortalecido em Deus.
+2. Paz e serenidade: Aplicar Filipenses 4:6-7 e respiração diafragmática para entrar no treino focado e calmo.
+3. Constância como fruto espiritual: O resultado vem da fidelidade no pouco dia após dia.
+Inspire o(a) atleta a levantar com a coragem dos justos e a perseverança da fé."""
     },
     "fisio": {
         "name": "Dr. Rafael",
-        "title": "Fisioterapeuta Esportivo & Biomecânica",
+        "title": "Restauração do Templo & Biomecânica",
         "avatar_icon": "healing",
         "color": "#06D6A0", # Teal Physio
-        "system_prompt": """Você é o Dr. Rafael, Fisioterapeuta Esportivo especializado em prevenção de lesões, mobilidade articular e recovery no app Apollo Fitness AI.
-Seu tom é técnico, cuidadoso, explicativo e focado em longevidade articular.
+        "system_prompt": """Você é o Dr. Rafael, Fisioterapeuta e Guardião Articular do Templo no app TEMPLO FITNESS AI.
+Sua missão é a preservação e longevidade física do atleta para que desfrute de saúde e vigor por décadas (Josué 14:11 / 3 João 1:2).
 Seus pilares:
-1. Mobilidade de tornozelos, quadril e coluna torácica para agachamentos e supinos seguros.
-2. Estabilidade do manguito rotador e joelhos.
-3. Protocolos de alívio para dores lombares, tendinites e contraturas.
-4. Liberação miofascial e recuperação pós-treino."""
+1. Mobilidade articular e postura para agachamentos, supinos e movimentos do dia a dia.
+2. Proteção de joelhos, manguito rotador e coluna.
+3. Alívio de dores, descompressão e recuperação muscular pós-treino.
+Ensine o(a) atleta a treinar com sabedoria sem sobrecarregar as articulações."""
     }
 }
 
@@ -148,71 +150,73 @@ class DevWorldAIService:
         if persona == "personal":
             if "ocupada" in msg_lower or "trocar" in msg_lower or "substituir" in msg_lower:
                 return (
-                    f"Fala {name}! Se a máquina está ocupada, não perca o aquecimento muscular nem a intensidade!\n\n"
-                    "🔄 **Substituições Imediatas de Alta Eficiência:**\n"
+                    f"Fala guerreiro {name}! 'O homem sábio é forte e consolida a sua força (Provérbios 24:5)'.\n"
+                    "Se a máquina está ocupada, não perca o fogo nem o aquecimento muscular!\n\n"
+                    "🔄 **Substituições Cinesiológicas dos Valentes:**\n"
                     "• **Se for Cadeira Extensora:** Faça **Agachamento Búlgaro** com halteres ou **Sissy Squat** no solo.\n"
-                    "• **Se for Puxada no Pulley:** Faça **Barra Fixa com elástico** ou **Puxada com Halteres unilateral**.\n"
-                    "• **Se for Supino Reto:** Faça **Supino com Halteres** mantendo rotação neutra ou **Flexão de Braço com pés elevados**.\n\n"
-                    "Mantenha 3 a 4 séries buscando 1 a 2 repetições antes da falha total (RPE 8-9)!"
+                    "• **Se for Puxada no Pulley:** Faça **Barra Fixa com elástico** ou **Remada Unilateral com Halter**.\n"
+                    "• **Se for Supino Reto:** Faça **Supino com Halteres** mantendo rotação neutra ou **Flexão de Braço no Solo**.\n\n"
+                    "Domine o seu corpo com 3 a 4 séries firmes (1 Coríntios 9:27)!"
                 )
             elif "dor" in msg_lower or "ombro" in msg_lower or "joelho" in msg_lower:
                 return (
-                    f"Atenção {name}! Se estiver sentindo fisgadas ou desconforto articular, pare a carga imediatamente.\n\n"
-                    "⚠️ **Ajuste de Segurança:**\n"
-                    "1. Reduza a amplitude para a zona livre de dor.\n"
-                    "2. Troque barras retas por halteres com pegada semi-neutra (alivia o impacto no manguito rotador).\n"
-                    "3. Chame o Dr. Rafael (Fisioterapeuta) na aba ao lado para fazer 2 exercícios rápidos de mobilidade antes de continuar!"
+                    f"Atenção {name}! Seu corpo é o Templo do Espírito Santo (1 Coríntios 6:19-20); cuide dele com sabedoria.\n\n"
+                    "⚠️ **Ajuste Preventivo Imediato:**\n"
+                    "1. Reduza a amplitude para a zona livre de desconforto.\n"
+                    "2. Troque barras rígidas por halteres com pegada neutra para preservar os tendões.\n"
+                    "3. Chame o Dr. Rafael (Fisioterapeuta) para calibrar sua mobilidade antes de voltar às cargas pesadas!"
                 )
             else:
                 return (
-                    f"Fala {name}! Vamos com tudo para o objetivo de **{goal.upper()}**!\n\n"
-                    "🔥 **Diretriz de Hoje:**\n"
-                    "• Foque na **fase excêntrica** do movimento (desça o peso em 2 a 3 segundos controlados).\n"
-                    "• Não esqueça de registrar cada série na aba de **Treino** para garantir que você está progredindo cargas semana a semana.\n\n"
-                    "Qual exercício você está fazendo agora ou precisa de ajuste?"
+                    f"Fala guerreiro {name}! Vamos com vigor para o objetivo de **{goal.upper()}**!\n\n"
+                    "⚔️ **Diretriz de Hoje:**\n"
+                    "• 'Tudo posso naquele que me fortalece (Filipenses 4:13)'. Não treine por vaidade passageira, mas para ser forte e pronto para toda boa obra.\n"
+                    "• Controle a fase excêntrica da repetição (2 a 3 segundos de descida controlada).\n"
+                    "• Registre suas séries e cargas na aba de **Treino** com disciplina inegociável!\n\n"
+                    "Qual exercício você está executando agora ou precisa de substituição?"
                 )
 
         elif persona == "nutri":
             if "pos treino" in msg_lower or "pós" in msg_lower:
                 return (
-                    f"Excelente pergunta, {name}! Para o seu objetivo de **{goal.upper()}**, a janela pós-treino é crucial para síntese proteica e reposição de glicogênio.\n\n"
-                    "🥗 **Sugestão de Pós-Treino Rápido:**\n"
-                    "• **Opção Líquida Rápida:** 30g de Whey Protein + 1 banana média batida com 30g de aveia + 5g de Creatina.\n"
-                    "• **Opção Refeição Sólida:** 150g de peito de frango grelhado ou patinho moído + 180g de arroz branco ou batata inglesa + vegetais verdes escuros.\n\n"
-                    "Não esqueça de manter a meta de água do dia que calculamos para você!"
+                    f"Excelente pergunta, {name}! Como diz a Palavra: 'Quer comais, quer bebais ou façais qualquer outra coisa, fazei tudo para a glória de Deus (1 Coríntios 10:31)'.\n\n"
+                    "🥗 **Sugestão de Pós-Treino Rápido & Nutritivo:**\n"
+                    "• **Opção Líquida:** 30g de Whey Protein + 1 banana madura + 30g de aveia batida com água + 5g de Creatina.\n"
+                    "• **Opção Refeição Sólida da Criação:** 150g de peito de frango grelhado ou ovos cozidos + 180g de arroz branco ou batata inglesa + legumes da terra.\n\n"
+                    "Honre seu templo mantendo também a meta diária de água!"
                 )
             elif "pre treino" in msg_lower or "pré" in msg_lower:
                 return (
-                    f"Para chegar com máxima energia no treino, {name}:\n\n"
+                    f"Para chegar com máxima energia e foco no templo, {name}:\n\n"
                     "⚡ **Refeição Pré-Treino (60 a 90 min antes):**\n"
-                    "• Carboidratos de fácil digestão (arroz, pão integral com geleia, banana com aveia ou tapioca).\n"
-                    "• Uma porção moderada de proteína (ovos mexidos ou whey).\n"
-                    "• Evite excesso de gorduras e fibras pesadas logo antes para não causar peso gástrico."
+                    "• Carboidratos limpos e energéticos (banana com aveia e canela, pão integral com ovos ou tapioca).\n"
+                    "• Boa hidratação prévia (pelo menos 500ml de água antes de começar).\n"
+                    "• Evite gorduras pesadas e excesso de ultraprocessados logo antes do treino."
                 )
             else:
                 return (
-                    f"Olá {name}! A alimentação é 70% do seu resultado estético e de força.\n\n"
+                    f"Olá {name}! A alimentação é um dos maiores pilares da mordomia do seu corpo.\n\n"
                     f"Para você que pesa {profile.get('weight_kg')}kg com foco em {goal.upper()}:\n"
                     f"• Meta de Proteína: ~{round(float(profile.get('weight_kg', 75))*2.2, 0)}g por dia.\n"
-                    f"• Meta de Água: ~{int(float(profile.get('weight_kg', 75))*40)}ml por dia.\n\n"
-                    "Gostaria de calcular os macros de alguma receita específica ou tirar dúvidas sobre suplementos?"
+                    f"• Meta de Hidratação: ~{int(float(profile.get('weight_kg', 75))*40)}ml de água por dia.\n\n"
+                    "Alimente seu corpo com respeito à criação divina e fuja da gula e do desleixo!"
                 )
 
         elif persona == "mente":
             return (
-                f"Olá {name}! Como está seu diálogo interno hoje?\n\n"
-                "🧠 **Pílula de Mindset do Atleta:**\n"
-                "A motivação te faz começar, mas apenas a **disciplina e a constância** te levam ao físico e à saúde que você deseja.\n"
-                "Mesmo nos dias em que a energia parecer baixa, lembre-se: um treino 'nota 6' feito é infinitamente melhor do que um treino perfeito que não saiu do papel.\n\n"
-                "Se estiver sentindo ansiedade ou agitação, recomendo fazer 2 minutos de **Box Breathing (4-4-4-4)** na aba de Saúde Mental antes de entrar na academia!"
+                f"Olá guerreiro {name}! Como está seu espírito e sua mente hoje?\n\n"
+                "🛡️ **Meditação de Fé & Foco:**\n"
+                "A Bíblia diz: 'Não te mandei eu? Sê forte e corajoso; não temas, nem te espantes, porque o Senhor teu Deus é contigo por onde quer que andares (Josué 1:9)'.\n\n"
+                "A preguiça e o desânimo são armadilhas da carne. Quando faltar motivação, acione o **domínio próprio** (Gálatas 5:23). Faça uma oração rápida de 1 minuto e consagre seu treino a Deus!\n\n"
+                "Precisa de foco para a sessão de hoje?"
             )
 
         else: # fisio
             return (
-                f"Olá {name}! Cuidar das articulações e da postura é o que garante que você continue treinando forte por anos sem lesão.\n\n"
-                "🦴 **Checklist Preventivo de Hoje:**\n"
-                "1. Faça rotação externa de ombros com elástico leve antes de treinar peito/ombro.\n"
-                "2. Mantenha os tornozelos móveis com alongamento de panturrilha na parede antes do agachamento.\n"
-                "3. Ao trabalhar sentado no computador, faça pausas a cada 50 min para descompressão lombar.\n\n"
-                "Está sentindo algum incômodo específico em alguma articulação ou músculo hoje?"
+                f"Olá {name}! Lembre-se sempre: 'O corpo de vocês é o santuário do Espírito Santo (1 Coríntios 6:19)'.\n\n"
+                "🦴 **Checklist do Guardião do Templo:**\n"
+                "1. Faça aquecimento com rotação externa leve de ombros antes de treinar peito/ombro.\n"
+                "2. Mantenha os tornozelos móveis antes de agachar para preservar o joelho e a coluna.\n"
+                "3. Treine com cadência inteligente: quem destrói as articulações por ego para de treinar cedo; quem cuida da biomecânica treina forte até a velhice como Calebe (Josué 14:11).\n\n"
+                "Está sentindo algum ponto de dor ou desconforto hoje?"
             )

@@ -47,7 +47,7 @@ class FitnessAppRobotTester:
 
     def run_all_tests(self):
         print("\n" + "=" * 75)
-        print("🚀 INICIANDO ROBÔ DE TESTES: SIMULAÇÃO DE USUÁRIO REAL (APOLLO FITNESS AI)")
+        print("🚀 INICIANDO ROBÔ DE TESTES: SIMULAÇÃO DE USUÁRIO REAL (TEMPLO FITNESS AI)")
         print("=" * 75 + "\n")
 
         self.test_database_initialization()

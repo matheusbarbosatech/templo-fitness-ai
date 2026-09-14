@@ -112,9 +112,10 @@ class SettingsView:
 
         about_card = SportStyles.card_container(
             content=ft.Column([
-                SportStyles.section_header("SOBRE O APOLLO FITNESS AI", "Versão 1.0.0 Oficial", icon=Icons.INFO),
-                ft.Text("• Super-App de Saúde Esportiva & Musculação 360° com Flet & Python.", size=12, color=SportColors.TEXT_SECONDARY),
-                ft.Text("• Conselho Multidisciplinar de IAs: Personal, Nutri, Psicólogo e Fisioterapeuta.", size=12, color=SportColors.TEXT_SECONDARY),
+                SportStyles.section_header("SOBRE O TEMPLO FITNESS AI", "Versão 2.0.0 Cristã Oficial", icon=Icons.INFO),
+                ft.Text("• Super-App Cristão de Treino, Saúde & Mordomia do Templo com Flet & Python.", size=12, color=SportColors.TEXT_SECONDARY),
+                ft.Text("• Conselho Multidisciplinar de IAs: Personal, Nutri, Mentor de Fé e Fisioterapeuta.", size=12, color=SportColors.TEXT_SECONDARY),
+                ft.Text("• Base Bíblica: 1 Coríntios 6:19-20 — O corpo como santuário do Espírito Santo.", size=12, color=SportColors.TEXT_SECONDARY),
                 ft.Text("• Armazenamento 100% Offline-First & Seguro em SQLite local.", size=12, color=SportColors.TEXT_SECONDARY),
             ], spacing=8),
             border_color=SportColors.BORDER_DEFAULT,

@@ -133,15 +133,42 @@ class MentalView:
                         on_click=lambda _: self._stop_box_breathing(),
                         width=100
                     ),
-                ], spacing=8)
-            ], spacing=12),
-            border_color=SportColors.BORDER_PURPLE,
+        # 3. Consagração do Templo & Oração Pré-Treino
+        prayer_card = SportStyles.card_container(
+            content=ft.Column([
+                SportStyles.section_header("ORAÇÃO DO TEMPLO & CONSAGRAÇÃO", "Dedique seu esforço, corpo e saúde a Deus", icon=Icons.AUTO_AWESOME),
+                ft.Container(
+                    content=ft.Column([
+                        ft.Text(
+                            "\"Senhor meu Deus, Criador e Sustentador,\n"
+                            "Consagro a Ti o meu corpo, que é santuário do Teu Espírito Santo (1 Coríntios 6:19).\n"
+                            "Dá-me a firmeza na fé, o vigor da Tua presença para vencer a fadiga e o fruto do domínio próprio para subjugar toda preguiça.\n"
+                            "Que este treino não seja fruto de vaidade passageira, mas instrumento de saúde, força e prontidão para a Tua obra. Em nome de Jesus, Amém!\"",
+                            size=12,
+                            italic=True,
+                            color=SportColors.TEXT_WHITE
+                        ),
+                        ft.Divider(color=SportColors.BORDER_DEFAULT, height=6),
+                        ft.Row([
+                            SportStyles.badge("Filipenses 4:13", SportColors.AMBER_ALERT),
+                            SportStyles.badge("1 Coríntios 9:27", SportColors.PRIMARY_NEON),
+                            SportStyles.badge("Provérbios 24:5", SportColors.CYAN_ELECTRIC),
+                        ], spacing=6)
+                    ], spacing=8),
+                    bgcolor=SportColors.BG_SURFACE_ALT,
+                    padding=AppPadding.all(12),
+                    border_radius=10,
+                    border=AppBorder.all(1, SportColors.BORDER_AMBER)
+                )
+            ], spacing=10),
+            border_color=SportColors.BORDER_AMBER,
             padding=16
         )
 
         return ft.Container(
             content=ft.ListView([
                 mood_card,
+                prayer_card,
                 box_breathing_card,
                 ft.Container(height=90)
             ], spacing=14, padding=AppPadding.all(16)),

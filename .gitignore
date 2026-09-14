@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large files & APKs (GitHub limits to 100MB)
+*.apk
+apollo_fitness_ai.apk
+
+# C/C++ build artifacts & Flutter
+build/
+.dart_tool/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Database files & logs (local data)
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

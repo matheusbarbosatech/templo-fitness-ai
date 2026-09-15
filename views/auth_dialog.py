@@ -5,6 +5,7 @@ Permite alternar perfis em 1 clique e cadastrar novos alunos/atletas.
 import flet as ft
 from typing import Callable, Optional
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
+from core.ui_helper import UIHelper
 from services.db_service import DBService
 
 class AuthDialog:
@@ -111,21 +112,12 @@ class AuthDialog:
             ]
         )
 
-        self.page.dialog = self.dialog
-        self.dialog.open = True
-        self.page.update()
+        UIHelper.open_dialog(self.page, self.dialog)
 
     def _switch_user(self, user_id: int):
         DBService.switch_user(user_id)
         self._close()
-        if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text(f"Perfil alternado para: {DBService.get_active_user()['name']}!", color=SportColors.TEXT_WHITE),
-                bgcolor=SportColors.BG_SURFACE_ALT,
-                duration=1500
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
+        UIHelper.show_toast(self.page, f"Perfil alternado para: {DBService.get_active_user()['name']}!", color=SportColors.PRIMARY_NEON)
         if self.on_user_changed:
             self.on_user_changed()
 
@@ -137,6 +129,4 @@ class AuthDialog:
 
     def _close(self):
         if self.dialog:
-            self.dialog.open = False
-        if self.page:
-            self.page.update()
+            UIHelper.close_dialog(self.page, self.dialog)

@@ -6,6 +6,7 @@ comparativo visual Antes & Depois e histórico de pesagem. 100% compatível com 
 import flet as ft
 from datetime import date
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder, AppAlignment
+from core.ui_helper import UIHelper
 from services.db_service import DBService
 
 from typing import Optional
@@ -108,7 +109,7 @@ class PhotosEvolutionView:
                     src=photo_path,
                     width=size,
                     height=size,
-                    fit=ft.ImageFit.COVER,
+                    fit="cover",
                     border_radius=8
                 )
             except Exception:
@@ -231,10 +232,7 @@ class PhotosEvolutionView:
                 )
             ]
         )
-        if self.page:
-            self.page.dialog = dialog
-            dialog.open = True
-            self.page.update()
+        UIHelper.open_dialog(self.page, dialog)
 
     def _save_log(self, dialog, angle, weight, chest, arm, waist, photo_path, notes):
         uid = self.user_id or DBService.get_active_user_id()
@@ -249,18 +247,11 @@ class PhotosEvolutionView:
             notes=notes or "Registro regular de evolução.",
             user_id=uid
         )
-        self._close_dialog(dialog)
+        UIHelper.close_dialog(self.page, dialog)
+        UIHelper.show_toast(self.page, "Evolução corporal registrada com sucesso!", color=SportColors.PRIMARY_NEON)
+        self.build()
         if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text("Evolução corporal registrada com sucesso!", color=SportColors.TEXT_WHITE),
-                bgcolor=SportColors.BG_SURFACE_ALT,
-                duration=1500
-            )
-            self.page.snack_bar.open = True
-            self.build()
             self.page.update()
 
     def _close_dialog(self, dialog):
-        dialog.open = False
-        if self.page:
-            self.page.update()
+        UIHelper.close_dialog(self.page, dialog)

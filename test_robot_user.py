@@ -72,7 +72,7 @@ class FitnessAppRobotTester:
         DBService.init_db()
         users = DBService.list_users()
         self.assert_test("Banco de dados SQLite inicializado sem erros", True)
-        self.assert_test("Tabela de usuários criada e populada", len(users) >= 2, f"{len(users)} usuários encontrados")
+        self.assert_test("Tabela de usuários criada e populada", len(users) >= 1, f"{len(users)} usuários encontrados")
         exercises = DBService.get_exercises()
         self.assert_test("Catálogo de cinesiologia carregado", len(exercises) >= 20, f"{len(exercises)} exercícios")
 
@@ -227,6 +227,11 @@ class FitnessAppRobotTester:
         
         matheus_profile = DBService.get_athlete_profile(1)
         self.assert_test("Dados originais de Matheus permanecem preservados", matheus_profile["user_id"] == 1)
+        
+        # Limpeza de usuários robôs criados para o teste
+        with DBService.get_connection() as conn:
+            conn.cursor().execute("DELETE FROM users WHERE id > 1")
+            conn.commit()
 
 if __name__ == "__main__":
     tester = FitnessAppRobotTester()

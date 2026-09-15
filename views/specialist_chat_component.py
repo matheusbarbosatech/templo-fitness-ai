@@ -176,7 +176,7 @@ class SpecialistChatComponent:
                     padding=AppPadding.all(12),
                     border_radius=AppBorderRadius.only(top_left=2, top_right=12, bottom_left=12, bottom_right=12),
                     border=AppBorder.all(1, f"{self.p_info['color']}44"),
-                    width=290
+                    expand=True
                 )
             ], alignment=ft.MainAxisAlignment.START, vertical_alignment=ft.CrossAxisAlignment.START, spacing=8)
 

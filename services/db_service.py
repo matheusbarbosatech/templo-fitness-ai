@@ -301,15 +301,7 @@ class DBService:
             if cursor.fetchone()[0] == 0:
                 cursor.execute("""
                 INSERT INTO users (id, name, username, role, avatar_icon, color_hex)
-                VALUES (1, 'Matheus Atleta', 'matheus', 'aluno', 'fitness_center', '#00FFA3')
-                """)
-                cursor.execute("""
-                INSERT INTO users (id, name, username, role, avatar_icon, color_hex)
-                VALUES (2, 'Personal Márcio (Coach)', 'coach_marcio', 'personal', 'sports', '#FF3366')
-                """)
-                cursor.execute("""
-                INSERT INTO users (id, name, username, role, avatar_icon, color_hex)
-                VALUES (3, 'Juliana Aluna (Cutting)', 'juliana', 'aluno', 'person', '#00E5FF')
+                VALUES (1, 'Matheus Atleta', 'matheus', 'aluno', 'fitness_center', '#CCFF00')
                 """)
                 conn.commit()
 
@@ -322,11 +314,11 @@ class DBService:
             return [dict(r) for r in cursor.fetchall()]
 
     @classmethod
-    def get_active_user(cls) -> Dict[str, Any]:
-        user_id = cls.get_active_user_id()
+    def get_active_user(cls, user_id: Optional[int] = None) -> Dict[str, Any]:
+        target_uid = user_id or cls.get_active_user_id()
         with cls.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+            cursor.execute("SELECT * FROM users WHERE id = ?", (target_uid,))
             row = cursor.fetchone()
             if row:
                 return dict(row)
@@ -820,6 +812,45 @@ class DBService:
             return True
 
     @classmethod
+    def get_exercise_gif(cls, name: str) -> str:
+        """Retorna a URL do GIF ou demonstração animada do exercício."""
+        visuals = {
+            "Supino Reto com Barra": "https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-BENCH-PRESS.gif",
+            "Supino Inclinado com Halteres": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif",
+            "Crucifixo na Polia (Crossover)": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crossover.gif",
+            "Crossover Polia Baixa": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Low-Cable-Crossover.gif",
+            "Paralelas (Dips) com Foco em Peitoral": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Chest-Dips.gif",
+            "Desenvolvimento com Halteres": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Shoulder-Press.gif",
+            "Elevação Lateral com Halteres": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif",
+            "Elevação Lateral na Polia": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Lateral-Raise.gif",
+            "Desenvolvimento Militar com Barra": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Overhead-Press.gif",
+            "Tríceps Corda na Polia Alta": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Triceps-Pushdown.gif",
+            "Tríceps Testa com Barra W": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lying-Triceps-Extension.gif",
+            "Tríceps Francês Unilateral": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-French-Press.gif",
+            "Puxada Frontal na Polia (Pulley)": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif",
+            "Remada Curvada com Barra": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bent-Over-Row.gif",
+            "Remada Baixa no Triângulo": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif",
+            "Remada Unilateral com Halter (Serrote)": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif",
+            "Crucifixo Invertido no Peck Deck": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Reverse-Machine-Flyes.gif",
+            "Rosca Direta com Barra W": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Curl.gif",
+            "Rosca Martelo com Halteres": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hammer-Curl.gif",
+            "Rosca Scott na Máquina / Barra W": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Preacher-Curl.gif",
+            "Agachamento Livre com Barra": "https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif",
+            "Leg Press 45°": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Press.gif",
+            "Cadeira Extensora": "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-EXTENSION.gif",
+            "Agachamento Búlgaro": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Bulgarian-Split-Squat.gif",
+            "Stiff com Barra / Halteres": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Stiff-Leg-Deadlift.gif",
+            "Mesa Flexora": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lying-Leg-Curl.gif",
+            "Cadeira Flexora": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Leg-Curl.gif",
+            "Elevação Pélvica com Barra": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Hip-Thrust.gif",
+            "Panturrilha em Pé na Máquina": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Standing-Calf-Raise.gif",
+            "Abdominal na Polia Alta (Crunch)": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Kneeling-Cable-Crunch.gif",
+            "Elevação de Pernas na Barra Fixa": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hanging-Leg-Raise.gif",
+            "Prancha Abdominal Isométrica": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Plank.gif",
+        }
+        return visuals.get(name, "https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-BENCH-PRESS.gif")
+
+    @classmethod
     def get_routines(cls, user_id: Optional[int] = None) -> List[Dict[str, Any]]:
         target_uid = user_id or cls.get_active_user_id()
         with cls.get_connection() as conn:
@@ -833,8 +864,28 @@ class DBService:
                 routines = [dict(r) for r in cursor.fetchall()]
 
             for r in routines:
-                cursor.execute("SELECT * FROM routine_exercises WHERE routine_id = ? ORDER BY id ASC", (r["id"],))
-                r["exercises"] = [dict(ex) for ex in cursor.fetchall()]
+                cursor.execute("""
+                SELECT re.*, 
+                       el.category as muscle_category,
+                       el.primary_muscle,
+                       el.secondary_muscles,
+                       el.equipment,
+                       el.execution_guide,
+                       el.why_do_it,
+                       el.common_mistakes
+                FROM routine_exercises re
+                LEFT JOIN exercise_library el ON re.exercise_name = el.name
+                WHERE re.routine_id = ?
+                ORDER BY re.id ASC
+                """, (r["id"],))
+                
+                ex_list = []
+                for row in cursor.fetchall():
+                    item = dict(row)
+                    item["gif_url"] = cls.get_exercise_gif(item["exercise_name"])
+                    ex_list.append(item)
+                r["exercises"] = ex_list
+
             return routines
 
     @classmethod

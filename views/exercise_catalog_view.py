@@ -6,6 +6,7 @@ dicas biomecânicas e erros comuns a evitar.
 import flet as ft
 from typing import Optional
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
+from core.ui_helper import UIHelper
 from services.db_service import DBService
 
 class ExerciseCatalogView:
@@ -123,14 +124,28 @@ class ExerciseCatalogView:
 
     def show_exercise_detail_modal(self, ex: dict):
         """Abre modal com guia biomecânico completo."""
+        gif_url = DBService.get_exercise_gif(ex["name"])
         dialog = ft.AlertDialog(
             modal=True,
             title=ft.Row([
                 ft.Icon(Icons.FITNESS_CENTER, color=SportColors.PRIMARY_NEON, size=24),
-                ft.Text(ex["name"], size=17, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                ft.Text(ex["name"], size=16, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
             ], spacing=8),
             content=ft.Container(
                 content=ft.ListView([
+                    ft.Container(
+                        content=ft.Image(
+                            src=gif_url,
+                            height=150,
+                            fit="contain",
+                            border_radius=10,
+                            repeat=ft.ImageRepeat.NO_REPEAT
+                        ),
+                        bgcolor=SportColors.BG_SURFACE_ALT,
+                        border_radius=10,
+                        padding=AppPadding.all(4),
+                        border=AppBorder.all(1, SportColors.BORDER_DEFAULT)
+                    ),
                     ft.Row([
                         SportStyles.badge(f"Grupo: {ex['category']}", SportColors.PRIMARY_NEON),
                         SportStyles.badge(f"Aparelho: {ex['equipment']}", SportColors.AMBER_GOLD),
@@ -184,12 +199,7 @@ class ExerciseCatalogView:
                 )
             ]
         )
-        if self.page:
-            self.page.dialog = dialog
-            dialog.open = True
-            self.page.update()
+        UIHelper.open_dialog(self.page, dialog)
 
     def _close_dialog(self, dialog):
-        dialog.open = False
-        if self.page:
-            self.page.update()
+        UIHelper.close_dialog(self.page, dialog)

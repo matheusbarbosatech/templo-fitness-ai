@@ -1,6 +1,6 @@
 """
 Templo Fitness AI - Super-App Oficial de Treino, Força & Mordomia do Templo.
-Foco exclusivo e enxuto: Personal Trainer & Nutricionista com IA Integrada.
+Foco exclusivo e enxuto: Personal Trainer, Nutricionista & Evolução com IA Integrada.
 Tecnologias: Python Flet, SQLite Local (Offline-First), API DevWorld.
 """
 import sys
@@ -13,17 +13,18 @@ if str(ROOT_DIR) not in sys.path:
 
 import flet as ft
 from core.config import AppConfig
-from core.theme import SportColors, Icons, NavigationDestination, AppPadding, AppBorder
+from core.theme import SportColors, Icons, NavigationDestination, AppPadding, AppBorder, AppBorderRadius, AppAlignment
+from core.ui_helper import UIHelper
 from services.db_service import DBService
 
-# Views Centrais Enxutas
+# Views Centrais
 from views.personal_hub_view import PersonalHubView
 from views.nutrition_hub_view import NutritionHubView
 from views.photos_evolution_view import PhotosEvolutionView
 from views.login_view import LoginView
 
 def main(page: ft.Page):
-    # 1. Configurações Globais da Janela e Tema
+    # 1. Configurações Globais da Página e Tema
     page.title = f"{AppConfig.APP_ICON} {AppConfig.APP_NAME} - Personal, Nutrição & Evolução"
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = SportColors.BG_DARK
@@ -31,9 +32,9 @@ def main(page: ft.Page):
     
     try:
         page.window.width = 440
-        page.window.height = 920
+        page.window.height = 900
         page.window.min_width = 380
-        page.window.min_height = 720
+        page.window.min_height = 700
         page.window.resizable = True
     except Exception:
         pass
@@ -48,8 +49,10 @@ def main(page: ft.Page):
     is_logged_in = False
     active_user_id = 1
     current_index = 0
-    content_container = ft.Container(expand=True)
-
+    
+    # Containers do App
+    content_area = ft.Container(expand=True)
+    
     personal_hub = None
     nutrition_hub = None
     photos_evolution = None
@@ -57,10 +60,10 @@ def main(page: ft.Page):
     def on_login_success(user_id=None):
         nonlocal is_logged_in, personal_hub, nutrition_hub, photos_evolution, active_user_id
         if user_id:
-            active_user_id = user_id
-            DBService.switch_user(user_id)
+            active_user_id = int(user_id)
+            DBService.switch_user(active_user_id)
             try:
-                page.client_storage.set("logged_user_id", user_id)
+                page.client_storage.set("logged_user_id", active_user_id)
             except Exception:
                 pass
         else:
@@ -79,13 +82,12 @@ def main(page: ft.Page):
             page.client_storage.remove("logged_user_id")
         except Exception:
             pass
-        page.navigation_bar = None
         render_login()
 
     def render_login():
         page.appbar = None
         page.navigation_bar = None
-        content_container.content = LoginView(page, on_login_success=on_login_success).build()
+        content_area.content = LoginView(page, on_login_success=on_login_success).build()
         page.update()
 
     def render_app():
@@ -94,7 +96,7 @@ def main(page: ft.Page):
             lambda: nutrition_hub.build(),
             lambda: photos_evolution.build(),
         ]
-        content_container.content = views[current_index]()
+        content_area.content = views[current_index]()
         update_app_bar()
         page.navigation_bar = nav_bar
         page.update()
@@ -106,9 +108,13 @@ def main(page: ft.Page):
             nav_bar.selected_index = index
         render_app()
 
-    # 4. Barra Superior (AppBar) com Identificação do Atleta e Troca de Perfil
+    # 4. Barra Superior (AppBar) com Identificação do Atleta e Troca Rápida
     def update_app_bar():
-        active_u = DBService.get_active_user(user_id=active_user_id)
+        try:
+            active_u = DBService.get_active_user(active_user_id)
+        except Exception:
+            active_u = {"name": "Atleta", "color_hex": SportColors.PRIMARY_NEON, "role": "aluno"}
+            
         u_name = active_u.get("name", "Atleta").split()[0]
         u_color = active_u.get("color_hex", SportColors.PRIMARY_NEON)
 
@@ -116,12 +122,12 @@ def main(page: ft.Page):
             leading=ft.Container(
                 content=ft.Text(AppConfig.APP_ICON, size=24),
                 padding=AppPadding.only(left=12),
-                alignment=ft.alignment.center if hasattr(ft, "alignment") else None
+                alignment=AppAlignment.CENTER
             ),
             title=ft.Row([
                 ft.Text(AppConfig.APP_NAME, size=15, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                 ft.Container(
-                    content=ft.Text("PRO", size=10, weight=ft.FontWeight.BOLD, color=SportColors.BG_DARK),
+                    content=ft.Text("PRO", size=9, weight=ft.FontWeight.BOLD, color=SportColors.BG_DARK),
                     bgcolor=SportColors.PRIMARY_NEON,
                     padding=AppPadding.symmetric(horizontal=6, vertical=2),
                     border_radius=4
@@ -141,12 +147,12 @@ def main(page: ft.Page):
                     padding=AppPadding.symmetric(horizontal=8, vertical=4),
                     border_radius=12,
                     border=AppBorder.all(1, u_color),
-                    tooltip=f"Atleta Conectado: {active_u.get('name')}",
+                    tooltip=f"Atleta Conectado: {active_u.get('name')}. Clique para trocar.",
                     on_click=lambda _: on_logout()
                 ),
                 ft.IconButton(
-                    icon=Icons.LOGOUT,
-                    icon_color=SportColors.TEXT_MUTED,
+                    icon=Icons.SWAP_HORIZ,
+                    icon_color=SportColors.TEXT_SECONDARY,
                     icon_size=18,
                     tooltip="Trocar Atleta / Sair",
                     on_click=lambda _: on_logout()
@@ -171,7 +177,7 @@ def main(page: ft.Page):
             NavigationDestination(
                 icon=Icons.RESTAURANT_OUTLINED,
                 selected_icon=Icons.RESTAURANT,
-                label="Nutricionista"
+                label="Nutrição"
             ),
             NavigationDestination(
                 icon=Icons.PHOTO_CAMERA_OUTLINED,
@@ -182,9 +188,16 @@ def main(page: ft.Page):
         on_change=lambda e: navigate_to(e.control.selected_index)
     )
 
-    # 6. Montagem Inicial e Auto-Login
-    page.add(content_container)
+    # 6. Container Principal Responsivo
+    app_wrapper = ft.Container(
+        content=content_area,
+        bgcolor=SportColors.BG_DARK,
+        expand=True
+    )
 
+    page.add(app_wrapper)
+
+    # 7. Verificação de Sessão Salva
     saved_uid = None
     try:
         saved_uid = page.client_storage.get("logged_user_id")

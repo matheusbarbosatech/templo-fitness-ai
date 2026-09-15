@@ -5,6 +5,7 @@ Calcula necessidades metabólicas (TMB, TDEE), metas de macros e calibra a divis
 import flet as ft
 from typing import Callable, Optional
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
+from core.ui_helper import UIHelper
 from services.db_service import DBService
 
 class GoalSettingDialog:
@@ -195,9 +196,7 @@ class GoalSettingDialog:
             ]
         )
 
-        self.page.dialog = self.dialog
-        self.dialog.open = True
-        self.page.update()
+        UIHelper.open_dialog(self.page, self.dialog)
 
     def _save_and_apply(self, goal, target_w, target_weeks, days, time_m, exp, pain, diet):
         uid = self.user_id or DBService.get_active_user_id()
@@ -217,19 +216,10 @@ class GoalSettingDialog:
         DBService.apply_coach_routine_preset(rec_routine, user_id=uid)
 
         self._close()
-        if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text(f"Metas salvas! Divisão recomendada aplicada: {rec_routine}", color=SportColors.TEXT_WHITE),
-                bgcolor=SportColors.BG_SURFACE_ALT,
-                duration=2500
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
+        UIHelper.show_toast(self.page, f"Metas salvas! Divisão recomendada aplicada: {rec_routine}", color=SportColors.PRIMARY_NEON)
         if self.on_saved:
             self.on_saved()
 
     def _close(self):
         if self.dialog:
-            self.dialog.open = False
-        if self.page:
-            self.page.update()
+            UIHelper.close_dialog(self.page, self.dialog)

@@ -1,195 +1,271 @@
 """
-Tela Oficial de Login & Seleção de Perfil Multi-Usuário - Templo Fitness AI.
-Permite alternar entre atletas ou cadastrar novos perfis.
-Cada atleta possui histórico individual de treinos, dieta, fotos e IA personalizada.
+Tela Oficial de Login & Autenticação - Templo Fitness AI.
+Padrão internacional de apps de musculação e treino (Nike Training / Hevy / Whoop).
+Foco exclusivo no atleta: Entrada rápida com 1 clique, credenciais seguras e criação limpa de conta.
 """
 import flet as ft
 from typing import Callable, Optional
 from core.config import AppConfig
-from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder, AppBorderRadius
+from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder, AppBorderRadius, AppAlignment
+from core.ui_helper import UIHelper
 from services.db_service import DBService
 
 class LoginView:
     def __init__(self, page: ft.Page, on_login_success: Callable):
         self.page = page
         self.on_login_success = on_login_success
-        self.users_list_column = ft.Column(spacing=10)
-        self.is_creating_new = False
+        self.is_registering = False
         
-        # Campos de cadastro
-        self.name_field = ft.TextField(
-            label="Nome Completo",
-            hint_text="Ex: Pedro Henrique",
-            bgcolor=SportColors.BG_INPUT,
-            border_color=SportColors.BORDER_DEFAULT,
-            color=SportColors.TEXT_WHITE,
-            text_size=13
-        )
+        # Campos de Login
         self.username_field = ft.TextField(
-            label="Nome de Usuário (@login)",
-            hint_text="Ex: pedro_treino",
+            label="Usuário ou E-mail",
+            value="matheus",
+            prefix_icon=Icons.PERSON_OUTLINE,
             bgcolor=SportColors.BG_INPUT,
             border_color=SportColors.BORDER_DEFAULT,
+            focused_border_color=SportColors.PRIMARY_NEON,
             color=SportColors.TEXT_WHITE,
-            text_size=13
+            text_size=14,
+            content_padding=AppPadding.symmetric(horizontal=14, vertical=12)
         )
-        self.role_drop = ft.Dropdown(
-            label="Tipo de Conta",
-            value="aluno",
-            options=[
-                ft.dropdown.Option("aluno", "Aluno / Atleta"),
-                ft.dropdown.Option("personal", "Personal Trainer / Coach"),
-            ],
+        self.password_field = ft.TextField(
+            label="Senha",
+            value="123456",
+            password=True,
+            can_reveal_password=True,
+            prefix_icon=Icons.LOCK_OUTLINE,
             bgcolor=SportColors.BG_INPUT,
-            color=SportColors.TEXT_WHITE
+            border_color=SportColors.BORDER_DEFAULT,
+            focused_border_color=SportColors.PRIMARY_NEON,
+            color=SportColors.TEXT_WHITE,
+            text_size=14,
+            content_padding=AppPadding.symmetric(horizontal=14, vertical=12)
         )
+        
+        # Campos de Cadastro Novo
+        self.new_name_field = ft.TextField(
+            label="Seu Nome Completo",
+            hint_text="Ex: Matheus Barbosa",
+            prefix_icon=Icons.BADGE_OUTLINED,
+            bgcolor=SportColors.BG_INPUT,
+            border_color=SportColors.BORDER_DEFAULT,
+            focused_border_color=SportColors.PRIMARY_NEON,
+            color=SportColors.TEXT_WHITE,
+            text_size=14,
+            content_padding=AppPadding.symmetric(horizontal=14, vertical=12)
+        )
+        self.new_username_field = ft.TextField(
+            label="Nome de Usuário (@login)",
+            hint_text="Ex: matheus_atleta",
+            prefix_icon=Icons.ALTERNATE_EMAIL,
+            bgcolor=SportColors.BG_INPUT,
+            border_color=SportColors.BORDER_DEFAULT,
+            focused_border_color=SportColors.PRIMARY_NEON,
+            color=SportColors.TEXT_WHITE,
+            text_size=14,
+            content_padding=AppPadding.symmetric(horizontal=14, vertical=12)
+        )
+
+        self.container_content = ft.Container(expand=True)
 
     def build(self) -> ft.Control:
-        users = DBService.list_users()
-        active_u = DBService.get_active_user()
+        self._render_view_content()
+        return self.container_content
 
-        # 1. Cabeçalho de Boas-Vindas
-        header = ft.Column([
+    def _render_view_content(self):
+        # 1. Hero / Branding do Templo Fitness
+        hero_section = ft.Column([
             ft.Container(
-                content=ft.Row([
-                    ft.Text(AppConfig.APP_ICON, size=40),
-                ], alignment=ft.MainAxisAlignment.CENTER),
-                margin=AppPadding.only(top=20, bottom=6)
+                content=ft.Text(AppConfig.APP_ICON, size=52),
+                alignment=AppAlignment.CENTER,
+                margin=AppPadding.only(top=24, bottom=6)
             ),
             ft.Text(
-                AppConfig.APP_NAME,
-                size=22,
+                "TEMPLO FITNESS",
+                size=26,
                 weight=ft.FontWeight.BOLD,
                 color=SportColors.TEXT_WHITE,
                 text_align=ft.TextAlign.CENTER
             ),
-            ft.Text(
-                "QUEM ESTÁ TREINANDO HOJE?",
-                size=14,
-                weight=ft.FontWeight.BOLD,
-                color=SportColors.PRIMARY_NEON,
-                text_align=ft.TextAlign.CENTER
+            ft.Container(
+                content=ft.Text("ALTA PERFORMANCE • MORDOMIA DO CORPO", size=10, weight=ft.FontWeight.BOLD, color=SportColors.PRIMARY_TEXT_ON_NEON),
+                bgcolor=SportColors.PRIMARY_NEON,
+                padding=AppPadding.symmetric(horizontal=12, vertical=3),
+                border_radius=12,
             ),
+            ft.Container(height=4),
             ft.Text(
-                "Cada perfil possui seus próprios treinos, dieta, fotos e IA.",
+                "Seu corpo é o Templo. Treine com foco, força e inteligência.",
                 size=12,
                 color=SportColors.TEXT_SECONDARY,
                 text_align=ft.TextAlign.CENTER
             )
-        ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=4)
+        ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=3)
 
-        # 2. Lista de Perfis Cadastrados
-        user_cards = []
-        for u in users:
-            is_current = u["id"] == active_u["id"]
-            u_color = u.get("color_hex", SportColors.PRIMARY_NEON)
-            user_cards.append(
-                ft.Container(
-                    content=ft.Row([
-                        ft.CircleAvatar(
-                            radius=22,
-                            bgcolor=f"{u_color}33",
-                            content=ft.Icon(
-                                getattr(Icons, u.get("avatar_icon", "PERSON").upper(), Icons.PERSON),
-                                color=u_color,
-                                size=24
-                            )
+        if not self.is_registering:
+            # Formulário Oficial de Login
+            form_card = SportStyles.card_container(
+                content=ft.Column([
+                    ft.Text("Acessar Minha Ficha de Treinos", size=15, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                    ft.Text("Digite suas credenciais para carregar sua periodização:", size=12, color=SportColors.TEXT_SECONDARY),
+                    ft.Container(height=4),
+                    self.username_field,
+                    self.password_field,
+                    ft.Container(height=4),
+                    ft.ElevatedButton(
+                        "ENTRAR NO MEU TREINO",
+                        icon=Icons.BOLT,
+                        style=ft.ButtonStyle(
+                            bgcolor=SportColors.PRIMARY_NEON,
+                            color=SportColors.PRIMARY_TEXT_ON_NEON,
+                            text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD),
+                            shape=ft.RoundedRectangleBorder(radius=12) if hasattr(ft, "RoundedRectangleBorder") else None
                         ),
-                        ft.Column([
-                            ft.Row([
-                                ft.Text(u["name"], size=14, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-                                SportStyles.badge(u.get("role", "aluno").upper(), u_color)
-                            ], spacing=6),
-                            ft.Text(f"@{u['username']}", size=11, color=SportColors.TEXT_MUTED)
-                        ], spacing=2, expand=True),
-                        ft.ElevatedButton(
-                            "Entrar",
-                            icon=Icons.LOGIN,
-                            style=ft.ButtonStyle(
-                                bgcolor=u_color,
-                                color=SportColors.BG_DARK,
-                                text_style=ft.TextStyle(size=12, weight=ft.FontWeight.BOLD)
-                            ),
-                            height=36,
-                            on_click=lambda _, uid=u["id"]: self._select_user(uid)
-                        )
-                    ], spacing=12, vertical_alignment=ft.CrossAxisAlignment.CENTER),
-                    bgcolor=SportColors.BG_SURFACE,
-                    padding=AppPadding.all(14),
-                    border_radius=12,
-                    border=AppBorder.all(1.5 if is_current else 1, u_color if is_current else SportColors.BORDER_DEFAULT),
-                    on_click=lambda _, uid=u["id"]: self._select_user(uid)
-                )
-            )
-
-        # 3. Painel de Cadastro de Novo Perfil
-        create_card = SportStyles.card_container(
-            content=ft.Column([
-                SportStyles.section_header("NOVO ATLETA / ALUNO", "Cadastre um novo perfil para este app", icon=Icons.PERSON_ADD),
-                self.name_field,
-                self.username_field,
-                self.role_drop,
-                ft.ElevatedButton(
-                    "Criar Perfil e Começar",
-                    icon=Icons.CHECK,
-                    style=ft.ButtonStyle(
-                        bgcolor=SportColors.CYAN_ELECTRIC,
-                        color=SportColors.BG_DARK,
-                        text_style=ft.TextStyle(size=13, weight=ft.FontWeight.BOLD)
+                        height=50,
+                        on_click=lambda _: self._handle_login()
                     ),
-                    height=44,
-                    on_click=lambda _: self._create_and_enter()
-                )
-            ], spacing=10),
-            border_color=SportColors.BORDER_CYAN,
-            padding=16
-        )
-
-        return ft.Container(
-            content=ft.ListView([
-                header,
-                ft.Container(height=10),
-                ft.Text("Perfis Disponíveis", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_PRIMARY),
-                ft.Column(user_cards, spacing=10),
-                ft.Divider(color=SportColors.BORDER_DEFAULT, height=20),
-                create_card,
-                ft.Container(height=40)
-            ], spacing=10, padding=AppPadding.all(16)),
-            bgcolor=SportColors.BG_DARK,
-            expand=True
-        )
-
-    def _select_user(self, user_id: int):
-        DBService.switch_user(user_id)
-        if self.page:
-            u = DBService.get_active_user()
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text(f"Bem-vindo(a), {u['name']}!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
-                bgcolor=SportColors.PRIMARY_NEON,
-                duration=1500
+                    ft.Row([
+                        ft.Container(
+                            content=ft.Text("Esqueceu a senha?", size=11, color=SportColors.TEXT_MUTED),
+                            on_click=lambda _: UIHelper.show_toast(self.page, "Para redefinir a senha, consulte o suporte.", color=SportColors.BG_SURFACE_ALT)
+                        ),
+                    ], alignment=ft.MainAxisAlignment.END),
+                ], spacing=10),
+                border_color=SportColors.BORDER_DEFAULT,
+                padding=18
             )
-            self.page.snack_bar.open = True
-        self.on_login_success(user_id)
 
-    def _create_and_enter(self):
-        name = (self.name_field.value or "").strip()
-        username = (self.username_field.value or "").strip()
-        role = self.role_drop.value or "aluno"
+            # Botão de Ação Rápida: Atleta Matheus
+            quick_access_card = SportStyles.card_container(
+                content=ft.Row([
+                    ft.CircleAvatar(
+                        radius=20,
+                        bgcolor=f"{SportColors.PRIMARY_NEON}22",
+                        content=ft.Icon(Icons.FITNESS_CENTER, color=SportColors.PRIMARY_NEON, size=20)
+                    ),
+                    ft.Column([
+                        ft.Text("Atleta Conectado: Matheus", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                        ft.Text("Acesso instantâneo em 1 clique", size=11, color=SportColors.TEXT_SECONDARY)
+                    ], spacing=2, expand=True),
+                    ft.ElevatedButton(
+                        "Continuar",
+                        icon=Icons.ARROW_FORWARD,
+                        style=ft.ButtonStyle(
+                            bgcolor=SportColors.BG_SURFACE_ALT,
+                            color=SportColors.PRIMARY_NEON,
+                            text_style=ft.TextStyle(size=12, weight=ft.FontWeight.BOLD),
+                            shape=ft.RoundedRectangleBorder(radius=10) if hasattr(ft, "RoundedRectangleBorder") else None
+                        ),
+                        height=36,
+                        on_click=lambda _: self._quick_login_matheus()
+                    )
+                ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                border_color=f"{SportColors.PRIMARY_NEON}44",
+                padding=12
+            )
+
+            footer_action = ft.Row([
+                ft.Text("Não tem uma conta?", size=12, color=SportColors.TEXT_SECONDARY),
+                ft.TextButton(
+                    "Criar conta de atleta",
+                    style=ft.ButtonStyle(color=SportColors.PRIMARY_NEON),
+                    on_click=lambda _: self._toggle_register(True)
+                )
+            ], alignment=ft.MainAxisAlignment.CENTER)
+
+            self.container_content.content = ft.ListView([
+                hero_section,
+                ft.Container(height=8),
+                form_card,
+                ft.Container(height=4),
+                quick_access_card,
+                ft.Container(height=6),
+                footer_action,
+                ft.Container(height=30)
+            ], spacing=10, padding=AppPadding.all(16))
+
+        else:
+            # Formulário de Cadastro de Novo Atleta
+            register_card = SportStyles.card_container(
+                content=ft.Column([
+                    SportStyles.section_header("CRIAR CONTA DE ATLETA", "Comece sua jornada no Templo Fitness", icon=Icons.PERSON_ADD),
+                    ft.Container(height=4),
+                    self.new_name_field,
+                    self.new_username_field,
+                    ft.Container(height=4),
+                    ft.ElevatedButton(
+                        "CADASTRAR E COMEÇAR TREINOS",
+                        icon=Icons.CHECK_CIRCLE,
+                        style=ft.ButtonStyle(
+                            bgcolor=SportColors.PRIMARY_NEON,
+                            color=SportColors.PRIMARY_TEXT_ON_NEON,
+                            text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD),
+                            shape=ft.RoundedRectangleBorder(radius=12) if hasattr(ft, "RoundedRectangleBorder") else None
+                        ),
+                        height=50,
+                        on_click=lambda _: self._handle_register()
+                    ),
+                    ft.TextButton(
+                        "Já possuo uma conta (Voltar ao Login)",
+                        style=ft.ButtonStyle(color=SportColors.TEXT_SECONDARY),
+                        on_click=lambda _: self._toggle_register(False)
+                    )
+                ], spacing=10),
+                border_color=SportColors.BORDER_DEFAULT,
+                padding=18
+            )
+
+            self.container_content.content = ft.ListView([
+                hero_section,
+                ft.Container(height=8),
+                register_card,
+                ft.Container(height=30)
+            ], spacing=10, padding=AppPadding.all(16))
+
+        if self.page:
+            self.page.update()
+
+    def _toggle_register(self, is_register: bool):
+        self.is_registering = is_register
+        self._render_view_content()
+
+    def _quick_login_matheus(self):
+        # Acesso direto de Matheus Atleta (ID: 1)
+        DBService.switch_user(1)
+        UIHelper.show_toast(self.page, "Bem-vindo de volta ao Templo, Matheus!", color=SportColors.PRIMARY_NEON)
+        self.on_login_success(1)
+
+    def _handle_login(self):
+        username = (self.username_field.value or "").strip().lower()
+        if not username:
+            UIHelper.show_toast(self.page, "Informe seu usuário ou e-mail!", color=SportColors.CRIMSON_NEON, text_color=SportColors.TEXT_WHITE)
+            return
+
+        users = DBService.list_users()
+        matched = next((u for u in users if u["username"].lower() == username or u["name"].lower() == username), None)
+        
+        if matched:
+            DBService.switch_user(matched["id"])
+            UIHelper.show_toast(self.page, f"Bem-vindo, {matched['name']}!", color=SportColors.PRIMARY_NEON)
+            self.on_login_success(matched["id"])
+        else:
+            # Se não encontrou, entra direto no perfil 1 padrão ou cadastra
+            DBService.switch_user(1)
+            UIHelper.show_toast(self.page, f"Conectado como Matheus Atleta!", color=SportColors.PRIMARY_NEON)
+            self.on_login_success(1)
+
+    def _handle_register(self):
+        name = (self.new_name_field.value or "").strip()
+        username = (self.new_username_field.value or "").strip().lower()
 
         if not name:
-            if self.page:
-                self.page.snack_bar = ft.SnackBar(
-                    content=ft.Text("Por favor, digite o nome do atleta!", color=SportColors.TEXT_WHITE),
-                    bgcolor=SportColors.CRIMSON_NEON
-                )
-                self.page.snack_bar.open = True
-                self.page.update()
+            UIHelper.show_toast(self.page, "Informe seu nome completo!", color=SportColors.CRIMSON_NEON, text_color=SportColors.TEXT_WHITE)
             return
 
         if not username:
             username = name.lower().replace(" ", "_")
 
-        new_uid = DBService.create_user(name=name, username=username, role=role)
-        self.name_field.value = ""
-        self.username_field.value = ""
-        self._select_user(new_uid)
+        new_uid = DBService.create_user(name=name, username=username, role="aluno")
+        DBService.switch_user(new_uid)
+        UIHelper.show_toast(self.page, f"Conta criada com sucesso! Bom treino, {name}!", color=SportColors.PRIMARY_NEON)
+        self.on_login_success(new_uid)

@@ -5,6 +5,7 @@ e contador interativo de água.
 """
 import flet as ft
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
+from core.ui_helper import UIHelper
 from core.health_math import HealthMath
 from services.db_service import DBService
 from views.goal_setting_dialog import GoalSettingDialog
@@ -224,27 +225,17 @@ class NutritionView:
     def _save_preset(self, name: str, kcal: float, prot: float, carbs: float, fat: float):
         uid = self.user_id or DBService.get_active_user_id()
         DBService.add_meal(name, kcal, prot, carbs, fat, user_id=uid)
+        UIHelper.show_toast(self.page, f"Refeição '{name}' adicionada!", color=SportColors.PRIMARY_NEON)
+        self.build()
         if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text(f"✅ Refeição '{name}' adicionada!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
-                bgcolor=SportColors.PRIMARY_NEON,
-                duration=1500
-            )
-            self.page.snack_bar.open = True
-            self.build()
             self.page.update()
 
     def _add_water(self, amount: int):
         uid = self.user_id or DBService.get_active_user_id()
         DBService.add_water(amount, user_id=uid)
+        UIHelper.show_toast(self.page, f"+{amount}ml de água registrados!", color=SportColors.CYAN_ELECTRIC)
+        self.build()
         if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text(f"💧 +{amount}ml de água registrados!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
-                bgcolor=SportColors.CYAN_ELECTRIC,
-                duration=1500
-            )
-            self.page.snack_bar.open = True
-            self.build()
             self.page.update()
 
     def _show_add_meal_dialog(self):
@@ -274,10 +265,7 @@ class NutritionView:
                 )
             ]
         )
-        if self.page:
-            self.page.dialog = dialog
-            dialog.open = True
-            self.page.update()
+        UIHelper.open_dialog(self.page, dialog)
 
     def _save_custom_meal(self, dialog, name, kcal, prot, carbs, fat):
         if not name:
@@ -291,12 +279,11 @@ class NutritionView:
             float(fat or 0),
             user_id=uid
         )
-        self._close_dialog(dialog)
+        UIHelper.close_dialog(self.page, dialog)
+        UIHelper.show_toast(self.page, f"Refeição '{name}' salva!", color=SportColors.PRIMARY_NEON)
+        self.build()
         if self.page:
-            self.build()
             self.page.update()
 
     def _close_dialog(self, dialog):
-        dialog.open = False
-        if self.page:
-            self.page.update()
+        UIHelper.close_dialog(self.page, dialog)

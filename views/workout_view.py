@@ -250,37 +250,39 @@ class WorkoutView:
             gif_url = ex.get("gif_url") or DBService.get_exercise_gif(ex_name)
 
             # 1. Demonstração Visual / Animação (GIF do Exercício)
-            visual_media = ft.Container(
-                content=ft.Stack([
-                    ft.Image(
-                        src=gif_url,
-                        height=160,
-                        width=None,
-                        fit="contain",
-                        border_radius=10,
-                        repeat=ft.ImageRepeat.NO_REPEAT,
-                        error_content=ft.Container(
-                            content=ft.Column([
-                                ft.Icon(Icons.FITNESS_CENTER, size=36, color=SportColors.PRIMARY_NEON),
-                                ft.Text(f"Demonstração: {ex_name}", size=11, color=SportColors.TEXT_SECONDARY)
-                            ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-                            height=140,
-                            alignment=AppAlignment.CENTER,
-                            bgcolor=SportColors.BG_SURFACE_ALT
-                        )
-                    ),
-                    ft.Container(
-                        content=ft.Row([
-                            SportStyles.badge("CINESIOLOGIA & MOVIMENTO", SportColors.PRIMARY_NEON),
-                        ]),
-                        top=8,
-                        left=8
-                    )
-                ]),
+            img_control = ft.Image(
+                src=gif_url,
+                height=180,
+                fit="contain",
                 border_radius=10,
+                error_content=ft.Container(
+                    content=ft.Column([
+                        ft.Icon(Icons.FITNESS_CENTER, size=36, color=SportColors.TEXT_MUTED),
+                        ft.Text(f"Demonstração: {ex_name}", size=11, color=SportColors.TEXT_SECONDARY)
+                    ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                    height=160,
+                    alignment=AppAlignment.CENTER,
+                    bgcolor=SportColors.BG_SURFACE_ALT
+                )
+            )
+
+            visual_media = ft.Container(
+                content=ft.Column([
+                    ft.Row([
+                        SportStyles.badge("CINESIOLOGIA & MOVIMENTO", SportColors.TEXT_WHITE),
+                        ft.Text(p_muscle, size=11, weight=ft.FontWeight.W_500, color=SportColors.TEXT_SECONDARY)
+                    ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                    ft.Container(
+                        content=img_control,
+                        alignment=AppAlignment.CENTER,
+                        height=180,
+                        border_radius=10
+                    )
+                ], spacing=8),
+                border_radius=12,
                 border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
                 bgcolor=SportColors.BG_SURFACE_ALT,
-                padding=AppPadding.all(4)
+                padding=AppPadding.all(10)
             )
 
             # 2. Descrição Completa do Exercício na Ficha

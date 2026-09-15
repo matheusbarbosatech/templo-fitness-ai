@@ -69,15 +69,29 @@ class SpecialistChatComponent:
                     ft.Text(self.p_info["title"], size=11, color=SportColors.TEXT_SECONDARY),
                 ], spacing=2, expand=True),
                 ft.IconButton(
+                    icon=Icons.ASSIGNMENT_IND_OUTLINED,
+                    icon_color=SportColors.PRIMARY_NEON,
+                    icon_size=18,
+                    tooltip="Refazer Avaliação Física & Anamnese 360°",
+                    on_click=lambda _: self._open_goal_dialog()
+                ),
+                ft.IconButton(
+                    icon=Icons.SETTINGS,
+                    icon_color=SportColors.TEXT_WHITE,
+                    icon_size=18,
+                    tooltip="Configurar Chave da API DevWorld",
+                    on_click=lambda _: self._open_settings_dialog()
+                ),
+                ft.IconButton(
                     icon=Icons.DELETE_OUTLINE,
                     icon_color=SportColors.TEXT_MUTED,
                     icon_size=18,
                     tooltip="Limpar histórico",
                     on_click=lambda _: self._clear_chat()
                 )
-            ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            ], spacing=4, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             bgcolor=SportColors.BG_SURFACE_ALT,
-            padding=AppPadding.symmetric(horizontal=14, vertical=10),
+            padding=AppPadding.symmetric(horizontal=12, vertical=8),
             border_radius=12,
             border=AppBorder.all(1, SportColors.BORDER_DEFAULT)
         )
@@ -116,6 +130,7 @@ class SpecialistChatComponent:
         self.quick_prompts_row.controls.clear()
         prompts = {
             "personal": [
+                "Quero refazer minha avaliação física",
                 "Como dar foco em membros superiores?",
                 "Como mudar minha divisão de treino?",
                 "Como substituir a máquina hoje?",
@@ -256,3 +271,14 @@ class SpecialistChatComponent:
         self._reload_messages()
         if self.page:
             self.page.update()
+
+    def _open_goal_dialog(self):
+        """Abre o diálogo de avaliação física e anamnese 360° diretamente do chat."""
+        from views.goal_setting_dialog import GoalSettingDialog
+        uid = self.user_id or DBService.get_active_user_id()
+        GoalSettingDialog(self.page, on_saved=lambda: self._reload_messages(), user_id=uid).show()
+
+    def _open_settings_dialog(self):
+        """Abre o diálogo de configurações e chave da API DevWorld."""
+        from views.settings_view import SettingsView
+        SettingsView.open_dialog(self.page, on_saved=lambda: self._reload_messages())

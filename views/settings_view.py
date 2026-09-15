@@ -1,16 +1,56 @@
 """
-Tela de Configurações, Perfil do Usuário e Chaves de API DevWorld - Templo Fitness AI.
+Tela e Diálogo de Configurações, Perfil do Usuário e Chave de API DevWorld - Templo Fitness AI.
 """
+import requests
 import flet as ft
+from typing import Optional, Callable
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
+from core.ui_helper import UIHelper
 from services.db_service import DBService
-from services.devworld_ai_service import DevWorldAIService
 
 class SettingsView:
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page, on_saved: Optional[Callable] = None):
         self.page = page
+        self.on_saved = on_saved
+        self.dialog: Optional[ft.AlertDialog] = None
 
-    def build(self) -> ft.Control:
+    @classmethod
+    def open_dialog(cls, page: ft.Page, on_saved: Optional[Callable] = None):
+        """Abre a tela de configurações em modal de forma direta e rápida."""
+        instance = cls(page, on_saved=on_saved)
+        instance.show_modal()
+
+    def show_modal(self):
+        content = self.build(is_modal=True)
+        self.dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Row([
+                ft.Icon(Icons.SETTINGS, color=SportColors.PRIMARY_NEON, size=20),
+                ft.Text("Configurações & API DevWorld", size=16, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
+            ], spacing=8),
+            content=ft.Container(
+                content=content,
+                width=370,
+                height=520
+            ),
+            actions=[
+                ft.ElevatedButton(
+                    "Fechar",
+                    icon=Icons.CHECK,
+                    style=ft.ButtonStyle(bgcolor=SportColors.PRIMARY_NEON, color=SportColors.BG_DARK),
+                    on_click=lambda _: self._close_modal()
+                )
+            ]
+        )
+        UIHelper.open_dialog(self.page, self.dialog)
+
+    def _close_modal(self):
+        if self.dialog:
+            UIHelper.close_dialog(self.page, self.dialog)
+        if self.on_saved:
+            self.on_saved()
+
+    def build(self, is_modal: bool = False) -> ft.Control:
         profile = DBService.get_athlete_profile()
 
         name_in = ft.TextField(label="Nome do Usuário", value=profile.get("name", ""), color=SportColors.TEXT_WHITE, bgcolor=SportColors.BG_INPUT)
@@ -46,7 +86,7 @@ class SettingsView:
 
         profile_card = SportStyles.card_container(
             content=ft.Column([
-                SportStyles.section_header("PERFIL DO USUÁRIO", "Dados usados para calibrar os cálculos e a IA", icon=Icons.PERSON),
+                SportStyles.section_header("PERFIL DO USUÁRIO", "Dados usados pela IA do DevWorld", icon=Icons.PERSON),
                 name_in,
                 ft.Row([age_in, height_in, weight_in], spacing=8),
                 goal_drop,
@@ -56,11 +96,11 @@ class SettingsView:
                     icon=Icons.SAVE,
                     style=ft.ButtonStyle(bgcolor=SportColors.PRIMARY_NEON, color=SportColors.BG_DARK),
                     on_click=lambda _: self._save_profile(name_in.value, age_in.value, height_in.value, weight_in.value, goal_drop.value, activity_drop.value),
-                    height=42
+                    height=40
                 )
-            ], spacing=12),
+            ], spacing=10),
             border_color=SportColors.BORDER_NEON,
-            padding=16
+            padding=14
         )
 
         api_key_in = ft.TextField(
@@ -68,7 +108,7 @@ class SettingsView:
             value=profile.get("devworld_api_key", ""),
             password=True,
             can_reveal_password=True,
-            hint_text="Cole sua chave aqui (ex: sk-... ou dw-...)",
+            hint_text="Cole sua chave da DevWorld aqui",
             color=SportColors.TEXT_WHITE,
             bgcolor=SportColors.BG_INPUT
         )
@@ -81,9 +121,9 @@ class SettingsView:
 
         api_card = SportStyles.card_container(
             content=ft.Column([
-                SportStyles.section_header("INTEGRAÇÃO COM API DEVWORLD", "Conecte sua IA como Copiloto Personal", icon=Icons.KEY),
+                SportStyles.section_header("INTEGRAÇÃO COM API DEVWORLD", "Copiloto Personal Inteligente Oficial", icon=Icons.KEY),
                 ft.Text(
-                    "Insira sua chave de API para habilitar respostas em tempo real com os modelos do DevWorld. Enquanto não houver chave configurada, o app funciona com o motor especialista de alta precisão integrado!",
+                    "Conecte sua chave da DevWorld para o Personal IA responder com inteligência total em tempo real.",
                     size=12,
                     color=SportColors.TEXT_SECONDARY
                 ),
@@ -91,7 +131,7 @@ class SettingsView:
                 base_url_in,
                 ft.Row([
                     ft.ElevatedButton(
-                        "Salvar Chave de API",
+                        "Salvar Chave DevWorld",
                         icon=Icons.CHECK,
                         style=ft.ButtonStyle(bgcolor=SportColors.CYAN_ELECTRIC, color=SportColors.BG_DARK),
                         on_click=lambda _: self._save_api_settings(api_key_in.value, base_url_in.value),
@@ -105,30 +145,29 @@ class SettingsView:
                         width=140
                     )
                 ], spacing=8)
-            ], spacing=12),
+            ], spacing=10),
             border_color=SportColors.BORDER_CYAN,
-            padding=16
+            padding=14
         )
 
         about_card = SportStyles.card_container(
             content=ft.Column([
-                SportStyles.section_header("SOBRE O TEMPLO FITNESS AI", "Versão 2.0.0 Cristã Oficial", icon=Icons.INFO),
-                ft.Text("• Super-App Cristão de Treino, Saúde & Mordomia do Templo com Flet & Python.", size=12, color=SportColors.TEXT_SECONDARY),
-                ft.Text("• Conselho Multidisciplinar de IAs: Personal, Nutri, Mentor de Fé e Fisioterapeuta.", size=12, color=SportColors.TEXT_SECONDARY),
+                SportStyles.section_header("SOBRE O TEMPLO FITNESS AI", "Super-App Oficial com API DevWorld", icon=Icons.INFO),
+                ft.Text("• Powered by DevWorld AI Platform.", size=12, color=SportColors.TEXT_SECONDARY),
                 ft.Text("• Base Bíblica: 1 Coríntios 6:19-20 — O corpo como santuário do Espírito Santo.", size=12, color=SportColors.TEXT_SECONDARY),
                 ft.Text("• Armazenamento 100% Offline-First & Seguro em SQLite local.", size=12, color=SportColors.TEXT_SECONDARY),
-            ], spacing=8),
+            ], spacing=6),
             border_color=SportColors.BORDER_DEFAULT,
-            padding=16
+            padding=14
         )
 
+        items = [api_card, profile_card]
+        if not is_modal:
+            items.append(about_card)
+            items.append(ft.Container(height=90))
+
         return ft.Container(
-            content=ft.ListView([
-                profile_card,
-                api_card,
-                about_card,
-                ft.Container(height=90)
-            ], spacing=14, padding=AppPadding.all(16)),
+            content=ft.ListView(items, spacing=14, padding=AppPadding.all(12) if is_modal else AppPadding.all(16)),
             bgcolor=SportColors.BG_DARK,
             expand=True
         )
@@ -143,14 +182,9 @@ class SettingsView:
             goal=goal or "hipertrofia",
             activity=activity or "intenso"
         )
-        if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text("✅ Perfil do usuário atualizado com sucesso!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
-                bgcolor=SportColors.PRIMARY_NEON,
-                duration=1500
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
+        UIHelper.show_toast(self.page, "Perfil do usuário atualizado com sucesso!", color=SportColors.PRIMARY_NEON)
+        if self.on_saved:
+            self.on_saved()
 
     def _save_api_settings(self, api_key, base_url):
         profile = DBService.get_athlete_profile()
@@ -162,33 +196,42 @@ class SettingsView:
             weight=profile.get("weight_kg", 78.5),
             goal=profile.get("goal", "hipertrofia"),
             activity=profile.get("activity_level", "intenso"),
-            api_key=api_key or "",
-            base_url=base_url or "https://api.devworld.com.br/v1"
+            api_key=(api_key or "").strip(),
+            base_url=(base_url or "https://api.devworld.com.br/v1").strip()
         )
-        if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text("🔑 Configurações da API DevWorld salvas!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
-                bgcolor=SportColors.CYAN_ELECTRIC,
-                duration=1500
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
+        UIHelper.show_toast(self.page, "Chave da API DevWorld salva com sucesso!", color=SportColors.CYAN_ELECTRIC)
+        if self.on_saved:
+            self.on_saved()
 
     def _test_api_connection(self, api_key, base_url):
-        if not api_key or not api_key.strip():
-            if self.page:
-                self.page.snack_bar = ft.SnackBar(
-                    content=ft.Text("Informe uma chave de API para testar!", color=SportColors.TEXT_WHITE),
-                    bgcolor=SportColors.AMBER_GOLD
-                )
-                self.page.snack_bar.open = True
-                self.page.update()
+        key = (api_key or "").strip()
+        url = (base_url or "https://api.devworld.com.br/v1").strip()
+        if not key:
+            UIHelper.show_toast(self.page, "Informe a chave de API DevWorld para testar!", color=SportColors.AMBER_GOLD, text_color=SportColors.TEXT_WHITE)
             return
 
-        if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text("⚡ Chave válida e pronta para o Conselho de IAs!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
-                bgcolor=SportColors.PRIMARY_NEON
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
+        UIHelper.show_toast(self.page, "Conectando à API DevWorld...", color=SportColors.CYAN_ELECTRIC)
+        try:
+            endpoint = f"{url.rstrip('/')}/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "devworld-gpt-4o-mini",
+                "messages": [{"role": "user", "content": "Ping"}],
+                "max_tokens": 5
+            }
+            res = requests.post(endpoint, json=payload, headers=headers, timeout=10)
+            if res.status_code == 200:
+                UIHelper.show_toast(self.page, "⚡ Conexão com API DevWorld estabelecida com sucesso!", color=SportColors.PRIMARY_NEON)
+            elif res.status_code == 401:
+                UIHelper.show_toast(self.page, "❌ Chave DevWorld não autorizada (401). Verifique a chave.", color=SportColors.RED_ERROR, text_color=SportColors.TEXT_WHITE)
+            elif res.status_code == 429:
+                UIHelper.show_toast(self.page, "⚠️ Limite de requisições DevWorld atingido (429).", color=SportColors.AMBER_GOLD, text_color=SportColors.TEXT_WHITE)
+            else:
+                UIHelper.show_toast(self.page, f"⚠️ Resposta da DevWorld: Status {res.status_code}", color=SportColors.AMBER_GOLD, text_color=SportColors.TEXT_WHITE)
+        except requests.exceptions.Timeout:
+            UIHelper.show_toast(self.page, "⏳ Tempo limite esgotado ao conectar à DevWorld.", color=SportColors.RED_ERROR, text_color=SportColors.TEXT_WHITE)
+        except Exception as err:
+            UIHelper.show_toast(self.page, f"❌ Erro de conexão: {str(err)[:45]}", color=SportColors.RED_ERROR, text_color=SportColors.TEXT_WHITE)

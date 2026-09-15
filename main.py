@@ -22,6 +22,8 @@ from views.personal_hub_view import PersonalHubView
 from views.nutrition_hub_view import NutritionHubView
 from views.photos_evolution_view import PhotosEvolutionView
 from views.login_view import LoginView
+from views.settings_view import SettingsView
+from views.goal_setting_dialog import GoalSettingDialog
 
 def main(page: ft.Page):
     # 1. Configurações Globais da Página e Tema
@@ -162,6 +164,20 @@ def main(page: ft.Page):
                     border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
                     tooltip=f"Usuário Conectado: {active_u.get('name')}. Clique para trocar.",
                     on_click=lambda _: on_logout()
+                ),
+                ft.IconButton(
+                    icon=Icons.ASSIGNMENT_IND_OUTLINED,
+                    icon_color=SportColors.PRIMARY_NEON,
+                    icon_size=20,
+                    tooltip="Refazer Avaliação Física & Anamnese 360°",
+                    on_click=lambda _: GoalSettingDialog(page, on_saved=render_app, user_id=active_user_id).show()
+                ),
+                ft.IconButton(
+                    icon=Icons.SETTINGS,
+                    icon_color=SportColors.TEXT_WHITE,
+                    icon_size=19,
+                    tooltip="Configurações & Chave API DevWorld",
+                    on_click=lambda _: SettingsView.open_dialog(page, on_saved=render_app)
                 ),
                 ft.IconButton(
                     icon=Icons.SWAP_HORIZ,

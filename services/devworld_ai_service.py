@@ -112,7 +112,7 @@ class DevWorldAIService:
         api_key = profile.get("devworld_api_key") or AppConfig.DEVWORLD_API_KEY_ENV
         base_url = profile.get("devworld_base_url") or AppConfig.DEVWORLD_BASE_URL
 
-        # Tentativa de chamada real à API DevWorld / OpenAI Compatible
+        # Tentativa de chamada real à API DevWorld
         if api_key and api_key.strip():
             try:
                 endpoint = f"{base_url.rstrip('/')}/chat/completions"
@@ -124,7 +124,7 @@ class DevWorldAIService:
                     "model": AppConfig.DEFAULT_MODEL,
                     "messages": messages,
                     "temperature": 0.7,
-                    "max_tokens": 800
+                    "max_tokens": 850
                 }
                 response = requests.post(endpoint, json=payload, headers=headers, timeout=20)
                 if response.status_code == 200:
@@ -132,113 +132,249 @@ class DevWorldAIService:
                     bot_text = data["choices"][0]["message"]["content"]
                     DBService.add_chat_message(persona_key, "assistant", bot_text, user_id=target_uid)
                     return bot_text
+                elif response.status_code == 401:
+                    print(f"[DevWorld API 401]: Chave inválida ou expirada.")
+                    fallback_reply = (
+                        "⚠️ **Aviso de Conexão DevWorld:** Sua chave de API não foi autorizada (erro 401). "
+                        "Por favor, clique no botão de configurações (⚙️) no topo para atualizar sua chave da DevWorld.\n\n"
+                        + cls._generate_smart_fallback(persona_key, user_message, profile, wellness=DBService.get_today_wellness(user_id=target_uid))
+                    )
+                    DBService.add_chat_message(persona_key, "assistant", fallback_reply, user_id=target_uid)
+                    return fallback_reply
                 else:
                     print(f"[DevWorld API Error]: Status {response.status_code} - {response.text}")
             except Exception as err:
                 print(f"[DevWorld Connection Exception]: {err}")
 
-        # Resposta de Motor Especialista Integrado (Fallback Inteligente)
+        # Resposta do Motor Cinesiológico Inteligente (Sem repetições estáticas)
         fallback_reply = cls._generate_smart_fallback(persona_key, user_message, profile, wellness=DBService.get_today_wellness(user_id=target_uid))
         DBService.add_chat_message(persona_key, "assistant", fallback_reply, user_id=target_uid)
         return fallback_reply
 
     @classmethod
     def _generate_smart_fallback(cls, persona: str, msg: str, profile: Dict[str, Any], wellness: Dict[str, Any]) -> str:
-        """Gera respostas especializadas instantâneas de alta qualidade enquanto a chave de API não é inserida."""
-        msg_lower = msg.lower()
-        name = profile.get("name", "Usuário")
-        goal = profile.get("goal", "hipertrofia")
+        """Gera respostas especializadas instantâneas de alta qualidade com ampla cobertura contextual sem repetições."""
+        msg_lower = msg.lower().strip()
+        name = profile.get("name", "Guerreiro").split()[0]
+        goal = (profile.get("goal") or "hipertrofia").lower()
+        weight = float(profile.get("weight_kg") or 78.5)
+        routine = profile.get("recommended_routine") or "PPL"
+        days_week = profile.get("training_days_week") or 5
 
+        # =========================================================================
+        # 1. PERSONA: PERSONAL TRAINER / TREINADOR
+        # =========================================================================
         if persona == "personal":
-            if "superior" in msg_lower or "superiores" in msg_lower or "braço" in msg_lower:
+            # REFAZER AVALIAÇÃO / METAS / ANAMNESE
+            if any(w in msg_lower for w in ["avaliação", "avaliacao", "refazer", "anamnese", "metas", "recalibrar", "mudar objetivo"]):
                 return (
-                    f"Olá {name}! Para dar **foco prioritário em Membros Superiores (Peito, Costas, Ombros e Braços)**, a periodização científica recomenda:\n\n"
-                    "🎯 **Divisões Ideais para Foco em Superiores:**\n"
-                    "1. **Upper / Lower (4 dias na semana):** 2 treinos completos dedicados exclusivamente aos membros superiores, com frequência 2x na semana e descanso neural perfeito.\n"
-                    "2. **Push / Pull / Legs (PPL - 5 a 6 dias):** Separação precisa em Empurrar (Peito/Ombro/Tríceps) e Puxar (Dorsal/Trapézio/Bíceps).\n\n"
-                    "⚡ **Como trocar agora no app:**\n"
-                    "• Vá na aba **Treino do Dia**.\n"
-                    "• Clique em **'Prescrições do Treinador'** no canto superior direito e escolha **Upper / Lower** ou **PPL**.\n"
-                    "• Sua ficha será reconfigurada na hora com exercícios, séries e GIFs anatômicos prontos!"
-                )
-            elif "mudar treino" in msg_lower or "trocar treino" in msg_lower or "divisão" in msg_lower or "avaliação" in msg_lower:
-                return (
-                    f"Fala {name}! Você tem total liberdade para mudar sua divisão e foco a qualquer momento:\n\n"
-                    "📋 **Opção 1 - Avaliação Física & Anamnese 360°:**\n"
-                    "Clique no botão **'Avaliação Física'** no topo da tela de treino. Responda seu objetivo, foco muscular (superiores, inferiores ou equilibrado) e dias disponíveis. A IA recalcula tudo e aplica a rotina recomendada!\n\n"
-                    "🪄 **Opção 2 - Prescrições Rápidas do Treinador:**\n"
-                    "Clique em **'Prescrições do Treinador'** para alternar em 1 clique entre **PPL**, **Upper / Lower** e **ABC Clássico**.\n\n"
-                    "Qual divisão você prefere aplicar hoje?"
-                )
-            elif "ocupada" in msg_lower or "trocar" in msg_lower or "substituir" in msg_lower:
-                return (
-                    f"Fala guerreiro {name}! 'O homem sábio é forte e consolida a sua força (Provérbios 24:5)'.\n"
-                    "Se a máquina está ocupada, não perca o fogo nem o aquecimento muscular!\n\n"
-                    "🔄 **Substituições Cinesiológicas dos Valentes:**\n"
-                    "• **Se for Cadeira Extensora:** Faça **Agachamento Búlgaro** com halteres ou **Sissy Squat** no solo.\n"
-                    "• **Se for Puxada no Pulley:** Faça **Barra Fixa com elástico** ou **Remada Unilateral com Halter**.\n"
-                    "• **Se for Supino Reto:** Faça **Supino com Halteres** mantendo rotação neutra ou **Flexão de Braço no Solo**.\n\n"
-                    "Domine o seu corpo com 3 a 4 séries firmes (1 Coríntios 9:27)!"
-                )
-            elif "dor" in msg_lower or "ombro" in msg_lower or "joelho" in msg_lower:
-                return (
-                    f"Atenção {name}! Seu corpo é o Templo do Espírito Santo (1 Coríntios 6:19-20); cuide dele com sabedoria.\n\n"
-                    "⚠️ **Ajuste Preventivo Imediato:**\n"
-                    "1. Reduza a amplitude para a zona livre de desconforto.\n"
-                    "2. Troque barras rígidas por halteres com pegada neutra para preservar os tendões.\n"
-                    "3. Chame o Dr. Rafael (Fisioterapeuta) para calibrar sua mobilidade antes de voltar às cargas pesadas!"
-                )
-            else:
-                return (
-                    f"Fala guerreiro {name}! Vamos com vigor para o objetivo de **{goal.upper()}**!\n\n"
-                    "⚔️ **Diretriz de Hoje:**\n"
-                    "• 'Tudo posso naquele que me fortalece (Filipenses 4:13)'. Não treine por vaidade passageira, mas para ser forte e pronto para toda boa obra.\n"
-                    "• Controle a fase excêntrica da repetição (2 a 3 segundos de descida controlada).\n"
-                    "• Registre suas séries e cargas na aba de **Treino** com disciplina inegociável!\n\n"
-                    "Qual exercício você está executando agora ou precisa de substituição?"
+                    f"Fala {name}! Você pode **refazer sua Avaliação Física & Anamnese 360°** a qualquer momento!\n\n"
+                    "📋 **Como refazer agora mesmo:**\n"
+                    "1. Clique no botão **📋 (ícone de prancheta)** localizado no topo desta tela (ao lado do nome) ou na barra superior do app.\n"
+                    "2. Atualize seus dados: Peso Alvo, Prazo, Frequência Semanal (atualmente {days_week} dias) e Foco Muscular.\n"
+                    "3. Clique em **'Calibrar Meu Treino & Metas'**.\n\n"
+                    "⚡ A IA do Templo recalcula na hora seu TMB, TDEE, divisão recomendada (ex: {routine}) e aplica a ficha direto no seu Treino do Dia!"
                 )
 
+            # SAUDAÇÃO / INÍCIO DE CONVERSA
+            elif any(msg_lower.startswith(w) for w in ["ola", "olá", "oi", "bom dia", "boa tarde", "boa noite", "e ai", "e aí", "opa", "salve", "fala"]):
+                return (
+                    f"Fala {name}! Paz e vigor! Pronto para honrar o Templo hoje com foco em **{goal.upper()}**?\n\n"
+                    f"Estou com sua periodização ativa ({routine} - {days_week}x na semana) e peso atual de {weight}kg na tela.\n\n"
+                    "Em que posso te orientar agora?\n"
+                    "• Dúvidas de execução de exercícios (supino, agachamento, terra...)\n"
+                    "• Ajuste de séries, repetições, cargas ou descanso\n"
+                    "• Substituição de máquina ocupada na academia\n"
+                    "• Refazer sua avaliação física ou mudar o foco muscular"
+                )
+
+            # CONFIGURAR API / CHAVE DEVWORLD
+            elif any(w in msg_lower for w in ["chave", "api", "devworld", "conectar", "configurar", "token"]):
+                return (
+                    f"Para ativar o modelo de linguagem em tempo real da **DevWorld**:\n\n"
+                    "🔑 **Passo a passo rápido:**\n"
+                    "1. Clique no botão de engrenagem **(⚙️)** na barra superior do app ou no cabeçalho aqui do chat.\n"
+                    "2. Cole sua chave de API DevWorld no campo correspondente.\n"
+                    "3. Clique em **'Testar Conexão'** para validar e depois em **'Salvar'**.\n\n"
+                    "Enquanto isso, eu continuo te prestando consultoria completa com base nos seus dados salvos!"
+                )
+
+            # SUBSTITUIÇÃO DE EXERCÍCIOS / MÁQUINA OCUPADA
+            elif any(w in msg_lower for w in ["ocupada", "ocupado", "trocar", "substituir", "alternativa", "lotada", "lotado"]):
+                return (
+                    f"Sem perder o aquecimento, {name}! 'O homem prudente constrói a sua força (Provérbios 24:5)'.\n\n"
+                    "🔄 **Substituições Biomecânicas Rápidas:**\n"
+                    "• **Se for Cadeira Extensora:** Faça **Agachamento Búlgaro** com halteres ou **Passada com Halteres**.\n"
+                    "• **Se for Puxador / Pulley:** Faça **Barra Fixa (com elástico se necessário)** ou **Remada Curvada com Barra**.\n"
+                    "• **Se for Supino Reto:** Faça **Supino Reto com Halteres** ou **Flexões com carga no solo**.\n"
+                    "• **Se for Leg Press:** Faça **Agachamento Goblet** pesado ou **Agachamento no Hack**.\n"
+                    "• **Se for Elevação Lateral na Máquina:** Use **Halteres** no plano escapular (30° à frente).\n\n"
+                    "Qual máquina específica está ocupada agora para eu te passar a substituição exata?"
+                )
+
+            # DORES / LESÕES / PREVENÇÃO
+            elif any(w in msg_lower for w in ["dor", "ombro", "joelho", "lombar", "cotovelo", "lesão", "lesao", "machucou", "estalo"]):
+                return (
+                    f"Atenção total, {name}! Seu corpo é o Templo do Espírito Santo (1 Coríntios 6:19); treinar com dor lesiva é negligência, não bravura.\n\n"
+                    "🛡️ **Protocolo Imediato de Segurança Articular:**\n"
+                    "1. **Interrompa a carga no ângulo da dor:** Reduza a amplitude até a zona confortável e segura.\n"
+                    "2. **Ombro no Supino:** Reduza a abdução dos cotovelos (mantenha em 45° a 60° em relação ao tronco) e use pegada neutra com halteres.\n"
+                    "3. **Joelho no Agachamento:** Garanta que os joelhos apontem na mesma direção da ponta dos pés e não faça valgo dinâmico (joelho caindo para dentro).\n"
+                    "4. **Lombar:** Acione o abdômen com 'bracing' diafragmático firme antes de cada repetição.\n\n"
+                    "Onde exatamente você sentiu o desconforto?"
+                )
+
+            # FOCO EM MEMBROS SUPERIORES
+            elif any(w in msg_lower for w in ["superior", "superiores", "braco", "braço", "peito", "costas", "ombros"]):
+                return (
+                    f"Excelente estratégia, {name}! Para hipertrofia acelerada de **Membros Superiores**, a ciência recomenda:\n\n"
+                    "🎯 **Pilares de Sobrecarga para Superiores:**\n"
+                    "1. **Frequência 2x na semana:** Dividir em empurrar/puxar ou rotina Upper/Lower gera estímulo ideal de síntese proteica.\n"
+                    "2. **Ordem dos exercícios:** Inicie sempre pelos grandes compostos (Supino ou Barra Fixa/Remada) e deixe isoladores (elevação lateral, rosca e tríceps) para o final.\n"
+                    "3. **Cadência excêntrica:** 2 a 3 segundos de descida controlada aumentam o dano mecânico sem necessidade de cargas lesivas.\n\n"
+                    "Você prefere aplicar a rotina **Upper / Lower** (4 dias) ou **Push / Pull / Legs** (5-6 dias)?"
+                )
+
+            # FOCO EM MEMBROS INFERIORES / PERNAS
+            elif any(w in msg_lower for w in ["inferior", "inferiores", "perna", "pernas", "gluteo", "glúteo", "quadriceps", "quadríceps", "panturrilha"]):
+                return (
+                    f"Vamos construir uma base firme como a rocha, {name}!\n\n"
+                    "🦵 **Princípios de Ouro para Membros Inferiores:**\n"
+                    "1. **Agachamento Profundo:** Quebre a paralela com controle; a maior hipertrofia de quadríceps e glúteos ocorre em máxima flexão de joelho sob tensão.\n"
+                    "2. **Cadeia Posterior:** Não negligencie o Stiff e a Mesa Flexora; equilíbrio entre quadríceps e isquiotibiais previne lesões no ligamento cruzado.\n"
+                    "3. **Descanso entre séries:** Pernas demandam maior débito cardíaco. Descanse pelo menos 2 minutos entre séries pesadas de Agachamento ou Leg Press.\n\n"
+                    "Quer ajustar sua divisão para ter 2 dias dedicados a pernas?"
+                )
+
+            # SÉRIES, REPETIÇÕES, CARGAS, RPE E PROGRESSÃO
+            elif any(w in msg_lower for w in ["quantas series", "quantas repetições", "quantas reps", "carga", "aumentar carga", "rpe", "rir", "descanso", "tempo de descanso", "sobrecarga"]):
+                return (
+                    f"Diretriz cinesiológica de precisão para você, {name}:\n\n"
+                    "⚡ **Calibração de Séries, Repetições & Intensidade:**\n"
+                    "• **Hipertrofia Otimizada:** 3 a 4 séries por exercício, trabalhando entre **6 a 12 repetições** com RPE 8-9 (parando com 1 a 2 repetições antes da falha total concêntrica).\n"
+                    "• **Quando subir a carga?** Aplique a regra do 'topo da faixa': se você fez todas as séries com 12 repetições mantendo a técnica impecável, na próxima sessão aumente 2kg a 4kg totais.\n"
+                    "• **Tempo de Descanso:** 90 a 120 segundos para exercícios compostos (Supino, Agachamento, Terra, Remada) e 60 a 90 segundos para isoladores.\n\n"
+                    "Anote suas cargas na aba **Treino** a cada série para garantir a sobrecarga progressiva semanal!"
+                )
+
+            # EXECUÇÃO DE EXERCÍCIOS ESPECÍFICOS (SUPINO, AGACHAMENTO, TERRA, ELEVAÇÃO LATERAL)
+            elif "supino" in msg_lower:
+                return (
+                    f"Checklist anatômico do **Supino**, {name}:\n\n"
+                    "1. **Escápulas:** Retraia e deprima as escápulas 'no bolso de trás da calça' contra o banco.\n"
+                    "2. **Pés e Base:** Pés firmemente plantados no chão para transferir força ('leg drive').\n"
+                    "3. **Cotovelos:** Não abra os cotovelos a 90° (risco grave ao manguito). Mantenha em ~60°.\n"
+                    "4. **Trajetória:** A barra desce na linha média/inferior do esterno e sobe com leve arco em direção aos olhos."
+                )
+            elif "agachamento" in msg_lower:
+                return (
+                    f"Checklist anatômico do **Agachamento Livre**, {name}:\n\n"
+                    "1. **Base dos Pés:** Largura dos ombros ou ligeiramente mais larga, pontas rodadas ~15° a 30° para fora.\n"
+                    "2. **Bracing Abdominal:** Puxe o ar para o abdômen e trave a musculatura do core antes de descer.\n"
+                    "3. **Trajetória:** O quadril vai para trás e para baixo simultaneamente, mantendo o peso distribuído em todo o pé.\n"
+                    "4. **Coluna Neutra:** Evite o 'butt wink' (retroversão pélvica na profundidade máxima)."
+                )
+            elif "terra" in msg_lower:
+                return (
+                    f"Checklist anatômico do **Levantamento Terra**, {name}:\n\n"
+                    "1. **Posição da Barra:** Colada na canela, cortando o meio dos pés ao olhar por cima.\n"
+                    "2. **Dorsal Ativa:** Imagine que está entortando a barra para ativar os dorsais e proteger a coluna torácica.\n"
+                    "3. **Subida:** Empurre o chão com os calcanhares; o quadril e o peito devem subir na mesma cadência até a extensão total."
+                )
+            elif "lateral" in msg_lower:
+                return (
+                    f"Checklist da **Elevação Lateral (Deltóide Lateral)**, {name}:\n\n"
+                    "1. **Plano Escapular:** Levante os halteres ~30° à frente da linha do corpo (não abra reto dos lados).\n"
+                    "2. **Cotovelos Leves:** Mantenha microflexão nos cotovelos e lidere o movimento com o cotovelo, não com as mãos.\n"
+                    "3. **Carga Inteligente:** Evite impulso com o tronco. 3 séries de 12 a 15 repetições controladas explodem os ombros sem lesionar."
+                )
+
+            # MOTIVAÇÃO / DESÂNIMO / FÉ
+            elif any(w in msg_lower for w in ["desanimo", "desânimo", "preguiça", "preguica", "cansado", "sem vontade", "motivação", "motivacao"]):
+                return (
+                    f"Ouça com o coração, guerreiro {name}:\n\n"
+                    "📖 *'Não to mandei eu? Esforça-te e tem bom ânimo; não temas, nem te espantes; porque o Senhor teu Deus é contigo, por onde quer que andares.' (Josué 1:9)*\n\n"
+                    "A motivação passageira é refém das emoções, mas o **domínio próprio** é um fruto espiritual sólido (Gálatas 5:23). "
+                    "Os maiores treinos da sua vida serão aqueles em que você foi sem vontade, venceu a carne e honrou a Deus com a sua disciplina.\n\n"
+                    "Levante a cabeça, beba 300ml de água e venha para o treino. 1 série de cada vez!"
+                )
+
+            # RESPOSTA GERAL DINÂMICA
+            else:
+                return (
+                    f"Fala {name}! Vamos firmes rumo ao seu objetivo de **{goal.upper()}**!\n\n"
+                    f"📋 **Prontuário Ativo do Treinador:**\n"
+                    f"• Divisão Atual: **{routine}** ({days_week} dias/semana) | Peso Atual: **{weight}kg**\n"
+                    "• Princípio de Hoje: Foco na contração voluntária e controle excêntrico de 2 a 3 segundos.\n\n"
+                    "Como posso te ajudar especificamente no treino de hoje?\n"
+                    "• Se tiver dúvidas sobre algum exercício (ex: supino, agachamento, puxadas)\n"
+                    "• Se quiser substituir alguma máquina ocupada\n"
+                    "• Se quiser refazer sua avaliação física, basta clicar no ícone **📋** no topo da tela!"
+                )
+
+        # =========================================================================
+        # 2. PERSONA: NUTRICIONISTA
+        # =========================================================================
         elif persona == "nutri":
-            if "pos treino" in msg_lower or "pós" in msg_lower:
+            protein_target = round(weight * 2.2, 0)
+            water_target = int(weight * 40)
+
+            if any(w in msg_lower for w in ["pos treino", "pós treino", "pos-treino", "pós-treino"]):
                 return (
-                    f"Excelente pergunta, {name}! Como diz a Palavra: 'Quer comais, quer bebais ou façais qualquer outra coisa, fazei tudo para a glória de Deus (1 Coríntios 10:31)'.\n\n"
-                    "🥗 **Sugestão de Pós-Treino Rápido & Nutritivo:**\n"
-                    "• **Opção Líquida:** 30g de Whey Protein + 1 banana madura + 30g de aveia batida com água + 5g de Creatina.\n"
-                    "• **Opção Refeição Sólida da Criação:** 150g de peito de frango grelhado ou ovos cozidos + 180g de arroz branco ou batata inglesa + legumes da terra.\n\n"
-                    "Honre seu templo mantendo também a meta diária de água!"
+                    f"Excelente pergunta, {name}!\n\n"
+                    "🥗 **Pós-Treino Ideal para o Templo ({goal.upper()}):**\n"
+                    "• **Opção Rápida:** 30g a 40g de Whey Protein + 1 banana madura + 30g de aveia + 5g de Creatina.\n"
+                    "• **Opção Prato Sólido:** 150g de peito de frango ou patinho moído + 150g a 200g de arroz branco/batata + vegetais verdes.\n"
+                    "A síntese proteica é otimizada quando unimos proteína de alto valor biológico com carboidrato para recuperar o glicogênio muscular!"
                 )
-            elif "pre treino" in msg_lower or "pré" in msg_lower:
+            elif any(w in msg_lower for w in ["pre treino", "pré treino", "pre-treino", "pré-treino", "energia"]):
                 return (
-                    f"Para chegar com máxima energia e foco no templo, {name}:\n\n"
-                    "⚡ **Refeição Pré-Treino (60 a 90 min antes):**\n"
-                    "• Carboidratos limpos e energéticos (banana com aveia e canela, pão integral com ovos ou tapioca).\n"
-                    "• Boa hidratação prévia (pelo menos 500ml de água antes de começar).\n"
-                    "• Evite gorduras pesadas e excesso de ultraprocessados logo antes do treino."
+                    f"Para chegar com máxima energia no templo, {name}:\n\n"
+                    "⚡ **Refeição Pré-Treino (60-90 min antes):**\n"
+                    "• Carboidratos limpos e de fácil digestão (banana com aveia e canela, pão integral com ovos mexidos ou tapioca).\n"
+                    "• Beba pelo menos 500ml de água antes de iniciar a sessão.\n"
+                    "• Evite excesso de gorduras e ultraprocessados que deixam a digestão lenta e roubam o fluxo sanguíneo muscular."
+                )
+            elif any(w in msg_lower for w in ["creatina", "whey", "suplemento", "suplementos"]):
+                return (
+                    f"Orientações científicas de suplementação para você ({weight}kg):\n\n"
+                    "🥛 **Suplementação Básica & Eficaz:**\n"
+                    "1. **Creatina:** 5g todos os dias (mesmo em dias sem treino), com água ou após uma refeição com carboidratos. Uso crônico.\n"
+                    "2. **Whey Protein:** Use estrategicamente pela praticidade para atingir sua meta diária de **~{protein_target}g de proteína**.\n"
+                    "3. Suplemento é complemento: a base deve ser comida de verdade da criação divina (ovos, carnes magras, arroz, feijão, frutas)."
                 )
             else:
                 return (
-                    f"Olá {name}! A alimentação é um dos maiores pilares da mordomia do seu corpo.\n\n"
-                    f"Para você que pesa {profile.get('weight_kg')}kg com foco em {goal.upper()}:\n"
-                    f"• Meta de Proteína: ~{round(float(profile.get('weight_kg', 75))*2.2, 0)}g por dia.\n"
-                    f"• Meta de Hidratação: ~{int(float(profile.get('weight_kg', 75))*40)}ml de água por dia.\n\n"
-                    "Alimente seu corpo com respeito à criação divina e fuja da gula e do desleixo!"
+                    f"Olá {name}! Como ensina 1 Coríntios 10:31: *'Quer comais, quer bebais ou façais qualquer outra coisa, fazei tudo para a glória de Deus.'*\n\n"
+                    f"📊 **Metas Nutricionais Calculadas para o seu Templo:**\n"
+                    f"• Meta Proteica: **~{protein_target}g** de proteína por dia (2.2g/kg para {weight}kg).\n"
+                    f"• Hidratação Mínima: **~{water_target}ml** de água por dia (40ml por kg).\n"
+                    f"• Objetivo Metabólico: **{goal.upper()}**.\n\n"
+                    "Qual refeição ou alimento você gostaria de ajustar agora?"
                 )
 
+        # =========================================================================
+        # 3. PERSONA: MENTE & DISCIPLINA (DR. GABRIEL)
+        # =========================================================================
         elif persona == "mente":
             return (
-                f"Olá guerreiro {name}! Como está seu espírito e sua mente hoje?\n\n"
-                "🛡️ **Meditação de Fé & Foco:**\n"
-                "A Bíblia diz: 'Não te mandei eu? Sê forte e corajoso; não temas, nem te espantes, porque o Senhor teu Deus é contigo por onde quer que andares (Josué 1:9)'.\n\n"
-                "A preguiça e o desânimo são armadilhas da carne. Quando faltar motivação, acione o **domínio próprio** (Gálatas 5:23). Faça uma oração rápida de 1 minuto e consagre seu treino a Deus!\n\n"
-                "Precisa de foco para a sessão de hoje?"
+                f"Olá guerreiro {name}! Como está o seu foco e seu espírito hoje?\n\n"
+                "🛡️ **Meditação de Fortaleza:**\n"
+                "A Palavra diz: *'O homem sábio é forte, e o homem de conhecimento consolida a sua força.' (Provérbios 24:5)*\n\n"
+                "Não permita que a preguiça ou as distrações do mundo silenciem o seu propósito. "
+                "Respire fundo, entregue seus planos a Deus e entre no treino com a mente blindada pela fé e pelo domínio próprio!\n\n"
+                "Precisa de uma palavra de direcionamento para o treino de hoje?"
             )
 
-        else: # fisio
+        # =========================================================================
+        # 4. PERSONA: FISIOTERAPEUTA (DR. RAFAEL)
+        # =========================================================================
+        else:
             return (
-                f"Olá {name}! Lembre-se sempre: 'O corpo de vocês é o santuário do Espírito Santo (1 Coríntios 6:19)'.\n\n"
-                "🦴 **Checklist do Guardião do Templo:**\n"
-                "1. Faça aquecimento com rotação externa leve de ombros antes de treinar peito/ombro.\n"
-                "2. Mantenha os tornozelos móveis antes de agachar para preservar o joelho e a coluna.\n"
-                "3. Treine com cadência inteligente: quem destrói as articulações por ego para de treinar cedo; quem cuida da biomecânica treina forte até a velhice como Calebe (Josué 14:11).\n\n"
-                "Está sentindo algum ponto de dor ou desconforto hoje?"
+                f"Olá {name}! A preservação articular é o segredo para treinar com força até a velhice como Calebe (Josué 14:11).\n\n"
+                "🦴 **Checklist do Guardião Biomecânico:**\n"
+                "1. **Aquecimento Específico:** 2 séries leves com 50% da carga antes de ir para a carga de trabalho.\n"
+                "2. **Manguito Rotador:** Rotação externa na polia antes de supinos ou desenvolvimentos pesados.\n"
+                "3. **Tornozelo e Quadril:** Mobilidade ativa antes do agachamento previne sobrecarga no joelho e na lombar.\n\n"
+                "Está sentindo algum ponto de estalo, pinçamento ou dor articular hoje?"
             )

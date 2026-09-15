@@ -615,9 +615,9 @@ class DBService:
             SET goal = ?, target_weight_kg = ?, target_weeks = ?, training_days_week = ?,
                 session_minutes = ?, experience_level = ?, joint_pain = ?, diet_strategy = ?,
                 daily_calories_target = ?, daily_protein_target = ?, daily_water_target_ml = ?,
-                recommended_routine = ?
+                recommended_routine = ?, priority_muscle_focus = ?
             WHERE user_id = ?
-            """, (goal, target_weight, target_weeks, days_week, session_mins, experience, joint_pain, diet_strategy, target_calories, protein_g, water_ml, recommended_routine, target_uid))
+            """, (goal, target_weight, target_weeks, days_week, session_mins, experience, joint_pain, diet_strategy, target_calories, protein_g, water_ml, recommended_routine, muscle_focus, target_uid))
             conn.commit()
 
         return {

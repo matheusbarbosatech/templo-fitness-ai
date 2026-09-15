@@ -35,7 +35,7 @@ class GoalSettingDialog:
 
         focus_drop = ft.Dropdown(
             label="Foco Muscular Prioritário",
-            value="equilibrado",
+            value=profile.get("priority_muscle_focus", "equilibrado") or "equilibrado",
             options=[
                 ft.dropdown.Option("equilibrado", "Desenvolvimento Equilibrado (Geral)"),
                 ft.dropdown.Option("superiores", "Foco em Membros Superiores (Peito, Costas, Braços e Ombros)"),

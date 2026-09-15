@@ -29,12 +29,16 @@ class PersonalHubView:
         self._update_tabs_ui()
         self._render_current_sub_view()
 
+        tabs_container = ft.Container(
+            content=self.tabs_row,
+            width=740,
+            padding=AppPadding.symmetric(horizontal=8, vertical=4)
+        )
+        tabs_wrapper = ft.Row([tabs_container], alignment=ft.MainAxisAlignment.CENTER)
+
         return ft.Container(
             content=ft.Column([
-                ft.Container(
-                    content=self.tabs_row,
-                    padding=AppPadding.only(left=12, right=12, top=10, bottom=4)
-                ),
+                tabs_wrapper,
                 self.content_area
             ], spacing=6, expand=True),
             bgcolor=SportColors.BG_DARK,

@@ -327,7 +327,7 @@ class DBService:
             if first:
                 cls.set_active_user_id(first["id"])
                 return dict(first)
-            return {"id": 1, "name": "Matheus Atleta", "username": "matheus", "role": "aluno", "color_hex": "#00FFA3"}
+            return {"id": 1, "name": "Matheus Atleta", "username": "matheus", "role": "aluno", "color_hex": "#FFFFFF"}
 
     @classmethod
     def switch_user(cls, user_id: int) -> Dict[str, Any]:

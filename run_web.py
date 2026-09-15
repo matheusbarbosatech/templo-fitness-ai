@@ -17,6 +17,13 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 import flet as ft
+
+# Compatibilidade universal Flet 1.0+
+if not hasattr(ft, "ElevatedButton"):
+    _btn = getattr(ft, "FilledButton", getattr(ft, "Button", None))
+    if _btn is not None:
+        setattr(ft, "ElevatedButton", _btn)
+
 from main import main
 
 if __name__ == "__main__":

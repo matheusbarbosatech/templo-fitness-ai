@@ -9,6 +9,10 @@ import flet as ft
 Icons = getattr(ft, "Icons", getattr(ft, "icons", None))
 Colors = getattr(ft, "Colors", getattr(ft, "colors", None))
 NavigationDestination = getattr(ft, "NavigationBarDestination", getattr(ft, "NavigationDestination", None))
+ElevatedButton = getattr(ft, "ElevatedButton", getattr(ft, "FilledButton", getattr(ft, "Button", None)))
+
+if not hasattr(ft, "ElevatedButton") and ElevatedButton is not None:
+    setattr(ft, "ElevatedButton", ElevatedButton)
 
 class SportColors:
     # Fundo e Superfícies (Preto Profundo & Cinzas Nobres)

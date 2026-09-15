@@ -140,8 +140,8 @@ class LoginView:
                 content=ft.Row([
                     ft.CircleAvatar(
                         radius=20,
-                        bgcolor=f"{SportColors.PRIMARY_NEON}22",
-                        content=ft.Icon(Icons.FITNESS_CENTER, color=SportColors.PRIMARY_NEON, size=20)
+                        bgcolor="#27272A",
+                        content=ft.Icon(Icons.FITNESS_CENTER, color=SportColors.TEXT_WHITE, size=18)
                     ),
                     ft.Column([
                         ft.Text("Atleta Conectado: Matheus", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
@@ -152,7 +152,7 @@ class LoginView:
                         icon=Icons.ARROW_FORWARD,
                         style=ft.ButtonStyle(
                             bgcolor=SportColors.BG_SURFACE_ALT,
-                            color=SportColors.PRIMARY_NEON,
+                            color=SportColors.TEXT_WHITE,
                             text_style=ft.TextStyle(size=12, weight=ft.FontWeight.BOLD),
                             shape=ft.RoundedRectangleBorder(radius=10) if hasattr(ft, "RoundedRectangleBorder") else None
                         ),
@@ -160,7 +160,7 @@ class LoginView:
                         on_click=lambda _: self._quick_login_matheus()
                     )
                 ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
-                border_color=f"{SportColors.PRIMARY_NEON}44",
+                border_color=SportColors.BORDER_DEFAULT,
                 padding=12
             )
 

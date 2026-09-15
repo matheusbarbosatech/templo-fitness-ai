@@ -29,6 +29,19 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = SportColors.BG_DARK
     page.padding = 0
+    try:
+        page.theme = ft.Theme(
+            color_scheme_seed="#71717A",
+            color_scheme=ft.ColorScheme(
+                primary="#FFFFFF",
+                on_primary="#0A0A0A",
+                secondary="#A1A1AA",
+                surface="#141414",
+                background="#0A0A0A",
+            )
+        )
+    except Exception:
+        pass
     
     try:
         page.window.width = 440
@@ -138,15 +151,15 @@ def main(page: ft.Page):
                     content=ft.Row([
                         ft.CircleAvatar(
                             radius=11,
-                            bgcolor=f"{u_color}33",
-                            content=ft.Icon(Icons.PERSON, color=u_color, size=13)
+                            bgcolor="#27272A",
+                            content=ft.Icon(Icons.PERSON, color=SportColors.TEXT_WHITE, size=13)
                         ),
                         ft.Text(u_name, size=11, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                     ], spacing=4),
                     bgcolor=SportColors.BG_SURFACE_ALT,
                     padding=AppPadding.symmetric(horizontal=8, vertical=4),
                     border_radius=12,
-                    border=AppBorder.all(1, u_color),
+                    border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
                     tooltip=f"Atleta Conectado: {active_u.get('name')}. Clique para trocar.",
                     on_click=lambda _: on_logout()
                 ),
@@ -167,7 +180,7 @@ def main(page: ft.Page):
     nav_bar = ft.NavigationBar(
         selected_index=0,
         bgcolor=SportColors.BG_SURFACE,
-        indicator_color=f"{SportColors.PRIMARY_NEON}33",
+        indicator_color="#27272A",
         destinations=[
             NavigationDestination(
                 icon=Icons.FITNESS_CENTER_OUTLINED,

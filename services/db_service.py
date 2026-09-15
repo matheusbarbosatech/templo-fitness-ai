@@ -301,7 +301,7 @@ class DBService:
             if cursor.fetchone()[0] == 0:
                 cursor.execute("""
                 INSERT INTO users (id, name, username, role, avatar_icon, color_hex)
-                VALUES (1, 'Matheus Atleta', 'matheus', 'aluno', 'fitness_center', '#CCFF00')
+                VALUES (1, 'Matheus Atleta', 'matheus', 'aluno', 'fitness_center', '#FFFFFF')
                 """)
                 conn.commit()
 

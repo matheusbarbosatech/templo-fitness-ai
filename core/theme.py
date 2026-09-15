@@ -1,7 +1,7 @@
 """
-Sistema de Design Oficial: 'Nike Training / Whoop Carbon Volt'
-Estética de altíssima performance: Preto Absoluto / Grafite Carbono, Tipografia Branca Nítida
-e Acento Volt Neon (#CCFF00) para máxima energia, legibilidade e elegância esportiva.
+Sistema de Design Oficial: 'Monochrome Stealth Minimalist (Cinza, Preto e Branco)'
+Estética de altíssimo luxo minimalista: Preto Profundo (#0A0A0A), Superfícies em Grafite/Cinza
+e Acentos em Branco Puro (#FFFFFF) e Prata Titânio para máxima sobriedade, foco e sofisticação.
 """
 import flet as ft
 
@@ -11,38 +11,38 @@ Colors = getattr(ft, "Colors", getattr(ft, "colors", None))
 NavigationDestination = getattr(ft, "NavigationBarDestination", getattr(ft, "NavigationDestination", None))
 
 class SportColors:
-    # Fundo e Superfícies (Carbon Dark / Obsidian Absoluto)
-    BG_DARK = "#090A0C"             # Preto Puro Esportivo (OLED Friendly)
-    BG_SURFACE = "#121316"          # Carbono Nobre Acetinado
-    BG_SURFACE_ALT = "#1A1B1F"      # Cards Interativos & Hover
-    BG_SURFACE_ELEVATED = "#222328" # Modais e Cabeçalhos em Destaque
-    BG_INPUT = "#0E0F12"            # Fundo Limpo para Inputs
+    # Fundo e Superfícies (Preto Profundo & Cinzas Nobres)
+    BG_DARK = "#0A0A0A"             # Preto Puro Minimalista (Matte Noir)
+    BG_SURFACE = "#141414"          # Cinza Grafite Acetinado para Cards
+    BG_SURFACE_ALT = "#1E1E1E"      # Cinza Carvão para Elementos Interativos / Hover
+    BG_SURFACE_ELEVATED = "#282828" # Modais e Cabeçalhos Elevados
+    BG_INPUT = "#121212"            # Fundo dos Campos de Entrada
     
-    # Acento de Alta Performance (Nike Volt / Whoop Acid Lime)
-    PRIMARY_NEON = "#CCFF00"        # Volt Neon Eletrizante (Estilo Nike Pro / Whoop)
-    PRIMARY_NEON_DARK = "#A3E635"   # Volt Suave
-    PRIMARY_TEXT_ON_NEON = "#090A0C"# Texto preto de alto contraste sobre Volt
+    # Destaque Principal Minimalista (Branco Puro & Prata)
+    PRIMARY_NEON = "#FFFFFF"        # Branco Puro para Destaques e Botões Principais
+    PRIMARY_NEON_DARK = "#E5E5E5"   # Branco Prata
+    PRIMARY_TEXT_ON_NEON = "#0A0A0A"# Preto Puro sobre o Branco para Contraste Máximo
     
-    # Cores de Apoio Funcionais
-    CYAN_ELECTRIC = "#38BDF8"       # Azul Hidratação & Oxigenação
-    CRIMSON_NEON = "#FF3366"        # Vermelho Frequência Cardíaca / Alerta
-    AMBER_GOLD = "#F59E0B"          # Âmbar Calorias / Fogo Metabólico
-    PURPLE_MIND = "#A855F7"         # Violeta Serenidade / Oração
-    TEAL_PHYSIO = "#14B8A6"         # Cinesiologia & Fisioterapia
+    # Cores de Apoio Funcionais (Tons de Cinza / Titânio e Platina)
+    CYAN_ELECTRIC = "#D4D4D8"       # Prata Titânio Claro
+    CRIMSON_NEON = "#E4E4E7"        # Prata Suave
+    AMBER_GOLD = "#A1A1AA"          # Cinza Médio Neutro
+    PURPLE_MIND = "#A1A1AA"         # Cinza Médio Neutro
+    TEAL_PHYSIO = "#A1A1AA"         # Cinza Médio Neutro
     
-    # Textos de Altíssima Legibilidade
-    TEXT_WHITE = "#FFFFFF"          # Branco Puro para Títulos
-    TEXT_PRIMARY = "#F4F4F5"        # Branco Suave para Corpo de Texto
-    TEXT_SECONDARY = "#A1A1AA"      # Cinza Claro para Métricas e Legendas
-    TEXT_MUTED = "#52525B"          # Cinza Sóbrio para Detalhes Técnicos
+    # Textos de Altíssima Legibilidade (Monocromático Puro)
+    TEXT_WHITE = "#FFFFFF"          # Branco Puro para Títulos e Destaques
+    TEXT_PRIMARY = "#E5E5E5"        # Branco Suave para Leitura Longa
+    TEXT_SECONDARY = "#A1A1AA"      # Cinza Neutro para Legendas e Métricas
+    TEXT_MUTED = "#666666"          # Cinza Sóbrio para Notas Técnicas
     
-    # Bordas Finas e Minimalistas
-    BORDER_DEFAULT = "#222328"      # Borda sutil de divisão
-    BORDER_FOCUS = "#3F3F46"        # Borda em foco
-    BORDER_NEON = "#CCFF00"         # Borda de seleção ativa
-    BORDER_CYAN = "#38BDF8"
-    BORDER_CRIMSON = "#FF3366"
-    BORDER_GOLD = "#F59E0B"
+    # Bordas Finas e Minimalistas (Grafite Suave)
+    BORDER_DEFAULT = "#262626"      # Borda sutil grafite
+    BORDER_FOCUS = "#444444"        # Borda em foco cinza claro
+    BORDER_NEON = "#FFFFFF"         # Borda de seleção ativa em branco puro
+    BORDER_CYAN = "#3F3F46"
+    BORDER_CRIMSON = "#3F3F46"
+    BORDER_GOLD = "#3F3F46"
 
 class AppAlignment:
     CENTER = ft.Alignment(0, 0)
@@ -72,7 +72,7 @@ class AppPadding:
 
 class AppBorder:
     @staticmethod
-    def all(width: float = 1, color: str = "#222328"):
+    def all(width: float = 1, color: str = "#262626"):
         try:
             if hasattr(ft.Border, "all"):
                 return ft.Border.all(width, color)
@@ -99,7 +99,7 @@ class AppBorderRadius:
 
 class SportStyles:
     @staticmethod
-    def card_container(content, border_color=SportColors.BORDER_DEFAULT, padding=16, radius=16, on_click=None, bgcolor=SportColors.BG_SURFACE):
+    def card_container(content, border_color=SportColors.BORDER_DEFAULT, padding=16, radius=14, on_click=None, bgcolor=SportColors.BG_SURFACE):
         pad = AppPadding.all(padding) if isinstance(padding, (int, float)) else padding
         return ft.Container(
             content=content,
@@ -113,9 +113,9 @@ class SportStyles:
         )
 
     @staticmethod
-    def badge(text: str, color: str, bg_color: str = None, icon=None):
+    def badge(text: str, color: str = SportColors.TEXT_PRIMARY, bg_color: str = None, icon=None):
         if not bg_color:
-            bg_color = f"{color}1F"
+            bg_color = SportColors.BG_SURFACE_ALT
         
         controls = []
         if icon:
@@ -131,16 +131,16 @@ class SportStyles:
         return ft.Container(
             content=ft.Row(controls, spacing=4, alignment=ft.MainAxisAlignment.CENTER, tight=True),
             padding=AppPadding.symmetric(horizontal=8, vertical=4),
-            border_radius=8,
+            border_radius=6,
             bgcolor=bg_color,
-            border=AppBorder.all(1, f"{color}3D"),
+            border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
         )
 
     @staticmethod
     def section_header(title: str, subtitle: str = "", icon=None, action_button=None):
         title_row = []
         if icon:
-            title_row.append(ft.Icon(icon, size=18, color=SportColors.PRIMARY_NEON))
+            title_row.append(ft.Icon(icon, size=18, color=SportColors.TEXT_WHITE))
         title_row.append(
             ft.Text(title, size=15, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
         )

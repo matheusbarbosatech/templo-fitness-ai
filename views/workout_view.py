@@ -702,6 +702,7 @@ class WorkoutView:
     def _show_coach_presets_dialog(self):
         """Abre modal com prescrições completas da periodização."""
         presets = [
+            ("Superiores", "Foco em Superiores & Postura (3 dias)", "Prescrição especial do Matheus: Peitoral, Costas, Ombros e Blindagem da Coluna.", Icons.FITNESS_CENTER),
             ("PPL", "Push / Pull / Legs (Hipertrofia Avançada)", "3 treinos com frequência ideal e recuperação neural profunda.", Icons.FITNESS_CENTER),
             ("UpperLower", "Upper / Lower (Força & Performance)", "2 treinos divididos entre membros superiores e inferiores.", Icons.SPORTS_GYMNASTICS),
             ("ABC", "ABC Clássico (Peito/Tríceps, Costas/Bíceps, Pernas)", "A divisão tradicional favorita das academias.", Icons.FITNESS_CENTER),

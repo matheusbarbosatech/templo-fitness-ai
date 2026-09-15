@@ -916,6 +916,30 @@ class DBService:
                         ("Prancha Abdominal Isométrica", 3, "60s", 0.0, 45),
                     ])
                 ]
+            elif preset_name.upper() in ["SUPERIORES", "SUPERIORES_MATHEUS", "PEITO_COSTAS"]:
+                routines = [
+                    ("Dia A - Foco em Peitoral e Core", "Push", "Estímulo no peito com segurança e blindagem da coluna", "#FFFFFF", [
+                        ("Supino Sentado na Máquina", 3, "12-15", 25.0, 60),
+                        ("Voador (Peck Deck)", 3, "12-15", 30.0, 60),
+                        ("Remada Sentada (com triângulo)", 3, "12-15", 35.0, 60),
+                        ("Tríceps no Pulley (Cordinha ou Barra)", 3, "12-15", 20.0, 60),
+                        ("Prancha Abdominal", 3, "20-30s", 0.0, 45),
+                    ]),
+                    ("Dia B - Foco em Costas e Ombros", "Pull", "Alívio de dores na coluna e melhora da postura", "#FFFFFF", [
+                        ("Puxada Alta na Máquina (Pulldown)", 3, "12-15", 40.0, 60),
+                        ("Remada Aberta (Máquina)", 3, "12-15", 35.0, 60),
+                        ("Elevação Lateral com Halteres", 3, "12-15", 8.0, 60),
+                        ("Rosca Direta na Polia (Bíceps)", 3, "12-15", 20.0, 60),
+                        ("Abdominal Supra (Curtinho no chão)", 3, "15-20", 0.0, 45),
+                    ]),
+                    ("Dia C - Foco em Peitoral Superior e Lombar", "Upper", "Fechando a semana com foco no peito e fortalecendo o suporte da coluna", "#FFFFFF", [
+                        ("Supino Inclinado (Máquina ou Halteres)", 3, "12-15", 20.0, 60),
+                        ("Crucifixo Reto (Máquina ou Halteres)", 3, "12-15", 12.0, 60),
+                        ("Crucifixo Invertido (Máquina)", 3, "12-15", 25.0, 60),
+                        ("Extensão Lombar (Banco Romano)", 3, "12-15", 0.0, 60),
+                        ("Prancha Abdominal", 3, "20-30s", 0.0, 45),
+                    ])
+                ]
             else: # Padrão ABC
                 routines = [
                     ("Treino A - Peito, Tríceps e Deltoide Anterior", "Push", "Foco em empurrar e densidade peitoral", "#FFFFFF", [
@@ -1011,6 +1035,20 @@ class DBService:
             "Stiff (Barra Livre ou Halteres)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/glutes/dumbbell-stiff-leg-deadlift.gif",
             "Agachamento Sumô": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/glutes/smith-sumo-squat.gif",
             "Cadeira Abdutora": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/abductors/lever-seated-hip-abduction.gif",
+            # Nova Ficha Superior 3x - Matheus (Peito, Costas & Postura)
+            "Supino Sentado na Máquina": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/lever-chest-press.gif",
+            "Voador (Peck Deck)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/lever-seated-fly.gif",
+            "Remada Sentada (com triângulo)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/upper-back/cable-seated-row.gif",
+            "Tríceps no Pulley (Cordinha ou Barra)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/triceps/cable-pushdown-with-rope-attachment.gif",
+            "Prancha Abdominal": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/abs/bodyweight-incline-side-plank.gif",
+            "Puxada Alta na Máquina (Pulldown)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/lats/cable-lat-pulldown-full-range-of-motion.gif",
+            "Remada Aberta (Máquina)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/upper-back/cable-low-seated-row.gif",
+            "Rosca Direta na Polia (Bíceps)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/biceps/barbell-curl.gif",
+            "Abdominal Supra (Curtinho no chão)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/abs/3-4-sit-up.gif",
+            "Supino Inclinado (Máquina ou Halteres)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/dumbbell-incline-bench-press.gif",
+            "Crucifixo Reto (Máquina ou Halteres)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/cable-standing-fly.gif",
+            "Crucifixo Invertido (Máquina)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/delts/lever-seated-reverse-fly.gif",
+            "Extensão Lombar (Banco Romano)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/spine/hyperextension.gif",
         }
         return visuals.get(name, "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/barbell-bench-press.gif")
 

@@ -205,8 +205,8 @@ class WorkoutView:
 
         if self.routines and self.selected_routine_index < len(self.routines):
             current = self.routines[self.selected_routine_index]
-            self.routine_header_title.value = f"🔥 {current.get('name', 'Treino')}"
-            self.routine_header_desc.value = f"🎯 {current.get('description', 'Foco de hipertrofia muscular')}"
+            self.routine_header_title.value = current.get('name', 'Treino')
+            self.routine_header_desc.value = current.get('description', 'Foco de hipertrofia muscular')
 
     def _select_routine(self, index: int):
         """Alterna a rotina em 1 clique e reconstrói os exercícios na tela instantaneamente."""
@@ -309,8 +309,8 @@ class WorkoutView:
                     # COMO FAZER & ERROS
                     ft.Column([
                         ft.Row([
-                            ft.Icon(Icons.WARNING_AMBER_ROUNDED, size=13, color=SportColors.AMBER_GOLD),
-                            ft.Text("COMO FAZER & O QUE EVITAR", size=11, weight=ft.FontWeight.BOLD, color=SportColors.AMBER_GOLD),
+                            ft.Icon(Icons.INFO_OUTLINE, size=13, color=SportColors.TEXT_SECONDARY),
+                            ft.Text("COMO FAZER & O QUE EVITAR", size=11, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_SECONDARY),
                         ], spacing=4),
                         ft.Text(mistakes, size=11, color=SportColors.TEXT_MUTED),
                     ], spacing=2),
@@ -402,7 +402,7 @@ class WorkoutView:
                             ft.Row([
                                 SportStyles.badge(p_muscle, SportColors.PRIMARY_NEON),
                                 SportStyles.badge(equipment, SportColors.TEXT_SECONDARY),
-                                SportStyles.badge(f"{target_sets} séries × {target_reps}", SportColors.AMBER_GOLD),
+                                SportStyles.badge(f"{target_sets} séries × {target_reps}", SportColors.TEXT_WHITE),
                             ], spacing=4),
                         ], spacing=3, expand=True),
                         ft.ElevatedButton(
@@ -480,7 +480,7 @@ class WorkoutView:
 
     def _finish_workout_session(self):
         if not self.completed_sets:
-            UIHelper.show_toast(self.page, "Complete pelo menos 1 série antes de finalizar o treino!", color=SportColors.AMBER_GOLD)
+            UIHelper.show_toast(self.page, "Complete pelo menos 1 série antes de finalizar o treino!", color=SportColors.TEXT_WHITE)
             return
 
         total_vol = sum(s["weight_kg"] * s["reps"] for s in self.completed_sets)
@@ -513,7 +513,7 @@ class WorkoutView:
                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                         ft.Row([
                             ft.Text("Tonelagem Levantada:", size=12, color=SportColors.TEXT_SECONDARY),
-                            ft.Text(f"{int(total_vol)} kg", size=14, weight=ft.FontWeight.BOLD, color=SportColors.AMBER_GOLD)
+                            ft.Text(f"{int(total_vol)} kg", size=14, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                     ], spacing=4),
                     bgcolor=SportColors.BG_SURFACE_ALT,

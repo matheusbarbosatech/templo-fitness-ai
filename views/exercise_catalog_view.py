@@ -104,15 +104,15 @@ class ExerciseCatalogView:
                     ft.Column([
                         ft.Text(ex["name"], size=14, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                         ft.Row([
-                            SportStyles.badge(ex["category"], SportColors.CYAN_ELECTRIC),
-                            SportStyles.badge(ex["equipment"], SportColors.AMBER_GOLD),
+                            SportStyles.badge(ex["category"], SportColors.TEXT_WHITE),
+                            SportStyles.badge(ex["equipment"], SportColors.TEXT_SECONDARY),
                         ], spacing=6),
                         ft.Text(f"Músculo Principal: {ex['primary_muscle']}", size=11, color=SportColors.TEXT_SECONDARY),
                     ], spacing=3, expand=True),
                     ft.IconButton(
                         icon=Icons.ARROW_FORWARD_IOS,
                         icon_size=16,
-                        icon_color=SportColors.PRIMARY_NEON,
+                        icon_color=SportColors.TEXT_WHITE,
                         on_click=lambda _, item=ex: self.show_exercise_detail_modal(item)
                     )
                 ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
@@ -148,49 +148,50 @@ class ExerciseCatalogView:
                     ),
                     ft.Row([
                         SportStyles.badge(f"Grupo: {ex['category']}", SportColors.PRIMARY_NEON),
-                        SportStyles.badge(f"Aparelho: {ex['equipment']}", SportColors.AMBER_GOLD),
+                        SportStyles.badge(f"Aparelho: {ex['equipment']}", SportColors.TEXT_SECONDARY),
                     ], spacing=6),
                     
                     SportStyles.card_container(
                         content=ft.Column([
-                            ft.Text("🎯 MÚSCULOS ALVO", size=12, weight=ft.FontWeight.BOLD, color=SportColors.CYAN_ELECTRIC),
+                            ft.Text("MÚSCULOS ALVO", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                             ft.Text(f"• Primário: {ex['primary_muscle']}", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                             ft.Text(f"• Secundários: {ex.get('secondary_muscles', 'Nenhum')}", size=12, color=SportColors.TEXT_SECONDARY),
                         ], spacing=4),
                         padding=10,
-                        border_color=SportColors.BORDER_CYAN
+                        border_color=SportColors.BORDER_DEFAULT
                     ),
 
                     SportStyles.card_container(
                         content=ft.Column([
-                            ft.Text("💡 POR QUE FAZER ESTE EXERCÍCIO?", size=12, weight=ft.FontWeight.BOLD, color=SportColors.PRIMARY_NEON),
+                            ft.Text("POR QUE FAZER ESTE EXERCÍCIO?", size=12, weight=ft.FontWeight.BOLD, color=SportColors.PRIMARY_NEON),
                             ft.Text(ex.get("why_do_it", ""), size=12, color=SportColors.TEXT_PRIMARY),
                         ], spacing=4),
                         padding=10,
-                        border_color=SportColors.BORDER_NEON
+                        border_color=SportColors.BORDER_DEFAULT
                     ),
 
                     SportStyles.card_container(
                         content=ft.Column([
-                            ft.Text("📋 PASSO A PASSO DE EXECUÇÃO", size=12, weight=ft.FontWeight.BOLD, color=SportColors.AMBER_GOLD),
+                            ft.Text("PASSO A PASSO DE EXECUÇÃO", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                             ft.Text(ex.get("execution_guide", ""), size=12, color=SportColors.TEXT_PRIMARY),
                         ], spacing=4),
                         padding=10,
-                        border_color=SportColors.BORDER_GOLD
+                        border_color=SportColors.BORDER_DEFAULT
                     ),
 
                     SportStyles.card_container(
                         content=ft.Column([
-                            ft.Text("⚠️ ERROS COMUNS & RISCO DE LESÃO", size=12, weight=ft.FontWeight.BOLD, color=SportColors.CRIMSON_NEON),
+                            ft.Text("ERROS COMUNS & PREVENÇÃO", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_SECONDARY),
                             ft.Text(ex.get("common_mistakes", ""), size=12, color=SportColors.TEXT_PRIMARY),
                         ], spacing=4),
                         padding=10,
-                        border_color=SportColors.BORDER_CRIMSON
+                        border_color=SportColors.BORDER_DEFAULT
                     ),
                 ], spacing=10),
                 width=380,
                 height=450
             ),
+
             actions=[
                 ft.ElevatedButton(
                     "Fechar",

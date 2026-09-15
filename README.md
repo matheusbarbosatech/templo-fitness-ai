@@ -26,8 +26,8 @@ Aplicativo completo de musculação, performance esportiva, disciplina e saúde 
 
 ### 4. 🤖 Sala da Junta Técnica de IA (DevWorld)
 - Alternância em 1 clique entre 4 Especialistas das Ciências do Esporte e Mordomia Cristã:
-  - 🏋️ **Treinador Márcio (Personal Trainer):** Sobrecarga progressiva, cadência de repetição e variações biomecânicas.
-  - 🥗 **Dra. Camila (Nutrição da Criação):** Alimentos naturais, distribuição de macros e domínio próprio contra a compulsão.
+  - 🏋️ **Treinador (Personal Trainer):** Sobrecarga progressiva, cadência de repetição e variações biomecânicas.
+  - 🥗 **Nutricionista (Nutrição da Criação):** Alimentos naturais, distribuição de macros e domínio próprio contra a compulsão.
   - 🧠 **Dr. Gabriel (Mente, Disciplina & Fé):** Renovação da mente (Rm 12:2), foco, combate à ansiedade e perseverança diária.
   - 🦴 **Dr. Rafael (Fisioterapeuta do Templo):** Preservação articular, mobilidade e longevidade física.
 

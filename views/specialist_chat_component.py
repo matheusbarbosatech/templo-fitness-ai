@@ -116,11 +116,11 @@ class SpecialistChatComponent:
         self.quick_prompts_row.controls.clear()
         prompts = {
             "personal": [
+                "Como dar foco em membros superiores?",
+                "Como mudar minha divisão de treino?",
                 "Como substituir a máquina hoje?",
-                "Qual a cadência de repetição ideal?",
                 "Como saber se devo aumentar a carga?",
-                "Dor no ombro no supino, o que fazer?",
-                "Como aplicar RPE/RIR nas séries?"
+                "Dor no ombro no supino, o que fazer?"
             ],
             "nutri": [
                 "O que comer no pré-treino para ter energia?",

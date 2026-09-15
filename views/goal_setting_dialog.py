@@ -23,11 +23,24 @@ class GoalSettingDialog:
             label="Objetivo Principal",
             value=profile.get("goal", "hipertrofia"),
             options=[
-                ft.dropdown.Option("hipertrofia", "💪 Hipertrofia & Ganho de Massa"),
-                ft.dropdown.Option("cutting", "🔥 Definição / Queima de Gordura"),
-                ft.dropdown.Option("recomposicao", "⚡ Recomposição Corporal (Massa + Secar)"),
-                ft.dropdown.Option("forca", "🏋️ Força Máxima (Powerlifting)"),
-                ft.dropdown.Option("saude", "❤️ Saúde, Postura & Longevidade"),
+                ft.dropdown.Option("hipertrofia", "Hipertrofia & Ganho de Massa"),
+                ft.dropdown.Option("cutting", "Definição / Queima de Gordura"),
+                ft.dropdown.Option("recomposicao", "Recomposição Corporal (Massa + Secar)"),
+                ft.dropdown.Option("forca", "Força Máxima (Powerlifting)"),
+                ft.dropdown.Option("saude", "Saúde, Postura & Longevidade"),
+            ],
+            color=SportColors.TEXT_WHITE,
+            bgcolor=SportColors.BG_INPUT
+        )
+
+        focus_drop = ft.Dropdown(
+            label="Foco Muscular Prioritário",
+            value="equilibrado",
+            options=[
+                ft.dropdown.Option("equilibrado", "Desenvolvimento Equilibrado (Geral)"),
+                ft.dropdown.Option("superiores", "Foco em Membros Superiores (Peito, Costas, Braços e Ombros)"),
+                ft.dropdown.Option("inferiores", "Foco em Membros Inferiores (Pernas e Glúteos)"),
+                ft.dropdown.Option("forca_composta", "Foco em Força nos Compostos"),
             ],
             color=SportColors.TEXT_WHITE,
             bgcolor=SportColors.BG_INPUT
@@ -146,7 +159,8 @@ class GoalSettingDialog:
                     session_mins=int(time_drop.value or 60),
                     experience=exp_drop.value or "intermediario",
                     joint_pain=pain_drop.value or "nenhuma",
-                    diet_strategy=diet_drop.value or "equilibrada"
+                    diet_strategy=diet_drop.value or "equilibrada",
+                    muscle_focus=focus_drop.value or "equilibrado"
                 )
                 result_container.content.controls[1].value = (
                     f"• Calorias Alvo: ~{int(calc['daily_calories'])} kcal/dia\n"
@@ -158,19 +172,20 @@ class GoalSettingDialog:
             except Exception:
                 pass
 
-        for c in [goal_drop, days_drop, time_drop, exp_drop, pain_drop, diet_drop]:
+        for c in [goal_drop, focus_drop, days_drop, time_drop, exp_drop, pain_drop, diet_drop]:
             c.on_change = on_field_changed
 
         self.dialog = ft.AlertDialog(
             modal=True,
             title=ft.Row([
-                ft.Icon(Icons.TRACK_CHANGES, color=SportColors.PRIMARY_NEON, size=22),
-                ft.Text("Definição de Metas & Objetivos", size=16, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
+                ft.Icon(Icons.ASSIGNMENT_IND_OUTLINED, color=SportColors.PRIMARY_NEON, size=22),
+                ft.Text("Avaliação Física & Anamnese 360°", size=16, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
             ], spacing=8),
             content=ft.Container(
                 content=ft.ListView([
-                    ft.Text("Responda às questões abaixo para que o Templo Fitness AI calibre seu treino e mordomia com precisão científica:", size=12, color=SportColors.TEXT_SECONDARY),
+                    ft.Text("Responda às questões da avaliação física para que a IA calibre seu treino e nutrição com rigor científico:", size=12, color=SportColors.TEXT_SECONDARY),
                     goal_drop,
+                    focus_drop,
                     ft.Row([target_weight_in, target_weeks_in], spacing=8),
                     days_drop,
                     time_drop,
@@ -180,7 +195,7 @@ class GoalSettingDialog:
                     result_container
                 ], spacing=10),
                 width=350,
-                height=460
+                height=480
             ),
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda _: self._close()),
@@ -190,7 +205,8 @@ class GoalSettingDialog:
                     style=ft.ButtonStyle(bgcolor=SportColors.PRIMARY_NEON, color=SportColors.BG_DARK),
                     on_click=lambda _: self._save_and_apply(
                         goal_drop.value, target_weight_in.value, target_weeks_in.value,
-                        days_drop.value, time_drop.value, exp_drop.value, pain_drop.value, diet_drop.value
+                        days_drop.value, time_drop.value, exp_drop.value, pain_drop.value, diet_drop.value,
+                        focus_drop.value
                     )
                 )
             ]
@@ -198,7 +214,7 @@ class GoalSettingDialog:
 
         UIHelper.open_dialog(self.page, self.dialog)
 
-    def _save_and_apply(self, goal, target_w, target_weeks, days, time_m, exp, pain, diet):
+    def _save_and_apply(self, goal, target_w, target_weeks, days, time_m, exp, pain, diet, focus="equilibrado"):
         uid = self.user_id or DBService.get_active_user_id()
         calc = DBService.save_goals(
             goal=goal or "hipertrofia",
@@ -209,16 +225,18 @@ class GoalSettingDialog:
             experience=exp or "intermediario",
             joint_pain=pain or "nenhuma",
             diet_strategy=diet or "equilibrada",
-            user_id=uid
+            user_id=uid,
+            muscle_focus=focus or "equilibrado"
         )
-        # Se for PPL ou UpperLower, aplica a rotina prescrita
+        # Aplica a rotina prescrita
         rec_routine = calc.get("recommended_routine", "ABC")
         DBService.apply_coach_routine_preset(rec_routine, user_id=uid)
 
         self._close()
-        UIHelper.show_toast(self.page, f"Metas salvas! Divisão recomendada aplicada: {rec_routine}", color=SportColors.PRIMARY_NEON)
+        UIHelper.show_toast(self.page, f"Avaliação concluída! Divisão aplicada: {rec_routine}", color=SportColors.PRIMARY_NEON)
         if self.on_saved:
             self.on_saved()
+
 
     def _close(self):
         if self.dialog:

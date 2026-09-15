@@ -26,7 +26,7 @@ def main():
     print("🚀 INICIANDO TEMPLO FITNESS AI - SUPER-APP CRISTÃO 360°")
     print("=" * 60)
     print(f"📁 Diretório: {ROOT_DIR}")
-    print("🧠 Conselho de IA: Treinador Márcio, Dra. Camila, Dr. Gabriel, Dr. Rafael")
+    print("🧠 Conselho de IA: Treinador, Nutricionista, Dr. Gabriel, Dr. Rafael")
     print("⚡ Abrindo janela Flet...")
     print("=" * 60)
 

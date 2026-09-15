@@ -67,25 +67,39 @@ class WorkoutView:
         self._update_routine_selector_ui()
         self._render_current_routine_exercises()
 
-        # Barra de Prescrições Rápidas
+        # Barra de Prescrições Rápidas & Avaliação Física
         top_action_bar = ft.Row([
             ft.Row([
                 ft.Icon(Icons.FLASH_ON, color=SportColors.PRIMARY_NEON, size=18),
                 ft.Text("PROGRAMA ATIVO", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_SECONDARY),
             ], spacing=6),
-            ft.ElevatedButton(
-                "Prescrições do Treinador",
-                icon=Icons.AUTO_FIX_HIGH,
-                style=ft.ButtonStyle(
-                    bgcolor=SportColors.BG_SURFACE_ALT,
-                    color=SportColors.PRIMARY_NEON,
-                    text_style=ft.TextStyle(size=11, weight=ft.FontWeight.BOLD),
-                    shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
+            ft.Row([
+                ft.ElevatedButton(
+                    "Avaliação Física",
+                    icon=Icons.ASSIGNMENT_IND_OUTLINED,
+                    style=ft.ButtonStyle(
+                        bgcolor=SportColors.BG_SURFACE_ALT,
+                        color=SportColors.TEXT_WHITE,
+                        text_style=ft.TextStyle(size=11, weight=ft.FontWeight.BOLD),
+                        shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
+                    ),
+                    height=32,
+                    on_click=lambda _: self._show_goal_setting_dialog()
                 ),
-                height=32,
-                on_click=lambda _: self._show_coach_presets_dialog()
-            )
-        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+                ft.ElevatedButton(
+                    "Prescrições do Treinador",
+                    icon=Icons.AUTO_FIX_HIGH,
+                    style=ft.ButtonStyle(
+                        bgcolor=SportColors.BG_SURFACE_ALT,
+                        color=SportColors.PRIMARY_NEON,
+                        text_style=ft.TextStyle(size=11, weight=ft.FontWeight.BOLD),
+                        shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
+                    ),
+                    height=32,
+                    on_click=lambda _: self._show_coach_presets_dialog()
+                )
+            ], spacing=6, wrap=True)
+        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, wrap=True)
 
         # Card do Cronômetro de Descanso
         timer_card = SportStyles.card_container(
@@ -147,12 +161,28 @@ class WorkoutView:
             padding=AppPadding.symmetric(vertical=8)
         )
 
+        # Card de Orientação do Treinador (Pré-Treino)
+        coach_advice_card = ft.Container(
+            content=ft.Row([
+                ft.Icon(Icons.LIGHTBULB_OUTLINE, color=SportColors.TEXT_WHITE, size=18),
+                ft.Column([
+                    ft.Text("ORIENTAÇÃO DO TREINADOR ANTES DE INICIAR", size=10, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_SECONDARY),
+                    ft.Text("Faça o aquecimento prévio (5-10 min). Controle a fase excêntrica (descida de 2 a 3s) e mantenha intervalo ativo entre as séries.", size=11, color=SportColors.TEXT_WHITE),
+                ], spacing=2, expand=True)
+            ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=SportColors.BG_SURFACE_ALT,
+            border_radius=10,
+            padding=AppPadding.symmetric(horizontal=12, vertical=10),
+            border=AppBorder.all(1, SportColors.BORDER_DEFAULT)
+        )
+
         return ft.Container(
             content=ft.ListView([
                 top_action_bar,
                 self.routine_selector_row,
                 timer_card,
                 routine_info_card,
+                coach_advice_card,
                 self.exercise_cards_column,
                 finish_bar,
                 ft.Container(height=80)
@@ -487,29 +517,54 @@ class WorkoutView:
         uid = self.user_id or DBService.get_active_user_id()
         current_routine = self.routines[self.selected_routine_index]
         r_name = current_routine.get("name", "Treino Concluído")
+        duration_min = max(int((time.time() - self.session_start_time) / 60), 1)
 
+        # 1. Salva a sessão no SQLite (workout_sessions e session_sets)
         DBService.save_workout_session(
             routine_name=r_name,
-            duration_min=int((time.time() - self.session_start_time) / 60) or 45,
+            duration_min=duration_min,
             total_volume=total_vol,
             sets=self.completed_sets,
             notes="Treino executado com postura exemplar e descrição biomecânica aplicada.",
             user_id=uid
         )
 
+        # 2. Registra o parecer técnico imediato do Treinador IA no histórico de mensagens
+        debrief_chat_msg = (
+            f"📋 **Debriefing do Treino Concluído: {r_name}**\n\n"
+            f"• **Séries Concluídas**: {len(self.completed_sets)} séries registradas com sucesso.\n"
+            f"• **Volume de Carga (Tonelagem)**: {int(total_vol)} kg levantados no total.\n"
+            f"• **Duração do Treino**: {duration_min} minutos.\n\n"
+            f"💬 **Parecer Técnico do Treinador**:\n"
+            f"Excelente empenho, foco e execução biomecânica! A sobrecarga aplicada estimulou as fibras musculares conforme o protocolo planejado.\n\n"
+            f"⚡ **Orientações Pós-Treino Imediatas**:\n"
+            f"1. 🥩 **Janela de Proteínas**: Consuma de 25g a 35g de proteína magra + carboidratos complexos nas próximas 1-2 horas para síntese proteica acelerada.\n"
+            f"2. 💧 **Hidratação**: Ingira entre 500ml e 800ml de água para restabelecer o equilíbrio hidroeletrolítico e mitigar a dor tardia.\n"
+            f"3. 💤 **Descanso & Sono**: Garanta 7 a 8 horas de sono contínuo para ativação de hormônios anabólicos e recuperação do sistema nervoso central."
+        )
+        try:
+            DBService.add_chat_message("personal", "assistant", debrief_chat_msg, user_id=uid)
+        except Exception:
+            pass
+
+        # 3. Exibe o Modal com o Parecer do Treinador
         dialog = ft.AlertDialog(
             modal=True,
             title=ft.Row([
                 ft.Icon(Icons.CHECK_CIRCLE, color=SportColors.PRIMARY_NEON, size=24),
-                ft.Text("Treino Concluído com Glória!", size=16, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                ft.Text("Treino Concluído com Sucesso!", size=16, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
             ], spacing=8),
             content=ft.Column([
-                ft.Text(f"Excelente esforço! Você finalizou o {r_name}.", size=13, color=SportColors.TEXT_PRIMARY),
+                ft.Text(f"Parabéns pelo esforço! Você finalizou o {r_name}.", size=13, color=SportColors.TEXT_PRIMARY),
                 ft.Container(
                     content=ft.Column([
                         ft.Row([
                             ft.Text("Séries Concluídas:", size=12, color=SportColors.TEXT_SECONDARY),
                             ft.Text(f"{len(self.completed_sets)} séries", size=12, weight=ft.FontWeight.BOLD, color=SportColors.PRIMARY_NEON)
+                        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                        ft.Row([
+                            ft.Text("Duração da Sessão:", size=12, color=SportColors.TEXT_SECONDARY),
+                            ft.Text(f"{duration_min} min", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                         ft.Row([
                             ft.Text("Tonelagem Levantada:", size=12, color=SportColors.TEXT_SECONDARY),
@@ -520,6 +575,23 @@ class WorkoutView:
                     padding=AppPadding.all(12),
                     border_radius=10
                 ),
+                # Card de Parecer do Treinador
+                ft.Container(
+                    content=ft.Column([
+                        ft.Row([
+                            ft.Icon(Icons.PSYCHOLOGY, color=SportColors.PRIMARY_NEON, size=16),
+                            ft.Text("PARECER DO TREINADOR IA", size=11, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
+                        ], spacing=6),
+                        ft.Text("• 🥩 Nutrição: Consuma 25-35g de proteína nas próximas 1-2h.", size=11, color=SportColors.TEXT_SECONDARY),
+                        ft.Text("• 💧 Hidratação: Reponha 500-800ml de água.", size=11, color=SportColors.TEXT_SECONDARY),
+                        ft.Text("• 💤 Recuperação: 7-8h de sono profundo para reparação muscular.", size=11, color=SportColors.TEXT_SECONDARY),
+                        ft.Text("✓ O debriefing completo foi registrado no chat com o Treinador.", size=10, color=SportColors.TEXT_MUTED)
+                    ], spacing=4),
+                    bgcolor=SportColors.BG_SURFACE,
+                    padding=AppPadding.all(10),
+                    border_radius=8,
+                    border=AppBorder.all(1, SportColors.BORDER_DEFAULT)
+                )
             ], tight=True, spacing=10),
             actions=[
                 ft.ElevatedButton(
@@ -612,6 +684,20 @@ class WorkoutView:
             self._render_current_routine_exercises()
             if self.page:
                 self.page.update()
+
+    def _show_goal_setting_dialog(self):
+        """Abre a avaliação física e anamnese 360° para calibrar o perfil e a divisão de treino."""
+        from views.goal_setting_dialog import GoalSettingDialog
+        def on_saved():
+            uid = self.user_id or DBService.get_active_user_id()
+            self.routines = DBService.get_routines(user_id=uid)
+            self.selected_routine_index = 0
+            self._update_routine_selector_ui()
+            self._render_current_routine_exercises()
+            if self.page:
+                self.page.update()
+        dialog = GoalSettingDialog(self.page, on_saved=on_saved, user_id=self.user_id)
+        dialog.show()
 
     def _show_coach_presets_dialog(self):
         """Abre modal com prescrições completas da periodização."""

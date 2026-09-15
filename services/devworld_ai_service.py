@@ -11,11 +11,11 @@ from services.db_service import DBService
 
 PERSONA_CONFIGS = {
     "personal": {
-        "name": "Treinador Márcio",
+        "name": "Treinador",
         "title": "Guardião da Força & Personal Cinesiologista",
         "avatar_icon": "fitness_center",
         "color": "#FFFFFF", # Branco Puro Minimalista
-        "system_prompt": """Você é o Treinador Márcio, Guardião da Força e Personal Trainer do app TEMPLO FITNESS AI.
+        "system_prompt": """Você é o Treinador, Personal Trainer e Especialista em Cinesiologia do app TEMPLO FITNESS AI.
 Sua filosofia é a união da ciência biomecânica de ponta com a mordomia do corpo como Templo do Espírito Santo (1 Coríntios 6:19-20).
 Seu tom é firme, motivador, bíblico, enérgico e focado em disciplina e domínio próprio (1 Coríntios 9:27) tanto para homens quanto para mulheres.
 Seus pilares:
@@ -25,11 +25,11 @@ Seus pilares:
 4. Lembre o(a) atleta: "O homem e a mulher sábios consolidam a sua força no Senhor (Provérbios 24:5)"."""
     },
     "nutri": {
-        "name": "Dra. Camila",
+        "name": "Nutricionista",
         "title": "Nutrição da Criação & Mordomia",
         "avatar_icon": "restaurant",
         "color": "#FFFFFF", # Branco Puro Minimalista
-        "system_prompt": """Você é a Dra. Camila, Nutricionista Especialista em Composição Corporal e Mordomia Alimentar do app TEMPLO FITNESS AI.
+        "system_prompt": """Você é a Nutricionista Especialista em Composição Corporal e Alimentação do app TEMPLO FITNESS AI.
 Sua filosofia: "Quer comais, quer bebais ou façais qualquer outra coisa, fazei tudo para a glória de Deus (1 Coríntios 10:31)".
 Seu tom é acolhedor, científico, prático e focado no domínio próprio contra a compulsão e o desleixo.
 Seus pilares:
@@ -150,7 +150,27 @@ class DevWorldAIService:
         goal = profile.get("goal", "hipertrofia")
 
         if persona == "personal":
-            if "ocupada" in msg_lower or "trocar" in msg_lower or "substituir" in msg_lower:
+            if "superior" in msg_lower or "superiores" in msg_lower or "braço" in msg_lower:
+                return (
+                    f"Fala guerreiro {name}! Para dar **foco prioritário em Membros Superiores (Peito, Costas, Ombros e Braços)**, a periodização científica recomenda:\n\n"
+                    "🎯 **Divisões Ideais para Foco em Superiores:**\n"
+                    "1. **Upper / Lower (4 dias na semana):** 2 treinos completos dedicados exclusivamente aos membros superiores, com frequência 2x na semana e descanso neural perfeito.\n"
+                    "2. **Push / Pull / Legs (PPL - 5 a 6 dias):** Separação precisa em Empurrar (Peito/Ombro/Tríceps) e Puxar (Dorsal/Trapézio/Bíceps).\n\n"
+                    "⚡ **Como trocar agora no app:**\n"
+                    "• Vá na aba **Treino do Dia**.\n"
+                    "• Clique em **'Prescrições do Treinador'** no canto superior direito e escolha **Upper / Lower** ou **PPL**.\n"
+                    "• Sua ficha será reconfigurada na hora com exercícios, séries e GIFs anatômicos prontos!"
+                )
+            elif "mudar treino" in msg_lower or "trocar treino" in msg_lower or "divisão" in msg_lower or "avaliação" in msg_lower:
+                return (
+                    f"Fala {name}! Você tem total liberdade para mudar sua divisão e foco a qualquer momento:\n\n"
+                    "📋 **Opção 1 - Avaliação Física & Anamnese 360°:**\n"
+                    "Clique no botão **'Avaliação Física'** no topo da tela de treino. Responda seu objetivo, foco muscular (superiores, inferiores ou equilibrado) e dias disponíveis. A IA recalcula tudo e aplica a rotina recomendada!\n\n"
+                    "🪄 **Opção 2 - Prescrições Rápidas do Treinador:**\n"
+                    "Clique em **'Prescrições do Treinador'** para alternar em 1 clique entre **PPL**, **Upper / Lower** e **ABC Clássico**.\n\n"
+                    "Qual divisão você prefere aplicar hoje?"
+                )
+            elif "ocupada" in msg_lower or "trocar" in msg_lower or "substituir" in msg_lower:
                 return (
                     f"Fala guerreiro {name}! 'O homem sábio é forte e consolida a sua força (Provérbios 24:5)'.\n"
                     "Se a máquina está ocupada, não perca o fogo nem o aquecimento muscular!\n\n"

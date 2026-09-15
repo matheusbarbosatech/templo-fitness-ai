@@ -2,7 +2,7 @@
 Hub Central da Nutricionista - Templo Fitness AI.
 Reúne:
 1. Plano Alimentar & Macros (Calorias, Proteínas, Carbos, Gorduras, Diário de Refeições e Água).
-2. Consultoria em Tempo Real com a Nutricionista IA (Dra. Camila).
+2. Consultoria em Tempo Real com a Nutricionista IA.
 """
 import flet as ft
 from typing import Optional
@@ -42,7 +42,7 @@ class NutritionHubView:
     def _update_tabs_ui(self):
         tabs_data = [
             ("Minha Dieta & Macros", Icons.RESTAURANT_MENU, 0),
-            ("Nutricionista IA (Camila)", Icons.SPA, 1)
+            ("Nutricionista IA", Icons.SPA, 1)
         ]
 
         self.tabs_row.controls.clear()
@@ -54,19 +54,19 @@ class NutritionHubView:
                         ft.Icon(
                             icon,
                             size=15,
-                            color=SportColors.BG_DARK if is_active else SportColors.AMBER_GOLD
+                            color=SportColors.PRIMARY_TEXT_ON_NEON if is_active else SportColors.TEXT_PRIMARY
                         ),
                         ft.Text(
                             label,
                             size=12,
                             weight=ft.FontWeight.BOLD if is_active else ft.FontWeight.W_500,
-                            color=SportColors.BG_DARK if is_active else SportColors.TEXT_WHITE
+                            color=SportColors.PRIMARY_TEXT_ON_NEON if is_active else SportColors.TEXT_WHITE
                         )
                     ], spacing=6, alignment=ft.MainAxisAlignment.CENTER),
-                    bgcolor=SportColors.AMBER_GOLD if is_active else SportColors.BG_SURFACE_ALT,
+                    bgcolor=SportColors.PRIMARY_NEON if is_active else SportColors.BG_SURFACE_ALT,
                     border_radius=10,
                     padding=AppPadding.symmetric(horizontal=12, vertical=8),
-                    border=AppBorder.all(1, SportColors.AMBER_GOLD if is_active else SportColors.BORDER_DEFAULT),
+                    border=AppBorder.all(1, SportColors.PRIMARY_NEON if is_active else SportColors.BORDER_DEFAULT),
                     on_click=lambda _, i=idx: self._switch_tab(i),
                     expand=True,
                     ink=True

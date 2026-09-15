@@ -5,7 +5,7 @@ Simula todas as ações de um usuário real de ponta a ponta:
 2. Formulário de Definição de Metas, Anamnese & Cálculo de Macros
 3. Módulo de Treino, Troca de Exercício com Dica do Personal & Tonelagem
 4. Aplicação de Prescrição Completa do Personal (PPL, Upper/Lower, ABC)
-5. Chat Multidisciplinar com IA (Treinador Márcio, Nutri Camila, Mente Gabriel, Fisio Rafael)
+5. Chat Multidisciplinar com IA (Treinador, Nutricionista, Mente Gabriel, Fisio Rafael)
 6. Evolução Corporal, Upload/Registro de Fotos e Comparativo Antes & Depois
 7. Nutrição, Hidratação & Check-in de Saúde Mental
 8. Isolamento de dados entre usuários diferentes
@@ -142,7 +142,7 @@ class FitnessAppRobotTester:
         self.assert_test("Registro de sessão de treino e cálculo de tonelagem", session_id > 0, f"Volume Total: {int(total_tonnage)} kg levantados")
 
     def test_coach_full_routine_presets(self):
-        print("\n📌 ETAPA 5: Troca de Divisão Completa (Prescrições do Treinador Márcio)")
+        print("\n📌 ETAPA 5: Troca de Divisão Completa (Prescrições do Treinador)")
         # Aplica preset PPL
         ppl_ok = DBService.apply_coach_routine_preset("PPL")
         self.assert_test("Prescrição PPL (Push Pull Legs) aplicada com sucesso", ppl_ok)
@@ -158,13 +158,13 @@ class FitnessAppRobotTester:
     def test_ai_team_conversations(self):
         print("\n📌 ETAPA 6: Chat Multidisciplinar com o Conselho de IAs")
         
-        # 1. Personal Trainer Márcio (Máquina ocupada)
+        # 1. Treinador (Máquina ocupada)
         reply_personal = DevWorldAIService.send_message("personal", "Treinador, a cadeira extensora tá lotada, o que faço?")
-        self.assert_test("Treinador Márcio responde com cinesiologia e substituições", "búlgaro" in reply_personal.lower() or "substitui" in reply_personal.lower() or "máquina" in reply_personal.lower() or len(reply_personal) > 50)
+        self.assert_test("Treinador responde com cinesiologia e substituições", "búlgaro" in reply_personal.lower() or "substitui" in reply_personal.lower() or "máquina" in reply_personal.lower() or len(reply_personal) > 50)
         
-        # 2. Dra. Camila (Nutricionista)
-        reply_nutri = DevWorldAIService.send_message("nutri", "Camila, o que devo comer no pós-treino para hipertrofia?")
-        self.assert_test("Dra. Camila responde com timing de macros e pós-treino", "proteína" in reply_nutri.lower() or "whey" in reply_nutri.lower() or len(reply_nutri) > 50)
+        # 2. Nutricionista
+        reply_nutri = DevWorldAIService.send_message("nutri", "Nutricionista, o que devo comer no pós-treino para hipertrofia?")
+        self.assert_test("Nutricionista responde com timing de macros e pós-treino", "proteína" in reply_nutri.lower() or "whey" in reply_nutri.lower() or len(reply_nutri) > 50)
         
         # 3. Dr. Gabriel (Psicólogo do Esporte)
         reply_mente = DevWorldAIService.send_message("mente", "Estou com preguiça e pouca energia hoje.")
@@ -228,9 +228,9 @@ class FitnessAppRobotTester:
         matheus_profile = DBService.get_athlete_profile(1)
         self.assert_test("Dados originais de Matheus permanecem preservados", matheus_profile["user_id"] == 1)
         
-        # Limpeza de usuários robôs criados para o teste
+        # Limpeza de usuários robôs criados para o teste (preserva usuários reais como Mary e Matheus)
         with DBService.get_connection() as conn:
-            conn.cursor().execute("DELETE FROM users WHERE id > 1")
+            conn.cursor().execute("DELETE FROM users WHERE username LIKE 'atleta_robo_%'")
             conn.commit()
 
 if __name__ == "__main__":

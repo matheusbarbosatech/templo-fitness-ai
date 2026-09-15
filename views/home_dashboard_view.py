@@ -131,8 +131,8 @@ class HomeDashboardView:
                     )
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 
-                self._specialist_mini_row(Icons.FITNESS_CENTER, SportColors.PRIMARY_NEON, "Personal Márcio", "Foco em cadência controlada de 2s na descida."),
-                self._specialist_mini_row(Icons.RESTAURANT, SportColors.AMBER_GOLD, "Dra. Camila (Nutri)", f"Meta: {cal_consumed}/{cal_goal} kcal • {prot_consumed}/{prot_goal}g proteína."),
+                self._specialist_mini_row(Icons.FITNESS_CENTER, SportColors.PRIMARY_NEON, "Treinador", "Foco em cadência controlada de 2s na descida."),
+                self._specialist_mini_row(Icons.RESTAURANT, SportColors.TEXT_WHITE, "Nutricionista", f"Meta: {cal_consumed}/{cal_goal} kcal • {prot_consumed}/{prot_goal}g proteína."),
                 self._specialist_mini_row(Icons.PSYCHOLOGY, SportColors.PURPLE_MIND, "Dr. Gabriel (Mente)", f"Prontidão {wellness.get('mood_score', 4)}/5 • Sono {wellness.get('sleep_hours', 7.5)}h."),
                 self._specialist_mini_row(Icons.HEALING, SportColors.TEAL_PHYSIO, "Dr. Rafael (Fisio)", f"{wellness.get('soreness_notes', 'Sem queixas articulares')}."),
             ], spacing=8),

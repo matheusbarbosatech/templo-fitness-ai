@@ -233,6 +233,8 @@ class DBService:
     def _run_schema_migrations(cls):
         """Adiciona colunas novas de forma segura se tabelas antigas existirem."""
         migrations = [
+            ("users", "password", "TEXT DEFAULT '123456'"),
+            ("athlete_profile", "priority_muscle_focus", "TEXT DEFAULT 'equilibrado'"),
             ("athlete_profile", "user_id", "INTEGER DEFAULT 1"),
             ("athlete_profile", "target_weight_kg", "REAL DEFAULT 75.0"),
             ("athlete_profile", "target_weeks", "INTEGER DEFAULT 12"),
@@ -297,13 +299,26 @@ class DBService:
     def _ensure_initial_users(cls):
         with cls.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM users")
-            if cursor.fetchone()[0] == 0:
+            cursor.execute("SELECT id FROM users WHERE username = 'matheus'")
+            if not cursor.fetchone():
                 cursor.execute("""
-                INSERT INTO users (id, name, username, role, avatar_icon, color_hex)
-                VALUES (1, 'Matheus Atleta', 'matheus', 'aluno', 'fitness_center', '#FFFFFF')
+                INSERT INTO users (id, name, username, role, avatar_icon, color_hex, password)
+                VALUES (1, 'Matheus Atleta', 'matheus', 'aluno', 'fitness_center', '#FFFFFF', '123456')
                 """)
                 conn.commit()
+
+            cursor.execute("SELECT id FROM users WHERE username = 'mary'")
+            mary_row = cursor.fetchone()
+            if not mary_row:
+                cursor.execute("""
+                INSERT INTO users (name, username, role, avatar_icon, color_hex, password)
+                VALUES ('Mary Ellen da Silva Alves Barbosa', 'mary', 'aluno', 'person', '#FFFFFF', '123456')
+                """)
+                mary_id = cursor.lastrowid
+                conn.commit()
+                cls._seed_mary_profile_and_routines(mary_id)
+            else:
+                cls._seed_mary_profile_and_routines(mary_row["id"])
 
     # ==================== GERENCIAMENTO MULTI-USUÁRIO ====================
     @classmethod
@@ -367,12 +382,133 @@ class DBService:
                 conn.commit()
 
     @classmethod
+    def _seed_mary_profile_and_routines(cls, mary_id: int):
+        with cls.get_connection() as conn:
+            cursor = conn.cursor()
+            # 1. Perfil
+            cursor.execute("SELECT COUNT(*) FROM athlete_profile WHERE user_id = ?", (mary_id,))
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("""
+                INSERT INTO athlete_profile (
+                    user_id, name, age, sex, height_cm, weight_kg, goal, activity_level,
+                    target_weight_kg, target_weeks, training_days_week, session_minutes,
+                    experience_level, joint_pain, diet_strategy, daily_calories_target,
+                    daily_protein_target, daily_water_target_ml, recommended_routine,
+                    priority_muscle_focus
+                )
+                VALUES (?, 'Mary Ellen da Silva Alves Barbosa', 28, 'F', 160.0, 62.0, 'hipertrofia', 'intenso',
+                        60.0, 12, 3, 60, 'iniciante', 'nenhuma', 'equilibrada', 1850.0, 135.0, 2500, 'ABC Feminino', 'Inferiores e Glúteos')
+                """, (mary_id,))
+
+            # 2. Biblioteca de Exercícios da Ficha
+            mary_exercises_lib = [
+                ("Bicicleta Ergométrica (Aquecimento)", "Aquecimento", "Cardiorrespiratório e Membros Inferiores", "Panturrilhas, Quadríceps", "Bicicleta Estacionária",
+                 "Ajuste o selim na altura da crista ilíaca. Pedale em cadência moderada e constante para elevar a temperatura corporal e lubrificar as articulações dos joelhos e quadris.",
+                 "Aquecimento cardiovascular prévio aumenta o fluxo sanguíneo muscular, previne lesões articulares e prepara o sistema neuromuscular.",
+                 "Usar carga excessiva antes do treino principal; pedalar com joelhos desalinhados ou postura encurvada.", "directions_bike"),
+                ("Leg Press Horizontal", "Pernas", "Quadríceps e Glúteos", "Adutores, Isquiotibiais", "Máquina Leg Press Horizontal",
+                 "Apoie os pés na largura dos ombros no meio da plataforma. Destrave com segurança e desça controladamente até formar um ângulo de 90° nos joelhos sem tirar a lombar do encosto. Empurre pelos calcanhares sem travar os joelhos em hiperextensão.",
+                 "Constrói volume e tônus muscular nas coxas e glúteos em cadeia cinética fechada com estabilização total da coluna.",
+                 "Tirar a lombar ou glúteos do assento na descida máxima; estalar os joelhos no topo; colocar pés muito baixos gerando sobrecarga patelar.", "fitness_center"),
+                ("Cadeira Adutora", "Pernas", "Adutores da Coxa", "Grácil, Pectíneo", "Cadeira Adutora",
+                 "Sente-se com a coluna totalmente apoiada no encosto. Abra as pernas na amplitude confortável e feche com força controlada aproximando os joelhos no centro. Segure 1 segundo no pico de contração.",
+                 "Fortalece a parte interna da coxa, melhorando o desenho muscular, a estabilidade pélvica e a harmonia dos membros inferiores.",
+                 "Soltar o peso batendo as placas no retorno; arquear a coluna para frente; amplitude insuficiente.", "fitness_center"),
+                ("Panturrilha em Pé Livre", "Pernas", "Panturrilha (Gastrocnêmio e Sóleo)", "Tibial Posterior", "Solo / Step",
+                 "Apoie a ponta dos pés em um degrau ou step. Desça os calcanhares para alongar a fáscia e empurre o solo até a ponta máxima dos pés, esmagando a panturrilha por 1 a 2 segundos no topo.",
+                 "Desenvolve a firmeza e vascularização da batata da perna, essencial para circulação venosa e suporte na pisada.",
+                 "Fazer movimentos rápidos e saltitantes usando elasticidade de tendão em vez de força muscular; flexionar os joelhos durante a subida.", "accessibility"),
+                ("Puxada Alta pela Frente (Polia)", "Costas", "Grande Dorsal", "Bíceps, Deltoide Posterior, Romboides", "Polia / Pulley Alto",
+                 "Pegada aberta pronada. Faça a retração escapular puxando a barra em direção à parte superior do peitoral, mantendo o peito estufado e cotovelos apontando para baixo e para trás. Retorne controlando o peso.",
+                 "Alarga a silhueta das costas criando a linha em V (cintura visualmente mais fina) e melhora a postura dos ombros.",
+                 "Balançar o tronco para trás pegando impulso; puxar a barra na nuca; encolher os ombros.", "fitness_center"),
+                ("Remada na Máquina", "Costas", "Romboides e Dorsal", "Trapézio Médio, Bíceps", "Máquina de Remada Sentada",
+                 "Apoie o peito no apoio acolchoado. Puxe os pegadores retraindo as escápulas e apertando o meio das costas. Não deixe os ombros subirem em direção às orelhas.",
+                 "Desenvolve densidade e espessura das costas, corrigindo desvios posturais causados pelo uso excessivo de celular e computadores.",
+                 "Descolar o peito do apoio; hiperestender a coluna lombar; puxar com o punho em vez das costas.", "fitness_center"),
+                ("Supino Reto com Halteres", "Peito", "Peitoral Maior", "Deltoide Anterior, Tríceps", "Halteres e Banco Reto",
+                 "Deite no banco com escápulas travadas e pés firmes no chão. Desça os halteres de forma controlada até a linha do peito mantendo os cotovelos a 45-60° do tronco. Empurre convergindo levemente sem bater os halteres.",
+                 "Permite liberdade articular total para os ombros e punhos, garantindo hipertrofia peitoral com máxima segurança.",
+                 "Abrir demais os cotovelos a 90° estressando os ombros; tirar os pés do chão; descer de forma descontrolada.", "fitness_center"),
+                ("Elevação Frontal + Lateral (Bi-set)", "Ombros", "Deltoide Lateral e Anterior", "Trapézio Superior", "Halteres",
+                 "Execute primeiro a elevação lateral elevando os halteres até a linha dos ombros com cotovelos levemente flexionados. Em seguida, sem descanso, execute a elevação frontal elevando os braços à frente até a altura dos olhos.",
+                 "Bi-set de alta intensidade para desenho e definição 3D dos ombros, lapidando as porções anterior e medial.",
+                 "Jogar o quadril e balançar a coluna lombar; subir acima da linha dos ombros comprimindo o manguito.", "fitness_center"),
+                ("Tríceps na Polia (Corda)", "Braços", "Tríceps Braquial", "Antebraço", "Polia Alta com Corda",
+                 "Cotovelos colados ao lado das costelas. Estenda os braços para baixo até o travamento e abra as pontas da corda para fora no final do movimento para contração máxima da cabeça lateral do tríceps.",
+                 "Tonifica e elimina a flacidez na região posterior do braço ('músculo do tchauzinho'), conferindo firmeza e definição.",
+                 "Abrir os cotovelos durante o movimento; jogar os ombros para frente; usar peso que impeça a extensão completa.", "fitness_center"),
+                ("Stiff (Barra Livre ou Halteres)", "Pernas", "Glúteos e Posteriores de Coxa", "Eretores da Espinha", "Barra Livre ou Halteres",
+                 "Pés na largura dos quadris, joelhos semi-flexionados e travados nesse ângulo. Empurre o quadril para trás enquanto desce a carga rente às pernas mantendo a coluna 100% reta e peito aberto. Suba contraindo fortemente os glúteos.",
+                 "Exercício de ouro para empinar os glúteos e alongar sob tensão os isquiotibiais, gerando hipertrofia de alto nível.",
+                 "Arredondar a coluna lombar; flexionar os joelhos como se fosse um agachamento; afastar o peso do corpo.", "fitness_center"),
+                ("Agachamento Sumô", "Pernas", "Glúteos e Adutores", "Quadríceps", "Halter ou Barra Smith",
+                 "Pés afastados além da linha dos ombros com pontas viradas para fora a 45°. Agache direcionando os joelhos na mesma direção dos pés, mantendo o tronco ereto e o abdômen travado. Empurre pelo chão ativando glúteos e adutores.",
+                 "Recruta intensamente o glúteo máximo e a face medial das coxas, desenhando a musculatura inferior com conforto articular.",
+                 "Deixar os joelhos desabarem para dentro (valgo dinâmico); curvar a coluna lombar para frente.", "fitness_center"),
+                ("Cadeira Abdutora", "Pernas", "Glúteo Médio e Mínimo", "Tensor da Fáscia Lata", "Cadeira Abdutora",
+                 "Sente-se com o tronco ereto ou levemente inclinado para frente para maior ativação do glúteo superior. Abra as pernas com força máxima contra a resistência e segure 1 segundo no pico antes de retornar devagar.",
+                 "Proporciona o preenchimento lateral dos glúteos ('efeito ampulheta') e fortalece os estabilizadores da pelve.",
+                 "Usar peso excessivo sem abrir a amplitude total; bater os pesos no retorno perdendo a tensão contínua.", "fitness_center")
+            ]
+            for ex in mary_exercises_lib:
+                cursor.execute("""
+                INSERT OR IGNORE INTO exercise_library (name, category, primary_muscle, secondary_muscles, equipment, execution_guide, why_do_it, common_mistakes, icon_name)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, ex)
+
+            # 3. Rotinas de Mary
+            cursor.execute("SELECT COUNT(*) FROM workout_routines WHERE user_id = ?", (mary_id,))
+            if cursor.fetchone()[0] == 0:
+                mary_routines = [
+                    ("Treino A - Inferiores 1 (Quadríceps e Adutores)", "Inferiores", "Foco em quadríceps, adutores e panturrilha com pré-aquecimento", "#FFFFFF", [
+                        ("Bicicleta Ergométrica (Aquecimento)", 1, "5-10 min", 0.0, 0),
+                        ("Leg Press Horizontal", 3, "10-12", 40.0, 90),
+                        ("Cadeira Extensora", 3, "12-15", 25.0, 60),
+                        ("Cadeira Adutora", 3, "12-15", 30.0, 60),
+                        ("Panturrilha em Pé Livre", 3, "15-20", 0.0, 45),
+                    ]),
+                    ("Treino B - Superiores (Costas, Peito, Ombros e Braços)", "Superiores", "Foco em postura, tronco definido, tônus nos braços e deltoides", "#FFFFFF", [
+                        ("Puxada Alta pela Frente (Polia)", 3, "10-12", 25.0, 60),
+                        ("Remada na Máquina", 3, "10-12", 20.0, 60),
+                        ("Supino Reto com Halteres", 3, "10-12", 6.0, 60),
+                        ("Elevação Frontal + Lateral (Bi-set)", 3, "10-12", 4.0, 60),
+                        ("Tríceps na Polia (Corda)", 3, "12-15", 15.0, 45),
+                    ]),
+                    ("Treino C - Inferiores 2 (Posteriores e Glúteos)", "Glúteos & Posteriores", "Foco em cadeia posterior, glúteo médio e máximo, e isquiotibiais", "#FFFFFF", [
+                        ("Bicicleta Ergométrica (Aquecimento)", 1, "5-10 min", 0.0, 0),
+                        ("Stiff (Barra Livre ou Halteres)", 3, "10-12", 20.0, 90),
+                        ("Agachamento Sumô", 3, "10-12", 16.0, 90),
+                        ("Cadeira Flexora", 3, "12-15", 25.0, 60),
+                        ("Cadeira Abdutora", 3, "12-15", 35.0, 60),
+                    ])
+                ]
+                for r_name, r_cat, r_desc, r_col, ex_list in mary_routines:
+                    cursor.execute("""
+                    INSERT INTO workout_routines (user_id, name, category, description, color_hex)
+                    VALUES (?, ?, ?, ?, ?)
+                    """, (mary_id, r_name, r_cat, r_desc, r_col))
+                    rid = cursor.lastrowid
+                    for ex_name, s, r, w, rest in ex_list:
+                        cursor.execute("""
+                        INSERT INTO routine_exercises (routine_id, exercise_name, target_sets, target_reps, target_weight, rest_seconds)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """, (rid, ex_name, s, r, w, rest))
+
+            conn.commit()
+
+    @classmethod
     def _ensure_routines_for_user(cls, user_id: int):
         with cls.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT COUNT(*) FROM workout_routines WHERE user_id = ?", (user_id,))
             if cursor.fetchone()[0] == 0:
-                cls.apply_coach_routine_preset("ABC", user_id=user_id)
+                cursor.execute("SELECT username FROM users WHERE id = ?", (user_id,))
+                user_row = cursor.fetchone()
+                if user_row and user_row["username"] == "mary":
+                    cls._seed_mary_profile_and_routines(user_id)
+                else:
+                    cls.apply_coach_routine_preset("ABC", user_id=user_id)
 
     @classmethod
     def _ensure_initial_profile(cls):
@@ -415,7 +551,7 @@ class DBService:
             conn.commit()
 
     @classmethod
-    def save_goals(cls, goal: str, target_weight: float, target_weeks: int, days_week: int, session_mins: int, experience: str, joint_pain: str, diet_strategy: str, user_id: Optional[int] = None) -> Dict[str, Any]:
+    def save_goals(cls, goal: str, target_weight: float, target_weeks: int, days_week: int, session_mins: int, experience: str, joint_pain: str, diet_strategy: str, user_id: Optional[int] = None, muscle_focus: str = "equilibrado") -> Dict[str, Any]:
         """Calcula metas nutricionais e rotina recomendada a partir do formulário de objetivos e persiste no perfil."""
         target_uid = user_id or cls.get_active_user_id()
         profile = cls.get_athlete_profile(target_uid)
@@ -441,23 +577,33 @@ class DBService:
         activity = profile.get("activity_level", "intenso")
         tdee = bmr * activity_factors.get(activity, 1.55)
 
-        # Ajustes por objetivo
+        # Ajustes por objetivo e foco muscular
         goal_lower = goal.lower()
+        focus_lower = (muscle_focus or "").lower()
+
         if "hipertrofia" in goal_lower:
             target_calories = round(tdee + 350, 0)
             protein_g = round(weight * 2.2, 0)
-            recommended_routine = "PPL" if days_week >= 5 else "ABC"
         elif "cutting" in goal_lower or "emagrecimento" in goal_lower or "definicao" in goal_lower:
             target_calories = round(max(1400, tdee - 450), 0)
             protein_g = round(weight * 2.4, 0)
-            recommended_routine = "UpperLower" if days_week <= 4 else "PPL"
         elif "forca" in goal_lower:
             target_calories = round(tdee + 200, 0)
             protein_g = round(weight * 2.0, 0)
-            recommended_routine = "UpperLower"
         else: # Recomposição / Manutenção
             target_calories = round(tdee, 0)
             protein_g = round(weight * 2.2, 0)
+
+        # Calibração da rotina ideal com base no foco e frequência
+        if "superior" in focus_lower or "upper" in focus_lower:
+            recommended_routine = "UpperLower" if days_week <= 4 else "PPL"
+        elif "inferior" in focus_lower:
+            recommended_routine = "ABC"
+        elif "forca" in goal_lower or days_week == 4:
+            recommended_routine = "UpperLower"
+        elif days_week >= 5:
+            recommended_routine = "PPL"
+        else:
             recommended_routine = "ABC"
 
         water_ml = int(weight * 40)
@@ -712,7 +858,7 @@ class DBService:
 
     @classmethod
     def apply_coach_routine_preset(cls, preset_name: str, user_id: Optional[int] = None) -> bool:
-        """Aplica uma prescrição completa do Treinador Márcio para o atleta ativo."""
+        """Aplica uma prescrição completa do Treinador para o atleta ativo."""
         target_uid = user_id or cls.get_active_user_id()
         with cls.get_connection() as conn:
             cursor = conn.cursor()
@@ -725,7 +871,7 @@ class DBService:
 
             if preset_name.upper() == "PPL":
                 routines = [
-                    ("Treino 1 - Push (Peito, Ombros e Tríceps)", "Push", "Prescrição Personal Márcio: Hipertrofia de Empurrar", "#FFFFFF", [
+                    ("Treino 1 - Push (Peito, Ombros e Tríceps)", "Push", "Prescrição Treinador: Hipertrofia de Empurrar", "#FFFFFF", [
                         ("Supino Reto com Barra", 4, "8-10", 60.0, 90),
                         ("Supino Inclinado com Halteres", 4, "10-12", 24.0, 90),
                         ("Crucifixo na Polia (Crossover)", 3, "12-15", 15.0, 60),
@@ -733,7 +879,7 @@ class DBService:
                         ("Elevação Lateral com Halteres", 4, "12-15", 10.0, 60),
                         ("Tríceps Corda na Polia Alta", 4, "10-12", 25.0, 60),
                     ]),
-                    ("Treino 2 - Pull (Costas, Bíceps e Trapézio)", "Pull", "Prescrição Personal Márcio: Densidade e Asa de Costas", "#FFFFFF", [
+                    ("Treino 2 - Pull (Costas, Bíceps e Trapézio)", "Pull", "Prescrição Treinador: Densidade e Asa de Costas", "#FFFFFF", [
                         ("Puxada Frontal na Polia (Pulley)", 4, "8-10", 55.0, 90),
                         ("Remada Curvada com Barra", 4, "8-10", 50.0, 90),
                         ("Remada Baixa no Triângulo", 3, "10-12", 45.0, 60),
@@ -741,7 +887,7 @@ class DBService:
                         ("Rosca Direta com Barra W", 4, "8-10", 25.0, 60),
                         ("Rosca Martelo com Halteres", 3, "10-12", 14.0, 60),
                     ]),
-                    ("Treino 3 - Legs (Pernas Completas & Abdômen)", "Legs", "Prescrição Personal Márcio: Força Máxima de Inferiores", "#FFFFFF", [
+                    ("Treino 3 - Legs (Pernas Completas & Abdômen)", "Legs", "Prescrição Treinador: Força Máxima de Inferiores", "#FFFFFF", [
                         ("Agachamento Livre com Barra", 4, "6-8", 80.0, 120),
                         ("Leg Press 45°", 4, "10-12", 160.0, 90),
                         ("Cadeira Extensora", 3, "12-15", 40.0, 60),
@@ -753,7 +899,7 @@ class DBService:
                 ]
             elif preset_name.upper() == "UPPERLOWER":
                 routines = [
-                    ("Treino 1 - Upper (Membros Superiores)", "Upper", "Prescrição Personal Márcio: Peito, Costas, Braços e Ombros", "#FFFFFF", [
+                    ("Treino 1 - Upper (Membros Superiores)", "Upper", "Prescrição Treinador: Peito, Costas, Braços e Ombros", "#FFFFFF", [
                         ("Supino Reto com Barra", 4, "8-10", 60.0, 90),
                         ("Remada Curvada com Barra", 4, "8-10", 50.0, 90),
                         ("Desenvolvimento com Halteres", 3, "10-12", 18.0, 90),
@@ -761,7 +907,7 @@ class DBService:
                         ("Rosca Direta com Barra W", 3, "10-12", 24.0, 60),
                         ("Tríceps Testa com Barra W", 3, "10-12", 22.0, 60),
                     ]),
-                    ("Treino 2 - Lower (Membros Inferiores & Core)", "Lower", "Prescrição Personal Márcio: Coxas, Glúteos e Abdômen", "#FFFFFF", [
+                    ("Treino 2 - Lower (Membros Inferiores & Core)", "Lower", "Prescrição Treinador: Coxas, Glúteos e Abdômen", "#FFFFFF", [
                         ("Agachamento Livre com Barra", 4, "8-10", 75.0, 120),
                         ("Leg Press 45°", 4, "10-12", 150.0, 90),
                         ("Stiff com Barra / Halteres", 4, "10-12", 45.0, 90),
@@ -815,6 +961,7 @@ class DBService:
     def get_exercise_gif(cls, name: str) -> str:
         """Retorna a URL do GIF ou demonstração animada do exercício."""
         visuals = {
+            # Exercícios Gerais & Masculino
             "Supino Reto com Barra": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/barbell-bench-press.gif",
             "Supino Inclinado com Halteres": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/dumbbell-incline-bench-press.gif",
             "Crucifixo na Polia (Crossover)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/cable-standing-fly.gif",
@@ -850,6 +997,20 @@ class DBService:
             "Abdominal na Polia Alta (Crunch)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/abs/cable-kneeling-crunch.gif",
             "Elevação de Pernas na Barra Fixa": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/abs/hanging-leg-raise.gif",
             "Prancha Abdominal Isométrica": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/abs/bodyweight-incline-side-plank.gif",
+            
+            # Ficha de Treinos Mary Ellen & Feminino (Foto)
+            "Bicicleta Ergométrica (Aquecimento)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/cardio/stationary-bike-run-v-3.gif",
+            "Leg Press Horizontal": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/glutes/lever-horizontal-one-leg-press.gif",
+            "Cadeira Adutora": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/adductors/lever-seated-hip-adduction.gif",
+            "Panturrilha em Pé Livre": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/calves/barbell-floor-calf-raise.gif",
+            "Puxada Alta pela Frente (Polia)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/lats/cable-pulldown.gif",
+            "Remada na Máquina": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/upper-back/cable-low-seated-row.gif",
+            "Supino Reto com Halteres": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/dumbbell-bench-press.gif",
+            "Elevação Frontal + Lateral (Bi-set)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/delts/band-front-lateral-raise.gif",
+            "Tríceps na Polia (Corda)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/triceps/cable-pushdown-with-rope-attachment.gif",
+            "Stiff (Barra Livre ou Halteres)": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/glutes/dumbbell-stiff-leg-deadlift.gif",
+            "Agachamento Sumô": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/glutes/smith-sumo-squat.gif",
+            "Cadeira Abdutora": "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/abductors/lever-seated-hip-abduction.gif",
         }
         return visuals.get(name, "https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/pectorals/barbell-bench-press.gif")
 

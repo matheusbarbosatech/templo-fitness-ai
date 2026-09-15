@@ -56,7 +56,7 @@ class LoginView:
         )
         self.new_username_field = ft.TextField(
             label="Nome de Usuário (@login)",
-            hint_text="Ex: matheus_atleta",
+            hint_text="Ex: matheus",
             prefix_icon=Icons.ALTERNATE_EMAIL,
             bgcolor=SportColors.BG_INPUT,
             border_color=SportColors.BORDER_DEFAULT,
@@ -135,39 +135,47 @@ class LoginView:
                 padding=18
             )
 
-            # Botão de Ação Rápida: Atleta Matheus
-            quick_access_card = SportStyles.card_container(
-                content=ft.Row([
-                    ft.CircleAvatar(
-                        radius=20,
-                        bgcolor="#27272A",
-                        content=ft.Icon(Icons.FITNESS_CENTER, color=SportColors.TEXT_WHITE, size=18)
-                    ),
-                    ft.Column([
-                        ft.Text("Atleta Conectado: Matheus", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-                        ft.Text("Acesso instantâneo em 1 clique", size=11, color=SportColors.TEXT_SECONDARY)
-                    ], spacing=2, expand=True),
-                    ft.ElevatedButton(
-                        "Continuar",
-                        icon=Icons.ARROW_FORWARD,
-                        style=ft.ButtonStyle(
-                            bgcolor=SportColors.BG_SURFACE_ALT,
-                            color=SportColors.TEXT_WHITE,
-                            text_style=ft.TextStyle(size=12, weight=ft.FontWeight.BOLD),
-                            shape=ft.RoundedRectangleBorder(radius=10) if hasattr(ft, "RoundedRectangleBorder") else None
-                        ),
-                        height=36,
-                        on_click=lambda _: self._quick_login_matheus()
+            # Botões de Acesso Rápido para Atletas Cadastrados
+            quick_users = [
+                ("Matheus", "matheus", Icons.FITNESS_CENTER, "Acesso rápido em 1 clique"),
+                ("Mary Ellen", "mary", Icons.PERSON, "Ficha personalizada (Inferiores & Superiores)")
+            ]
+            quick_access_cards = []
+            for q_name, q_user, q_icon, q_desc in quick_users:
+                quick_access_cards.append(
+                    SportStyles.card_container(
+                        content=ft.Row([
+                            ft.CircleAvatar(
+                                radius=18,
+                                bgcolor="#27272A",
+                                content=ft.Icon(q_icon, color=SportColors.TEXT_WHITE, size=16)
+                            ),
+                            ft.Column([
+                                ft.Text(q_name, size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                                ft.Text(f"{q_desc} • @{q_user}", size=10, color=SportColors.TEXT_SECONDARY)
+                            ], spacing=2, expand=True),
+                            ft.ElevatedButton(
+                                "Entrar",
+                                icon=Icons.ARROW_FORWARD,
+                                style=ft.ButtonStyle(
+                                    bgcolor=SportColors.BG_SURFACE_ALT,
+                                    color=SportColors.TEXT_WHITE,
+                                    text_style=ft.TextStyle(size=11, weight=ft.FontWeight.BOLD),
+                                    shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
+                                ),
+                                height=32,
+                                on_click=lambda _, u=q_user: self._quick_login_user(u)
+                            )
+                        ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                        border_color=SportColors.BORDER_DEFAULT,
+                        padding=10
                     )
-                ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
-                border_color=SportColors.BORDER_DEFAULT,
-                padding=12
-            )
+                )
 
             footer_action = ft.Row([
                 ft.Text("Não tem uma conta?", size=12, color=SportColors.TEXT_SECONDARY),
                 ft.TextButton(
-                    "Criar conta de atleta",
+                    "Criar conta",
                     style=ft.ButtonStyle(color=SportColors.PRIMARY_NEON),
                     on_click=lambda _: self._toggle_register(True)
                 )
@@ -178,7 +186,7 @@ class LoginView:
                 ft.Container(height=8),
                 form_card,
                 ft.Container(height=4),
-                quick_access_card,
+                ft.Column(quick_access_cards, spacing=6),
                 ft.Container(height=6),
                 footer_action,
                 ft.Container(height=30)
@@ -188,7 +196,7 @@ class LoginView:
             # Formulário de Cadastro de Novo Atleta
             register_card = SportStyles.card_container(
                 content=ft.Column([
-                    SportStyles.section_header("CRIAR CONTA DE ATLETA", "Comece sua jornada no Templo Fitness", icon=Icons.PERSON_ADD),
+                    SportStyles.section_header("CRIAR CONTA", "Comece sua jornada no Templo Fitness", icon=Icons.PERSON_ADD),
                     ft.Container(height=4),
                     self.new_name_field,
                     self.new_username_field,
@@ -229,14 +237,23 @@ class LoginView:
         self.is_registering = is_register
         self._render_view_content()
 
+    def _quick_login_user(self, username: str):
+        users = DBService.list_users()
+        matched = next((u for u in users if u["username"].lower() == username.lower()), None)
+        if matched:
+            DBService.switch_user(matched["id"])
+            UIHelper.show_toast(self.page, f"Bem-vindo(a) de volta, {matched['name']}!", color=SportColors.PRIMARY_NEON)
+            self.on_login_success(matched["id"])
+        else:
+            DBService.switch_user(1)
+            self.on_login_success(1)
+
     def _quick_login_matheus(self):
-        # Acesso direto de Matheus Atleta (ID: 1)
-        DBService.switch_user(1)
-        UIHelper.show_toast(self.page, "Bem-vindo de volta ao Templo, Matheus!", color=SportColors.PRIMARY_NEON)
-        self.on_login_success(1)
+        self._quick_login_user("matheus")
 
     def _handle_login(self):
         username = (self.username_field.value or "").strip().lower()
+        password = (self.password_field.value or "").strip()
         if not username:
             UIHelper.show_toast(self.page, "Informe seu usuário ou e-mail!", color=SportColors.CRIMSON_NEON, text_color=SportColors.TEXT_WHITE)
             return
@@ -245,13 +262,17 @@ class LoginView:
         matched = next((u for u in users if u["username"].lower() == username or u["name"].lower() == username), None)
         
         if matched:
+            u_pwd = matched.get("password") or "123456"
+            if password and password != u_pwd:
+                UIHelper.show_toast(self.page, "Senha incorreta! Digite sua senha.", color=SportColors.CRIMSON_NEON, text_color=SportColors.TEXT_WHITE)
+                return
             DBService.switch_user(matched["id"])
-            UIHelper.show_toast(self.page, f"Bem-vindo, {matched['name']}!", color=SportColors.PRIMARY_NEON)
+            UIHelper.show_toast(self.page, f"Bem-vindo(a), {matched['name']}!", color=SportColors.PRIMARY_NEON)
             self.on_login_success(matched["id"])
         else:
-            # Se não encontrou, entra direto no perfil 1 padrão ou cadastra
+            # Fallback seguro para o primeiro usuário ou avisa
             DBService.switch_user(1)
-            UIHelper.show_toast(self.page, f"Conectado como Matheus Atleta!", color=SportColors.PRIMARY_NEON)
+            UIHelper.show_toast(self.page, f"Conectado ao Templo!", color=SportColors.PRIMARY_NEON)
             self.on_login_success(1)
 
     def _handle_register(self):

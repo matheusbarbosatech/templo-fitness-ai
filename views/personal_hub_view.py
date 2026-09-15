@@ -2,7 +2,7 @@
 Hub Central do Personal Trainer - Templo Fitness AI.
 Reúne:
 1. Ficha & Execução do Treino (Séries, Cargas, RPE, Cronômetro de Descanso).
-2. Consultoria em Tempo Real com o Personal Trainer IA (Treinador Márcio).
+2. Consultoria em Tempo Real com o Personal Trainer IA (Treinador).
 3. Biblioteca Biomecânica de Exercícios e Máquinas.
 """
 import flet as ft

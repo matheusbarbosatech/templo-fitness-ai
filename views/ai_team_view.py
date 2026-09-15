@@ -40,8 +40,8 @@ class AITeamView:
                     content=ft.Row([
                         ft.CircleAvatar(
                             radius=14,
-                            bgcolor=f"{p['color']}33",
-                            content=ft.Icon(getattr(Icons, p["avatar_icon"].upper(), Icons.PERSON), color=p["color"], size=16)
+                            bgcolor="#27272A",
+                            content=ft.Icon(getattr(Icons, p["avatar_icon"].upper(), Icons.PERSON), color=SportColors.TEXT_WHITE, size=15)
                         ),
                         ft.Column([
                             ft.Text(p["name"], size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE if is_active else SportColors.TEXT_SECONDARY),
@@ -51,7 +51,7 @@ class AITeamView:
                     bgcolor=SportColors.BG_SURFACE_ALT if is_active else SportColors.BG_SURFACE,
                     border_radius=10,
                     padding=AppPadding.symmetric(horizontal=10, vertical=6),
-                    border=AppBorder.all(1.5 if is_active else 1, p["color"] if is_active else SportColors.BORDER_DEFAULT),
+                    border=AppBorder.all(1.5 if is_active else 1, SportColors.TEXT_WHITE if is_active else SportColors.BORDER_DEFAULT),
                     on_click=lambda _, pk=key: self._switch_persona(pk)
                 )
             )
@@ -159,24 +159,26 @@ class AITeamView:
         if is_user:
             return ft.Row([
                 ft.Container(
-                    content=ft.Text(content, size=13, color=SportColors.TEXT_WHITE),
-                    bgcolor=SportColors.BG_SURFACE_ALT,
-                    padding=AppPadding.all(12),
-                    border_radius=AppBorderRadius.only(top_left=12, top_right=12, bottom_left=12, bottom_right=2),
-                    border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-                    width=290
+                    content=ft.Text(content, size=13, color=SportColors.TEXT_WHITE, selectable=True),
+                    bgcolor="#27272A",
+                    padding=AppPadding.symmetric(horizontal=14, vertical=10),
+                    border_radius=AppBorderRadius.only(top_left=14, top_right=14, bottom_left=14, bottom_right=3),
+                    border=AppBorder.all(1, "#3F3F46")
                 )
             ], alignment=ft.MainAxisAlignment.END)
         else:
             return ft.Row([
                 ft.CircleAvatar(
-                    radius=16,
-                    bgcolor=f"{p_info['color']}33",
-                    content=ft.Icon(getattr(Icons, p_info["avatar_icon"].upper(), Icons.PERSON), color=p_info["color"], size=16)
+                    radius=14,
+                    bgcolor="#27272A",
+                    content=ft.Icon(getattr(Icons, p_info["avatar_icon"].upper(), Icons.PERSON), color=SportColors.TEXT_WHITE, size=14)
                 ),
                 ft.Container(
                     content=ft.Column([
-                        ft.Text(p_info["name"], size=11, weight=ft.FontWeight.BOLD, color=p_info["color"]),
+                        ft.Row([
+                            ft.Text(p_info["name"], size=11, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                            ft.Text("• Especialista IA", size=10, color=SportColors.TEXT_MUTED)
+                        ], spacing=4),
                         ft.Markdown(
                             content,
                             selectable=True,
@@ -185,10 +187,10 @@ class AITeamView:
                         )
                     ], spacing=4),
                     bgcolor=SportColors.BG_SURFACE,
-                    padding=AppPadding.all(12),
-                    border_radius=AppBorderRadius.only(top_left=2, top_right=12, bottom_left=12, bottom_right=12),
-                    border=AppBorder.all(1, f"{p_info['color']}55"),
-                    width=310
+                    padding=AppPadding.all(14),
+                    border_radius=AppBorderRadius.only(top_left=3, top_right=14, bottom_left=14, bottom_right=14),
+                    border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
+                    expand=True
                 )
             ], alignment=ft.MainAxisAlignment.START, vertical_alignment=ft.CrossAxisAlignment.START, spacing=8)
 

@@ -725,7 +725,7 @@ class DBService:
 
             if preset_name.upper() == "PPL":
                 routines = [
-                    ("Treino 1 - Push (Peito, Ombros e Tríceps)", "Push", "Prescrição Personal Márcio: Hipertrofia de Empurrar", "#FF3366", [
+                    ("Treino 1 - Push (Peito, Ombros e Tríceps)", "Push", "Prescrição Personal Márcio: Hipertrofia de Empurrar", "#FFFFFF", [
                         ("Supino Reto com Barra", 4, "8-10", 60.0, 90),
                         ("Supino Inclinado com Halteres", 4, "10-12", 24.0, 90),
                         ("Crucifixo na Polia (Crossover)", 3, "12-15", 15.0, 60),
@@ -733,7 +733,7 @@ class DBService:
                         ("Elevação Lateral com Halteres", 4, "12-15", 10.0, 60),
                         ("Tríceps Corda na Polia Alta", 4, "10-12", 25.0, 60),
                     ]),
-                    ("Treino 2 - Pull (Costas, Bíceps e Trapézio)", "Pull", "Prescrição Personal Márcio: Densidade e Asa de Costas", "#00E5FF", [
+                    ("Treino 2 - Pull (Costas, Bíceps e Trapézio)", "Pull", "Prescrição Personal Márcio: Densidade e Asa de Costas", "#FFFFFF", [
                         ("Puxada Frontal na Polia (Pulley)", 4, "8-10", 55.0, 90),
                         ("Remada Curvada com Barra", 4, "8-10", 50.0, 90),
                         ("Remada Baixa no Triângulo", 3, "10-12", 45.0, 60),
@@ -741,7 +741,7 @@ class DBService:
                         ("Rosca Direta com Barra W", 4, "8-10", 25.0, 60),
                         ("Rosca Martelo com Halteres", 3, "10-12", 14.0, 60),
                     ]),
-                    ("Treino 3 - Legs (Pernas Completas & Abdômen)", "Legs", "Prescrição Personal Márcio: Força Máxima de Inferiores", "#00FFA3", [
+                    ("Treino 3 - Legs (Pernas Completas & Abdômen)", "Legs", "Prescrição Personal Márcio: Força Máxima de Inferiores", "#FFFFFF", [
                         ("Agachamento Livre com Barra", 4, "6-8", 80.0, 120),
                         ("Leg Press 45°", 4, "10-12", 160.0, 90),
                         ("Cadeira Extensora", 3, "12-15", 40.0, 60),
@@ -753,7 +753,7 @@ class DBService:
                 ]
             elif preset_name.upper() == "UPPERLOWER":
                 routines = [
-                    ("Treino 1 - Upper (Membros Superiores)", "Upper", "Prescrição Personal Márcio: Peito, Costas, Braços e Ombros", "#FFB800", [
+                    ("Treino 1 - Upper (Membros Superiores)", "Upper", "Prescrição Personal Márcio: Peito, Costas, Braços e Ombros", "#FFFFFF", [
                         ("Supino Reto com Barra", 4, "8-10", 60.0, 90),
                         ("Remada Curvada com Barra", 4, "8-10", 50.0, 90),
                         ("Desenvolvimento com Halteres", 3, "10-12", 18.0, 90),
@@ -761,7 +761,7 @@ class DBService:
                         ("Rosca Direta com Barra W", 3, "10-12", 24.0, 60),
                         ("Tríceps Testa com Barra W", 3, "10-12", 22.0, 60),
                     ]),
-                    ("Treino 2 - Lower (Membros Inferiores & Core)", "Lower", "Prescrição Personal Márcio: Coxas, Glúteos e Abdômen", "#9D4EDD", [
+                    ("Treino 2 - Lower (Membros Inferiores & Core)", "Lower", "Prescrição Personal Márcio: Coxas, Glúteos e Abdômen", "#FFFFFF", [
                         ("Agachamento Livre com Barra", 4, "8-10", 75.0, 120),
                         ("Leg Press 45°", 4, "10-12", 150.0, 90),
                         ("Stiff com Barra / Halteres", 4, "10-12", 45.0, 90),
@@ -772,21 +772,21 @@ class DBService:
                 ]
             else: # Padrão ABC
                 routines = [
-                    ("Treino A - Peito, Tríceps e Deltoide Anterior", "Push", "Foco em empurrar e densidade peitoral", "#FF3366", [
+                    ("Treino A - Peito, Tríceps e Deltoide Anterior", "Push", "Foco em empurrar e densidade peitoral", "#FFFFFF", [
                         ("Supino Reto com Barra", 4, "8-10", 60.0, 90),
                         ("Supino Inclinado com Halteres", 4, "10-12", 24.0, 90),
                         ("Crucifixo na Polia (Crossover)", 3, "12-15", 15.0, 60),
                         ("Desenvolvimento com Halteres", 4, "8-10", 18.0, 90),
                         ("Tríceps Corda na Polia Alta", 4, "10-12", 25.0, 60),
                     ]),
-                    ("Treino B - Costas, Bíceps e Trapézio", "Pull", "Foco em puxadas e largura dorsal", "#00E5FF", [
+                    ("Treino B - Costas, Bíceps e Trapézio", "Pull", "Foco em puxadas e largura dorsal", "#FFFFFF", [
                         ("Puxada Frontal na Polia (Pulley)", 4, "8-10", 55.0, 90),
                         ("Remada Curvada com Barra", 4, "8-10", 50.0, 90),
                         ("Remada Baixa no Triângulo", 3, "10-12", 45.0, 60),
                         ("Crucifixo Invertido no Peck Deck", 4, "12-15", 35.0, 60),
                         ("Rosca Direta com Barra W", 4, "8-10", 25.0, 60),
                     ]),
-                    ("Treino C - Pernas, Ombros Lateral/Posterior & Abdômen", "Legs", "Foco em membros inferiores e deltoides", "#00FFA3", [
+                    ("Treino C - Pernas, Ombros Lateral/Posterior & Abdômen", "Legs", "Foco em membros inferiores e deltoides", "#FFFFFF", [
                         ("Agachamento Livre com Barra", 4, "8-10", 80.0, 120),
                         ("Leg Press 45°", 4, "10-12", 160.0, 90),
                         ("Cadeira Extensora", 3, "12-15", 40.0, 60),
@@ -1311,9 +1311,9 @@ class DBService:
 
             # Cria Treinos A (Push), B (Pull), C (Legs)
             routines = [
-                ("Treino A - Push (Peito, Ombros e Tríceps)", "Push", "Foco em empurrar, densidade peitoral e deltoides", "#FF3366"),
-                ("Treino B - Pull (Costas, Bíceps e Trapézio)", "Pull", "Foco em puxadas, dorsal em V e pico de bíceps", "#00E5FF"),
-                ("Treino C - Legs (Pernas Completas e Core)", "Legs", "Foco em quadríceps, posteriores, glúteos e abdômen", "#00FFA3"),
+                ("Treino A - Push (Peito, Ombros e Tríceps)", "Push", "Foco em empurrar, densidade peitoral e deltoides", "#FFFFFF"),
+                ("Treino B - Pull (Costas, Bíceps e Trapézio)", "Pull", "Foco em puxadas, dorsal em V e pico de bíceps", "#FFFFFF"),
+                ("Treino C - Legs (Pernas Completas e Core)", "Legs", "Foco em quadríceps, posteriores, glúteos e abdômen", "#FFFFFF"),
             ]
 
             for r_name, r_cat, r_desc, r_col in routines:

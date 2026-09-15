@@ -112,33 +112,43 @@ class LoginView:
                     self.username_field,
                     self.password_field,
                     ft.Container(height=4),
-                    ft.ElevatedButton(
-                        "ENTRAR NO MEU TREINO",
-                        icon=Icons.BOLT,
-                        style=ft.ButtonStyle(
-                            bgcolor=SportColors.PRIMARY_NEON,
-                            color=SportColors.PRIMARY_TEXT_ON_NEON,
-                            text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD),
-                            shape=ft.RoundedRectangleBorder(radius=12) if hasattr(ft, "RoundedRectangleBorder") else None
-                        ),
-                        height=50,
-                        on_click=lambda _: self._handle_login()
-                    ),
+                    ft.Row([
+                        ft.ElevatedButton(
+                            "ENTRAR NO MEU TREINO",
+                            icon=Icons.BOLT,
+                            style=ft.ButtonStyle(
+                                bgcolor=SportColors.PRIMARY_NEON,
+                                color=SportColors.PRIMARY_TEXT_ON_NEON,
+                                text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD),
+                                shape=ft.RoundedRectangleBorder(radius=12) if hasattr(ft, "RoundedRectangleBorder") else None
+                            ),
+                            height=48,
+                            expand=True,
+                            on_click=lambda _: self._handle_login()
+                        )
+                    ]),
                     ft.Row([
                         ft.Container(
                             content=ft.Text("Esqueceu a senha?", size=11, color=SportColors.TEXT_MUTED),
                             on_click=lambda _: UIHelper.show_toast(self.page, "Para redefinir a senha, consulte o suporte.", color=SportColors.BG_SURFACE_ALT)
                         ),
-                    ], alignment=ft.MainAxisAlignment.END),
+                    ], alignment=ft.MainAxisAlignment.CENTER),
                 ], spacing=10),
                 border_color=SportColors.BORDER_DEFAULT,
                 padding=18
             )
 
+            # Divisor visual sutil
+            divider = ft.Row([
+                ft.Container(height=1, bgcolor=SportColors.BORDER_DEFAULT, expand=True),
+                ft.Text("OU ACESSO RÁPIDO EM 1 CLIQUE", size=10, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED),
+                ft.Container(height=1, bgcolor=SportColors.BORDER_DEFAULT, expand=True)
+            ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+
             # Botões de Acesso Rápido para Usuários Cadastrados
             quick_users = [
-                ("Matheus", "matheus", Icons.FITNESS_CENTER, "Acesso rápido em 1 clique"),
-                ("Mary Ellen", "mary", Icons.PERSON, "Ficha personalizada (Inferiores & Superiores)")
+                ("Matheus", "matheus", Icons.FITNESS_CENTER, "Ficha Superiores (3x)"),
+                ("Mary Ellen", "mary", Icons.PERSON, "Ficha Inferiores & Superiores")
             ]
             quick_access_cards = []
             for q_name, q_user, q_icon, q_desc in quick_users:
@@ -147,12 +157,12 @@ class LoginView:
                         content=ft.Row([
                             ft.CircleAvatar(
                                 radius=18,
-                                bgcolor="#27272A",
-                                content=ft.Icon(q_icon, color=SportColors.TEXT_WHITE, size=16)
+                                bgcolor="#222226",
+                                content=ft.Icon(q_icon, color=SportColors.PRIMARY_NEON, size=16)
                             ),
                             ft.Column([
-                                ft.Text(q_name, size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-                                ft.Text(f"{q_desc} • @{q_user}", size=10, color=SportColors.TEXT_SECONDARY)
+                                ft.Text(q_name, size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                                ft.Text(f"{q_desc} • @{q_user}", size=11, color=SportColors.TEXT_SECONDARY)
                             ], spacing=2, expand=True),
                             ft.ElevatedButton(
                                 "Entrar",
@@ -163,12 +173,12 @@ class LoginView:
                                     text_style=ft.TextStyle(size=11, weight=ft.FontWeight.BOLD),
                                     shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
                                 ),
-                                height=32,
+                                height=34,
                                 on_click=lambda _, u=q_user: self._quick_login_user(u)
                             )
-                        ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                        ], spacing=12, vertical_alignment=ft.CrossAxisAlignment.CENTER),
                         border_color=SportColors.BORDER_DEFAULT,
-                        padding=10
+                        padding=12
                     )
                 )
 
@@ -181,16 +191,32 @@ class LoginView:
                 )
             ], alignment=ft.MainAxisAlignment.CENTER)
 
-            self.container_content.content = ft.ListView([
-                hero_section,
-                ft.Container(height=8),
-                form_card,
-                ft.Container(height=4),
-                ft.Column(quick_access_cards, spacing=6),
-                ft.Container(height=6),
-                footer_action,
-                ft.Container(height=30)
-            ], spacing=10, padding=AppPadding.all(16))
+            # Coluna interna com largura máxima elegante e centralizada
+            desktop_card_wrapper = ft.Container(
+                content=ft.Column([
+                    hero_section,
+                    ft.Container(height=6),
+                    form_card,
+                    ft.Container(height=8),
+                    divider,
+                    ft.Container(height=4),
+                    ft.Column(quick_access_cards, spacing=8),
+                    ft.Container(height=6),
+                    footer_action,
+                    ft.Container(height=30)
+                ], spacing=10, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                width=450
+            )
+
+            self.container_content.content = ft.Container(
+                content=ft.ListView([
+                    ft.Container(height=16),
+                    ft.Row([desktop_card_wrapper], alignment=ft.MainAxisAlignment.CENTER),
+                    ft.Container(height=24)
+                ], spacing=0, padding=AppPadding.symmetric(horizontal=12, vertical=8)),
+                expand=True,
+                bgcolor=SportColors.BG_DARK
+            )
 
         else:
             # Formulário de Cadastro de Novo Usuário
@@ -201,34 +227,52 @@ class LoginView:
                     self.new_name_field,
                     self.new_username_field,
                     ft.Container(height=4),
-                    ft.ElevatedButton(
-                        "CADASTRAR E COMEÇAR TREINOS",
-                        icon=Icons.CHECK_CIRCLE,
-                        style=ft.ButtonStyle(
-                            bgcolor=SportColors.PRIMARY_NEON,
-                            color=SportColors.PRIMARY_TEXT_ON_NEON,
-                            text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD),
-                            shape=ft.RoundedRectangleBorder(radius=12) if hasattr(ft, "RoundedRectangleBorder") else None
-                        ),
-                        height=50,
-                        on_click=lambda _: self._handle_register()
-                    ),
-                    ft.TextButton(
-                        "Já possuo uma conta (Voltar ao Login)",
-                        style=ft.ButtonStyle(color=SportColors.TEXT_SECONDARY),
-                        on_click=lambda _: self._toggle_register(False)
-                    )
+                    ft.Row([
+                        ft.ElevatedButton(
+                            "CADASTRAR E COMEÇAR TREINOS",
+                            icon=Icons.CHECK_CIRCLE,
+                            style=ft.ButtonStyle(
+                                bgcolor=SportColors.PRIMARY_NEON,
+                                color=SportColors.PRIMARY_TEXT_ON_NEON,
+                                text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD),
+                                shape=ft.RoundedRectangleBorder(radius=12) if hasattr(ft, "RoundedRectangleBorder") else None
+                            ),
+                            height=48,
+                            expand=True,
+                            on_click=lambda _: self._handle_register()
+                        )
+                    ]),
+                    ft.Row([
+                        ft.TextButton(
+                            "Já possuo uma conta (Voltar ao Login)",
+                            style=ft.ButtonStyle(color=SportColors.TEXT_SECONDARY),
+                            on_click=lambda _: self._toggle_register(False)
+                        )
+                    ], alignment=ft.MainAxisAlignment.CENTER)
                 ], spacing=10),
                 border_color=SportColors.BORDER_DEFAULT,
                 padding=18
             )
 
-            self.container_content.content = ft.ListView([
-                hero_section,
-                ft.Container(height=8),
-                register_card,
-                ft.Container(height=30)
-            ], spacing=10, padding=AppPadding.all(16))
+            register_wrapper = ft.Container(
+                content=ft.Column([
+                    hero_section,
+                    ft.Container(height=6),
+                    register_card,
+                    ft.Container(height=30)
+                ], spacing=10, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                width=450
+            )
+
+            self.container_content.content = ft.Container(
+                content=ft.ListView([
+                    ft.Container(height=16),
+                    ft.Row([register_wrapper], alignment=ft.MainAxisAlignment.CENTER),
+                    ft.Container(height=24)
+                ], spacing=0, padding=AppPadding.symmetric(horizontal=12, vertical=8)),
+                expand=True,
+                bgcolor=SportColors.BG_DARK
+            )
 
         if self.page:
             self.page.update()

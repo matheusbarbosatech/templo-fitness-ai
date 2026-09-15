@@ -84,7 +84,7 @@ class WorkoutView:
                     on_click=lambda _: self._show_coach_presets_dialog()
                 )
             ], spacing=2)
-        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, wrap=True)
 
         # Cronômetro de Descanso Compacto
         timer_strip = SportStyles.card_container(
@@ -108,7 +108,7 @@ class WorkoutView:
                             on_click=lambda _: self._stop_timer()
                         )
                     ], spacing=4)
-                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, vertical_alignment=ft.CrossAxisAlignment.CENTER, wrap=True),
                 self.timer_progress
             ], spacing=6),
             bgcolor=SportColors.BG_SURFACE_ALT,
@@ -160,7 +160,7 @@ class WorkoutView:
             self.history_column
         ], spacing=10)
 
-        # Coluna principal centralizada e responsiva (Padrão Hevy / Apple Fitness)
+        # Coluna principal centralizada e responsiva Mobile First (Padrão Hevy / Apple Fitness)
         main_content_column = ft.Column([
             top_bar,
             self.routine_selector_row,
@@ -170,21 +170,21 @@ class WorkoutView:
             finish_bar,
             history_section,
             ft.Container(height=60)
-        ], spacing=14, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+        ], spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         content_wrapper = ft.Container(
             content=main_content_column,
-            width=740
+            col={"xs": 12, "sm": 12, "md": 10, "lg": 8, "xl": 7}
         )
 
-        centered_row = ft.Row([content_wrapper], alignment=ft.MainAxisAlignment.CENTER)
+        responsive_workout_row = ft.ResponsiveRow([content_wrapper], alignment=ft.MainAxisAlignment.CENTER)
 
         return ft.Container(
             content=ft.ListView([
-                ft.Container(height=8),
-                centered_row,
+                ft.Container(height=6),
+                responsive_workout_row,
                 ft.Container(height=30)
-            ], spacing=0, padding=AppPadding.symmetric(horizontal=12, vertical=8)),
+            ], spacing=0, padding=AppPadding.symmetric(horizontal=8, vertical=6)),
             bgcolor=SportColors.BG_DARK,
             expand=True
         )
@@ -267,13 +267,13 @@ class WorkoutView:
         def _metric_pill(label: str, value: str):
             return ft.Container(
                 content=ft.Column([
-                    ft.Text(value, size=14, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE, text_align=ft.TextAlign.CENTER),
-                    ft.Text(label, size=9, weight=ft.FontWeight.W_600, color=SportColors.TEXT_MUTED, text_align=ft.TextAlign.CENTER)
-                ], spacing=2, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                    ft.Text(value, size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE, text_align=ft.TextAlign.CENTER),
+                    ft.Text(label, size=8, weight=ft.FontWeight.W_600, color=SportColors.TEXT_MUTED, text_align=ft.TextAlign.CENTER)
+                ], spacing=1, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
                 bgcolor="#14141E",
                 border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
                 border_radius=8,
-                padding=AppPadding.symmetric(horizontal=8, vertical=6),
+                padding=AppPadding.symmetric(horizontal=4, vertical=5),
                 expand=True
             )
 
@@ -294,15 +294,15 @@ class WorkoutView:
             # 1. Demonstração Visual / Animação Grande e Fluida (GIF do Exercício)
             img_control = ft.Image(
                 src=gif_url,
-                height=230,
+                height=210,
                 fit="contain",
                 border_radius=10,
                 error_content=ft.Container(
                     content=ft.Column([
-                        ft.Icon(Icons.FITNESS_CENTER, size=40, color=SportColors.TEXT_MUTED),
-                        ft.Text(f"{ex_name}", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_SECONDARY)
+                        ft.Icon(Icons.FITNESS_CENTER, size=36, color=SportColors.TEXT_MUTED),
+                        ft.Text(f"{ex_name}", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_SECONDARY)
                     ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-                    height=200,
+                    height=180,
                     alignment=AppAlignment.CENTER,
                     bgcolor=SportColors.BG_SURFACE_ALT
                 )
@@ -311,11 +311,11 @@ class WorkoutView:
             visual_media = ft.Container(
                 content=img_control,
                 alignment=AppAlignment.CENTER,
-                height=230,
+                height=210,
                 bgcolor="#09090E",
                 border_radius=12,
                 border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-                padding=AppPadding.all(6)
+                padding=AppPadding.all(4)
             )
 
             # 2. Métricas do Exercício (Padrão painel HTML / Apple Fitness)
@@ -323,21 +323,21 @@ class WorkoutView:
             metrics_row = ft.Row([
                 _metric_pill("SÉRIES", str(target_sets)),
                 _metric_pill("REPS", str(target_reps)),
-                _metric_pill("CARGA ALVO", weight_display),
+                _metric_pill("CARGA", weight_display),
                 _metric_pill("DESCANSO", f"{rest_sec}s")
-            ], spacing=8)
+            ], spacing=6)
 
-            # 3. Tabela de Séries com Padrão Internacional (Hevy / Strong)
+            # 3. Tabela de Séries Mobile First (Padrão Hevy & Strong para Celulares)
             table_header = ft.Container(
                 content=ft.Row([
-                    ft.Text("SÉRIE", size=10, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=44, text_align=ft.TextAlign.CENTER),
-                    ft.Text("CARGA (KG)", size=10, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=105, text_align=ft.TextAlign.CENTER),
-                    ft.Text("REPETIÇÕES", size=10, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=95, text_align=ft.TextAlign.CENTER),
-                    ft.Text("STATUS", size=10, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, expand=True, text_align=ft.TextAlign.CENTER),
-                ], spacing=10, alignment=ft.MainAxisAlignment.CENTER),
+                    ft.Text("SET", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=32, text_align=ft.TextAlign.CENTER),
+                    ft.Text("CARGA", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=76, text_align=ft.TextAlign.CENTER),
+                    ft.Text("REPS", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=70, text_align=ft.TextAlign.CENTER),
+                    ft.Text("FEITO", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=44, text_align=ft.TextAlign.CENTER),
+                ], spacing=6, alignment=ft.MainAxisAlignment.CENTER),
                 bgcolor="#101018",
-                border_radius=8,
-                padding=AppPadding.symmetric(horizontal=10, vertical=6)
+                border_radius=6,
+                padding=AppPadding.symmetric(horizontal=6, vertical=5)
             )
 
             sets_rows = []
@@ -350,58 +350,55 @@ class WorkoutView:
                     initial_reps = str(target_reps)
 
                 s_pill = ft.Container(
-                    content=ft.Text(f"#{s_num}", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                    content=ft.Text(f"{s_num}", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                     bgcolor="#1C1C26",
                     border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
                     border_radius=6,
-                    width=44,
-                    height=40,
+                    width=32,
+                    height=36,
                     alignment=AppAlignment.CENTER
                 )
 
                 w_input = ft.TextField(
                     value=str(int(target_weight)) if target_weight else "0",
-                    width=105,
-                    height=40,
-                    text_size=14,
+                    width=76,
+                    height=36,
+                    text_size=13,
                     text_align=ft.TextAlign.CENTER,
-                    suffix=ft.Text("kg", size=11, color=SportColors.TEXT_MUTED),
+                    suffix=ft.Text("kg", size=10, color=SportColors.TEXT_MUTED),
                     keyboard_type=ft.KeyboardType.NUMBER,
                     bgcolor=SportColors.BG_INPUT,
                     border_color=SportColors.BORDER_DEFAULT,
                     focused_border_color=SportColors.PRIMARY_NEON,
                     color=SportColors.TEXT_WHITE,
-                    content_padding=AppPadding.symmetric(horizontal=6, vertical=4)
+                    content_padding=AppPadding.symmetric(horizontal=4, vertical=2)
                 )
 
                 r_input = ft.TextField(
                     value=initial_reps,
-                    width=95,
-                    height=40,
-                    text_size=14,
+                    width=70,
+                    height=36,
+                    text_size=13,
                     text_align=ft.TextAlign.CENTER,
-                    suffix=ft.Text("reps", size=11, color=SportColors.TEXT_MUTED),
+                    suffix=ft.Text("reps", size=10, color=SportColors.TEXT_MUTED),
                     keyboard_type=ft.KeyboardType.NUMBER,
                     bgcolor=SportColors.BG_INPUT,
                     border_color=SportColors.BORDER_DEFAULT,
                     focused_border_color=SportColors.PRIMARY_NEON,
                     color=SportColors.TEXT_WHITE,
-                    content_padding=AppPadding.symmetric(horizontal=6, vertical=4)
+                    content_padding=AppPadding.symmetric(horizontal=4, vertical=2)
                 )
 
-                check_btn = ft.ElevatedButton(
-                    "✓ Feito",
-                    icon=Icons.CHECK,
-                    style=ft.ButtonStyle(
-                        bgcolor=SportColors.BG_SURFACE_ALT,
-                        color=SportColors.TEXT_WHITE,
-                        text_style=ft.TextStyle(size=12, weight=ft.FontWeight.BOLD),
-                        shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
-                    ),
-                    height=40,
-                    expand=True,
+                check_btn = ft.Container(
+                    content=ft.Icon(Icons.CHECK, size=16, color=SportColors.TEXT_MUTED),
+                    bgcolor=SportColors.BG_SURFACE_ALT,
+                    border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
+                    border_radius=6,
+                    width=44,
+                    height=36,
+                    alignment=AppAlignment.CENTER,
                     tooltip="Concluir série e iniciar cronômetro",
-                    on_click=None
+                    ink=True
                 )
 
                 self.active_inputs[ex_name][f"s{s_num}_w"] = w_input
@@ -409,14 +406,10 @@ class WorkoutView:
 
                 def make_on_check(btn=check_btn, w_inp=w_input, r_inp=r_input, s=s_num, name=ex_name, r_time=rest_sec):
                     def handler(_):
-                        btn.text = "✓ Feito"
-                        btn.style = ft.ButtonStyle(
-                            bgcolor=SportColors.PRIMARY_NEON,
-                            color=SportColors.PRIMARY_TEXT_ON_NEON,
-                            text_style=ft.TextStyle(size=12, weight=ft.FontWeight.BOLD),
-                            shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
-                        )
-                        btn.disabled = True
+                        btn.content = ft.Icon(Icons.CHECK, size=18, color=SportColors.PRIMARY_TEXT_ON_NEON)
+                        btn.bgcolor = SportColors.PRIMARY_NEON
+                        btn.border = AppBorder.all(1, SportColors.PRIMARY_NEON)
+                        btn.on_click = None
                         
                         try:
                             w_val = float(w_inp.value or 0)
@@ -449,18 +442,18 @@ class WorkoutView:
                         w_input,
                         r_input,
                         check_btn
-                    ], spacing=10, alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+                    ], spacing=6, alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.CENTER)
                 )
 
             sets_table = ft.Container(
                 content=ft.Column([
                     table_header,
-                    ft.Column(sets_rows, spacing=8)
-                ], spacing=8),
+                    ft.Column(sets_rows, spacing=6)
+                ], spacing=6),
                 bgcolor="#111118",
                 border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
                 border_radius=10,
-                padding=10
+                padding=8
             )
 
             # Modal de Instruções (aberto só sob demanda para manter tela limpa)
@@ -506,7 +499,7 @@ class WorkoutView:
                         ft.Row([
                             SportStyles.badge(p_muscle, SportColors.PRIMARY_NEON, icon=Icons.FITNESS_CENTER),
                             SportStyles.badge(equipment, SportColors.TEXT_SECONDARY, icon=Icons.SETTINGS),
-                        ], spacing=4),
+                        ], spacing=4, wrap=True),
                     ], spacing=2, expand=True),
                 ], spacing=10, expand=True, vertical_alignment=ft.CrossAxisAlignment.CENTER),
                 ft.Row([

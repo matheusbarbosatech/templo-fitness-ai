@@ -140,21 +140,21 @@ def main(page: ft.Page):
                 alignment=AppAlignment.CENTER
             ),
             title=ft.Row([
-                ft.Text(AppConfig.APP_NAME, size=15, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                ft.Text(AppConfig.APP_NAME, size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE, no_wrap=True),
                 ft.Container(
-                    content=ft.Text("PRO", size=9, weight=ft.FontWeight.BOLD, color=SportColors.BG_DARK),
+                    content=ft.Text("PRO", size=8, weight=ft.FontWeight.BOLD, color=SportColors.BG_DARK),
                     bgcolor=SportColors.PRIMARY_NEON,
-                    padding=AppPadding.symmetric(horizontal=6, vertical=2),
+                    padding=AppPadding.symmetric(horizontal=5, vertical=2),
                     border_radius=4
                 )
-            ], spacing=6, alignment=ft.MainAxisAlignment.START),
+            ], spacing=4, alignment=ft.MainAxisAlignment.START),
             actions=[
                 ft.Container(
                     content=ft.Row([
                         ft.CircleAvatar(
-                            radius=11,
+                            radius=10,
                             bgcolor="#27272A",
-                            content=ft.Icon(Icons.PERSON, color=SportColors.TEXT_WHITE, size=13)
+                            content=ft.Icon(Icons.PERSON, color=SportColors.TEXT_WHITE, size=12)
                         ),
                         ft.Text(u_name, size=11, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                     ], spacing=4),
@@ -162,29 +162,22 @@ def main(page: ft.Page):
                     padding=AppPadding.symmetric(horizontal=8, vertical=4),
                     border_radius=12,
                     border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-                    tooltip=f"Usuário Conectado: {active_u.get('name')}. Clique para trocar.",
+                    tooltip=f"Usuário: {active_u.get('name')}. Clique para trocar.",
                     on_click=lambda _: on_logout()
                 ),
                 ft.IconButton(
                     icon=Icons.ASSIGNMENT_IND_OUTLINED,
                     icon_color=SportColors.PRIMARY_NEON,
-                    icon_size=20,
+                    icon_size=18,
                     tooltip="Refazer Avaliação Física & Anamnese 360°",
                     on_click=lambda _: GoalSettingDialog(page, on_saved=render_app, user_id=active_user_id).show()
                 ),
                 ft.IconButton(
                     icon=Icons.SETTINGS,
                     icon_color=SportColors.TEXT_WHITE,
-                    icon_size=19,
+                    icon_size=18,
                     tooltip="Configurações & Chave API DevWorld",
                     on_click=lambda _: SettingsView.open_dialog(page, on_saved=render_app)
-                ),
-                ft.IconButton(
-                    icon=Icons.SWAP_HORIZ,
-                    icon_color=SportColors.TEXT_SECONDARY,
-                    icon_size=18,
-                    tooltip="Trocar Usuário / Sair",
-                    on_click=lambda _: on_logout()
                 ),
                 ft.Container(width=4)
             ],

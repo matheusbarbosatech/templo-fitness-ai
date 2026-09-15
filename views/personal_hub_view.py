@@ -31,10 +31,10 @@ class PersonalHubView:
 
         tabs_container = ft.Container(
             content=self.tabs_row,
-            width=740,
-            padding=AppPadding.symmetric(horizontal=8, vertical=4)
+            col={"xs": 12, "sm": 12, "md": 10, "lg": 8, "xl": 7},
+            padding=AppPadding.symmetric(horizontal=4, vertical=2)
         )
-        tabs_wrapper = ft.Row([tabs_container], alignment=ft.MainAxisAlignment.CENTER)
+        tabs_wrapper = ft.ResponsiveRow([tabs_container], alignment=ft.MainAxisAlignment.CENTER)
 
         return ft.Container(
             content=ft.Column([

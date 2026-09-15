@@ -191,7 +191,7 @@ class LoginView:
                 )
             ], alignment=ft.MainAxisAlignment.CENTER)
 
-            # Coluna interna com largura máxima elegante e centralizada
+            # Coluna interna com largura máxima elegante e centralizada (Mobile First)
             desktop_card_wrapper = ft.Container(
                 content=ft.Column([
                     hero_section,
@@ -205,15 +205,20 @@ class LoginView:
                     footer_action,
                     ft.Container(height=30)
                 ], spacing=10, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-                width=450
+                col={"xs": 12, "sm": 10, "md": 8, "lg": 6, "xl": 4}
+            )
+
+            responsive_login_row = ft.ResponsiveRow(
+                [desktop_card_wrapper],
+                alignment=ft.MainAxisAlignment.CENTER
             )
 
             self.container_content.content = ft.Container(
                 content=ft.ListView([
-                    ft.Container(height=16),
-                    ft.Row([desktop_card_wrapper], alignment=ft.MainAxisAlignment.CENTER),
+                    ft.Container(height=12),
+                    responsive_login_row,
                     ft.Container(height=24)
-                ], spacing=0, padding=AppPadding.symmetric(horizontal=12, vertical=8)),
+                ], spacing=0, padding=AppPadding.symmetric(horizontal=8, vertical=8)),
                 expand=True,
                 bgcolor=SportColors.BG_DARK
             )
@@ -251,7 +256,7 @@ class LoginView:
                     ], alignment=ft.MainAxisAlignment.CENTER)
                 ], spacing=10),
                 border_color=SportColors.BORDER_DEFAULT,
-                padding=18
+                padding=14
             )
 
             register_wrapper = ft.Container(
@@ -261,15 +266,20 @@ class LoginView:
                     register_card,
                     ft.Container(height=30)
                 ], spacing=10, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-                width=450
+                col={"xs": 12, "sm": 10, "md": 8, "lg": 6, "xl": 4}
+            )
+
+            responsive_register_row = ft.ResponsiveRow(
+                [register_wrapper],
+                alignment=ft.MainAxisAlignment.CENTER
             )
 
             self.container_content.content = ft.Container(
                 content=ft.ListView([
-                    ft.Container(height=16),
-                    ft.Row([register_wrapper], alignment=ft.MainAxisAlignment.CENTER),
+                    ft.Container(height=12),
+                    responsive_register_row,
                     ft.Container(height=24)
-                ], spacing=0, padding=AppPadding.symmetric(horizontal=12, vertical=8)),
+                ], spacing=0, padding=AppPadding.symmetric(horizontal=8, vertical=8)),
                 expand=True,
                 bgcolor=SportColors.BG_DARK
             )

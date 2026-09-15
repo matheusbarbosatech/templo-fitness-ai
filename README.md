@@ -11,7 +11,7 @@ Aplicativo completo de musculação, performance esportiva, disciplina e saúde 
 ### 1. 🏠 Dashboard 360° & Mordomia do Templo
 - **Versículo Diário & Propósito:** Lembrete de que o treino é mordomia do corpo e instrumento de vocação divina.
 - Visão holística: Treino ativo do dia, hidratação, calorias e balanço de macronutrientes.
-- **Alternância Multi-Usuário:** Suporte a múltiplos atletas no mesmo aparelho com dados isolados.
+- **Alternância Multi-Usuário:** Suporte a múltiplos usuários no mesmo aparelho com dados isolados.
 
 ### 2. 🏋️ Módulo de Execução de Treino & Prescrições do Personal
 - Controle dinâmico de séries, repetições, cargas e RPE.

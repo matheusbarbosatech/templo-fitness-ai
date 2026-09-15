@@ -1,6 +1,6 @@
 """
 Dashboard Principal 360° - Templo Fitness AI (Estilo Minimalista Apple Fitness+ / Whoop).
-Apresenta o resumo holístico diário do atleta com design limpo, legibilidade perfeita e tons elegantes.
+Apresenta o resumo holístico diário do usuário com design limpo, legibilidade perfeita e tons elegantes.
 """
 import flet as ft
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
@@ -46,7 +46,7 @@ class HomeDashboardView:
         prot_consumed = int(nutrition.get("total_protein", 0))
         prot_goal = int(macros_target.get("protein_g", 160))
 
-        # 1. Header do Atleta
+        # 1. Header do Usuário
         header_card = SportStyles.card_container(
             content=ft.Column([
                 ft.Row([
@@ -56,7 +56,7 @@ class HomeDashboardView:
                         content=ft.Icon(Icons.PERSON, color=SportColors.PRIMARY_NEON, size=24)
                     ),
                     ft.Column([
-                        ft.Text(f"Olá, {profile.get('name', 'Atleta')}", size=18, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                        ft.Text(f"Olá, {profile.get('name', 'Usuário')}", size=18, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
                         ft.Row([
                             SportStyles.badge(profile.get('goal', 'Hipertrofia').capitalize(), SportColors.PRIMARY_NEON),
                             SportStyles.badge(f"{profile.get('weight_kg')} kg", SportColors.TEXT_SECONDARY),
@@ -73,7 +73,7 @@ class HomeDashboardView:
                         on_click=lambda _: GoalSettingDialog(self.page, on_saved=lambda: self._nav_to(0)).show()
                     ),
                     ft.ElevatedButton(
-                        "👥 Alternar Atleta",
+                        "👥 Alternar Usuário",
                         style=ft.ButtonStyle(bgcolor=SportColors.BG_SURFACE_ALT, color=SportColors.TEXT_WHITE),
                         height=32,
                         on_click=lambda _: AuthDialog(self.page, on_user_changed=lambda: self._nav_to(0)).show()

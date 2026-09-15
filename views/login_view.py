@@ -1,7 +1,7 @@
 """
 Tela Oficial de Login & Autenticação - Templo Fitness AI.
 Padrão internacional de apps de musculação e treino (Nike Training / Hevy / Whoop).
-Foco exclusivo no atleta: Entrada rápida com 1 clique, credenciais seguras e criação limpa de conta.
+Foco exclusivo no usuário: Entrada rápida com 1 clique, credenciais seguras e criação limpa de conta.
 """
 import flet as ft
 from typing import Callable, Optional
@@ -135,7 +135,7 @@ class LoginView:
                 padding=18
             )
 
-            # Botões de Acesso Rápido para Atletas Cadastrados
+            # Botões de Acesso Rápido para Usuários Cadastrados
             quick_users = [
                 ("Matheus", "matheus", Icons.FITNESS_CENTER, "Acesso rápido em 1 clique"),
                 ("Mary Ellen", "mary", Icons.PERSON, "Ficha personalizada (Inferiores & Superiores)")
@@ -193,7 +193,7 @@ class LoginView:
             ], spacing=10, padding=AppPadding.all(16))
 
         else:
-            # Formulário de Cadastro de Novo Atleta
+            # Formulário de Cadastro de Novo Usuário
             register_card = SportStyles.card_container(
                 content=ft.Column([
                     SportStyles.section_header("CRIAR CONTA", "Comece sua jornada no Templo Fitness", icon=Icons.PERSON_ADD),

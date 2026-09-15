@@ -10,7 +10,7 @@ Este guia passo a passo ensina exatamente como subir o código para o seu **GitH
 - [x] **Segurança do Repositório:** Arquivo `.gitignore` configurado (o arquivo `.apk` de 141MB está ignorado para não travar o limite do GitHub).
 - [x] **Suporte a Nuvem:** Porta dinâmica `PORT` e host `0.0.0.0` configurados no `run_web.py`.
 - [x] **Blueprint do Render:** Arquivo `render.yaml` gerado na raiz (`templo-fitness-ai`).
-- [x] **Multi-Usuário & Metas:** Sistema completo para alternar atletas e calibrar treinos.
+- [x] **Multi-Usuário & Metas:** Sistema completo para alternar usuários e calibrar treinos.
 - [x] **Identidade Bíblica Unissex:** Mordomia do Templo do Espírito Santo (1 Coríntios 6:19-20).
 
 ---

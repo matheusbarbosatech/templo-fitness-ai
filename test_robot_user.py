@@ -78,10 +78,10 @@ class FitnessAppRobotTester:
 
     def test_multi_user_login_and_switching(self):
         print("\n📌 ETAPA 2: Login e Alternância de Usuários Diferentes")
-        # Cria novo atleta de teste
-        test_username = f"atleta_robo_{int(time.time())}"
-        new_uid = DBService.create_user(name="Rodrigo Atleta Robô", username=test_username, role="aluno")
-        self.assert_test("Cadastro de novo atleta realizado", new_uid > 0, f"ID: {new_uid}")
+        # Cria novo usuário de teste
+        test_username = f"user_robo_{int(time.time())}"
+        new_uid = DBService.create_user(name="Rodrigo Usuário Robô", username=test_username, role="aluno")
+        self.assert_test("Cadastro de novo usuário realizado", new_uid > 0, f"ID: {new_uid}")
 
         # Alterna para o novo usuário
         active_user = DBService.switch_user(new_uid)
@@ -111,7 +111,7 @@ class FitnessAppRobotTester:
     def test_workout_exercise_swap_and_execution(self):
         print("\n📌 ETAPA 4: Módulo de Treino & Troca de Exercício (Recomendação do Personal)")
         routines = DBService.get_routines()
-        self.assert_test("Rotinas de treino carregadas para o atleta", len(routines) > 0, f"{len(routines)} rotinas")
+        self.assert_test("Rotinas de treino carregadas para o usuário", len(routines) > 0, f"{len(routines)} rotinas")
         
         active_routine = routines[0]
         routine_id = active_routine["id"]
@@ -208,7 +208,7 @@ class FitnessAppRobotTester:
         print("\n📌 ETAPA 8: Nutrição, Hidratação & Registro de Bem-Estar")
         DBService.add_water(500)
         DBService.add_water(1000)
-        DBService.add_meal("Almoço Atleta: Frango com Batata Doce", calories=650, protein=52, carbs=70, fat=12)
+        DBService.add_meal("Almoço: Frango com Batata Doce", calories=650, protein=52, carbs=70, fat=12)
         
         nutrition = DBService.get_daily_nutrition()
         self.assert_test("Registro de hidratação totalizado", nutrition["total_water_ml"] >= 1500, f"{nutrition['total_water_ml']} ml")
@@ -230,7 +230,7 @@ class FitnessAppRobotTester:
         
         # Limpeza de usuários robôs criados para o teste (preserva usuários reais como Mary e Matheus)
         with DBService.get_connection() as conn:
-            conn.cursor().execute("DELETE FROM users WHERE username LIKE 'atleta_robo_%'")
+            conn.cursor().execute("DELETE FROM users WHERE username LIKE 'user_robo_%' OR username LIKE 'atleta_robo_%'")
             conn.commit()
 
 if __name__ == "__main__":

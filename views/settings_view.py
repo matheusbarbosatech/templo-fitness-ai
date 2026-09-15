@@ -1,5 +1,5 @@
 """
-Tela de Configurações, Perfil do Atleta e Chaves de API DevWorld - Templo Fitness AI.
+Tela de Configurações, Perfil do Usuário e Chaves de API DevWorld - Templo Fitness AI.
 """
 import flet as ft
 from core.theme import SportColors, SportStyles, Icons, AppPadding, AppBorder
@@ -13,7 +13,7 @@ class SettingsView:
     def build(self) -> ft.Control:
         profile = DBService.get_athlete_profile()
 
-        name_in = ft.TextField(label="Nome do Atleta", value=profile.get("name", ""), color=SportColors.TEXT_WHITE, bgcolor=SportColors.BG_INPUT)
+        name_in = ft.TextField(label="Nome do Usuário", value=profile.get("name", ""), color=SportColors.TEXT_WHITE, bgcolor=SportColors.BG_INPUT)
         age_in = ft.TextField(label="Idade (anos)", value=str(profile.get("age", 26)), keyboard_type=ft.KeyboardType.NUMBER, color=SportColors.TEXT_WHITE, bgcolor=SportColors.BG_INPUT)
         height_in = ft.TextField(label="Altura (cm)", value=str(profile.get("height_cm", 178)), keyboard_type=ft.KeyboardType.NUMBER, color=SportColors.TEXT_WHITE, bgcolor=SportColors.BG_INPUT)
         weight_in = ft.TextField(label="Peso Atual (kg)", value=str(profile.get("weight_kg", 78.5)), keyboard_type=ft.KeyboardType.NUMBER, color=SportColors.TEXT_WHITE, bgcolor=SportColors.BG_INPUT)
@@ -38,7 +38,7 @@ class SettingsView:
                 ft.dropdown.Option("leve", "Leve (1-2x semana)"),
                 ft.dropdown.Option("moderado", "Moderado (3-4x semana)"),
                 ft.dropdown.Option("intenso", "Intenso (5-6x semana)"),
-                ft.dropdown.Option("muito_intenso", "Atleta / 2x por dia"),
+                ft.dropdown.Option("muito_intenso", "Muito Intenso / 2x por dia"),
             ],
             color=SportColors.TEXT_WHITE,
             bgcolor=SportColors.BG_INPUT
@@ -46,7 +46,7 @@ class SettingsView:
 
         profile_card = SportStyles.card_container(
             content=ft.Column([
-                SportStyles.section_header("PERFIL DO ATLETA", "Dados usados para calibrar os cálculos e a IA", icon=Icons.PERSON),
+                SportStyles.section_header("PERFIL DO USUÁRIO", "Dados usados para calibrar os cálculos e a IA", icon=Icons.PERSON),
                 name_in,
                 ft.Row([age_in, height_in, weight_in], spacing=8),
                 goal_drop,
@@ -135,7 +135,7 @@ class SettingsView:
 
     def _save_profile(self, name, age, height, weight, goal, activity):
         DBService.update_athlete_profile(
-            name=name or "Atleta",
+            name=name or "Usuário",
             age=int(age or 26),
             sex="M",
             height=float(height or 178),
@@ -145,7 +145,7 @@ class SettingsView:
         )
         if self.page:
             self.page.snack_bar = ft.SnackBar(
-                content=ft.Text("✅ Perfil do atleta atualizado com sucesso!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
+                content=ft.Text("✅ Perfil do usuário atualizado com sucesso!", color=SportColors.BG_DARK, weight=ft.FontWeight.BOLD),
                 bgcolor=SportColors.PRIMARY_NEON,
                 duration=1500
             )
@@ -155,7 +155,7 @@ class SettingsView:
     def _save_api_settings(self, api_key, base_url):
         profile = DBService.get_athlete_profile()
         DBService.update_athlete_profile(
-            name=profile.get("name", "Atleta"),
+            name=profile.get("name", "Usuário"),
             age=profile.get("age", 26),
             sex=profile.get("sex", "M"),
             height=profile.get("height_cm", 178),

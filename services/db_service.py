@@ -45,12 +45,12 @@ class DBService:
             )
             """)
             
-            # 1. Perfil do Atleta
+            # 1. Perfil do Usuário
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS athlete_profile (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER DEFAULT 1,
-                name TEXT DEFAULT 'Matheus Atleta',
+                name TEXT DEFAULT 'Matheus',
                 age INTEGER DEFAULT 26,
                 sex TEXT DEFAULT 'M',
                 height_cm REAL DEFAULT 178.0,
@@ -303,7 +303,7 @@ class DBService:
             if not cursor.fetchone():
                 cursor.execute("""
                 INSERT INTO users (id, name, username, role, avatar_icon, color_hex, password)
-                VALUES (1, 'Matheus Atleta', 'matheus', 'aluno', 'fitness_center', '#FFFFFF', '123456')
+                VALUES (1, 'Matheus', 'matheus', 'aluno', 'fitness_center', '#FFFFFF', '123456')
                 """)
                 conn.commit()
 
@@ -342,7 +342,7 @@ class DBService:
             if first:
                 cls.set_active_user_id(first["id"])
                 return dict(first)
-            return {"id": 1, "name": "Matheus Atleta", "username": "matheus", "role": "aluno", "color_hex": "#FFFFFF"}
+            return {"id": 1, "name": "Matheus", "username": "matheus", "role": "aluno", "color_hex": "#FFFFFF"}
 
     @classmethod
     def switch_user(cls, user_id: int) -> Dict[str, Any]:
@@ -374,7 +374,7 @@ class DBService:
             cursor = conn.cursor()
             cursor.execute("SELECT COUNT(*) FROM athlete_profile WHERE user_id = ?", (user_id,))
             if cursor.fetchone()[0] == 0:
-                user_name = name or f"Atleta #{user_id}"
+                user_name = name or f"Usuário #{user_id}"
                 cursor.execute("""
                 INSERT INTO athlete_profile (user_id, name, age, sex, height_cm, weight_kg, goal, activity_level)
                 VALUES (?, ?, 26, 'M', 178.0, 78.5, 'hipertrofia', 'intenso')
@@ -512,7 +512,7 @@ class DBService:
 
     @classmethod
     def _ensure_initial_profile(cls):
-        cls._ensure_profile_for_user(1, name="Matheus Atleta")
+        cls._ensure_profile_for_user(1, name="Matheus")
 
     @classmethod
     def get_athlete_profile(cls, user_id: Optional[int] = None) -> Dict[str, Any]:
@@ -529,7 +529,7 @@ class DBService:
             if first:
                 return dict(first)
             return {
-                "name": "Matheus Atleta", "age": 26, "sex": "M",
+                "name": "Matheus", "age": 26, "sex": "M",
                 "height_cm": 178.0, "weight_kg": 78.5, "goal": "hipertrofia",
                 "activity_level": "intenso", "devworld_api_key": "", "devworld_base_url": "https://api.devworld.com.br/v1",
                 "target_weight_kg": 75.0, "target_weeks": 12, "training_days_week": 4,
@@ -858,11 +858,11 @@ class DBService:
 
     @classmethod
     def apply_coach_routine_preset(cls, preset_name: str, user_id: Optional[int] = None) -> bool:
-        """Aplica uma prescrição completa do Treinador para o atleta ativo."""
+        """Aplica uma prescrição completa do Treinador para o usuário ativo."""
         target_uid = user_id or cls.get_active_user_id()
         with cls.get_connection() as conn:
             cursor = conn.cursor()
-            # Deleta rotinas antigas do atleta
+            # Deleta rotinas antigas do usuário
             cursor.execute("SELECT id FROM workout_routines WHERE user_id = ?", (target_uid,))
             old_ids = [r["id"] for r in cursor.fetchall()]
             for oid in old_ids:

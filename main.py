@@ -121,14 +121,14 @@ def main(page: ft.Page):
             nav_bar.selected_index = index
         render_app()
 
-    # 4. Barra Superior (AppBar) com Identificação do Atleta e Troca Rápida
+    # 4. Barra Superior (AppBar) com Identificação do Usuário e Troca Rápida
     def update_app_bar():
         try:
             active_u = DBService.get_active_user(active_user_id)
         except Exception:
-            active_u = {"name": "Atleta", "color_hex": SportColors.PRIMARY_NEON, "role": "aluno"}
+            active_u = {"name": "Usuário", "color_hex": SportColors.PRIMARY_NEON, "role": "aluno"}
             
-        u_name = active_u.get("name", "Atleta").split()[0]
+        u_name = active_u.get("name", "Usuário").split()[0]
         u_color = active_u.get("color_hex", SportColors.PRIMARY_NEON)
 
         page.appbar = ft.AppBar(
@@ -160,14 +160,14 @@ def main(page: ft.Page):
                     padding=AppPadding.symmetric(horizontal=8, vertical=4),
                     border_radius=12,
                     border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-                    tooltip=f"Atleta Conectado: {active_u.get('name')}. Clique para trocar.",
+                    tooltip=f"Usuário Conectado: {active_u.get('name')}. Clique para trocar.",
                     on_click=lambda _: on_logout()
                 ),
                 ft.IconButton(
                     icon=Icons.SWAP_HORIZ,
                     icon_color=SportColors.TEXT_SECONDARY,
                     icon_size=18,
-                    tooltip="Trocar Atleta / Sair",
+                    tooltip="Trocar Usuário / Sair",
                     on_click=lambda _: on_logout()
                 ),
                 ft.Container(width=4)

@@ -72,7 +72,7 @@ class HealthMath:
             "protein_g": protein_g,
             "carbs_g": carbs_g,
             "fat_g": fat_g,
-            "water_ml": round(weight_kg * 40, 0), # 40ml por kg para atletas
+            "water_ml": round(weight_kg * 40, 0), # 40ml por kg para praticantes de musculação
         }
 
     @staticmethod

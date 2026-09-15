@@ -1,6 +1,6 @@
 """
 Modal de Autenticação e Alternância Multi-Usuário (Alunos & Personal Trainer) - Templo Fitness AI.
-Permite alternar perfis em 1 clique e cadastrar novos alunos/atletas.
+Permite alternar perfis em 1 clique e cadastrar novos alunos/usuários.
 """
 import flet as ft
 from typing import Callable, Optional
@@ -61,7 +61,7 @@ class AuthDialog:
             label="Tipo de Conta",
             value="aluno",
             options=[
-                ft.dropdown.Option("aluno", "Aluno / Atleta"),
+                ft.dropdown.Option("aluno", "Aluno / Usuário"),
                 ft.dropdown.Option("personal", "Personal Trainer / Coach"),
             ],
             color=SportColors.TEXT_WHITE,
@@ -71,7 +71,7 @@ class AuthDialog:
         create_panel = ft.ExpansionTile(
             title=ft.Row([
                 ft.Icon(Icons.PERSON_ADD_ALT_1, color=SportColors.CYAN_ELECTRIC, size=18),
-                ft.Text("Cadastrar Novo Atleta / Usuário", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
+                ft.Text("Cadastrar Novo Usuário", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE)
             ], spacing=6),
             controls=[
                 ft.Container(
@@ -99,7 +99,7 @@ class AuthDialog:
             ], spacing=8),
             content=ft.Container(
                 content=ft.ListView([
-                    ft.Text("Selecione qual atleta está usando o Templo Fitness AI:", size=12, color=SportColors.TEXT_SECONDARY),
+                    ft.Text("Selecione qual usuário está acessando o Templo Fitness AI:", size=12, color=SportColors.TEXT_SECONDARY),
                     ft.Column(user_cards, spacing=8),
                     ft.Divider(color=SportColors.BORDER_DEFAULT, height=1),
                     create_panel

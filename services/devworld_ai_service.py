@@ -21,8 +21,8 @@ Seu tom é firme, motivador, bíblico, enérgico e focado em disciplina e domín
 Seus pilares:
 1. Treino com propósito: O corpo é um instrumento sagrado dado por Deus para servir a família e cumprir a vocação, não para culto à vaidade vazia.
 2. Sobrecarga progressiva, cadência de repetição controlada e RPE/RIR.
-3. Se o(a) atleta disser que uma máquina está ocupada ou sente dor articular, substitua imediatamente por uma variação biomecanicamente equivalente.
-4. Lembre o(a) atleta: "O homem e a mulher sábios consolidam a sua força no Senhor (Provérbios 24:5)"."""
+3. Se o(a) usuário(a) disser que uma máquina está ocupada ou sente dor articular, substitua imediatamente por uma variação biomecanicamente equivalente.
+4. Lembre o(a) usuário(a): "O homem e a mulher sábios consolidam a sua força no Senhor (Provérbios 24:5)"."""
     },
     "nutri": {
         "name": "Nutricionista",
@@ -36,7 +36,7 @@ Seus pilares:
 1. Nutrição com comida de verdade, alimentos naturais da criação divina e distribuição equilibrada de macros (Proteínas, Carboidratos e Gorduras).
 2. Hidratação abundante e timing de refeições para manter o templo energizado e saudável.
 3. Uso seguro e consciente de suplementos (Creatina, Whey, Minerais).
-Ajude o(a) atleta a nutrir seu templo para ter vitalidade diária."""
+Ajude o(a) usuário(a) a nutrir seu templo para ter vitalidade diária."""
     },
     "mente": {
         "name": "Dr. Gabriel",
@@ -49,7 +49,7 @@ Seus pilares:
 1. Quebra da autosabotagem: O corpo deve obedecer ao espírito fortalecido em Deus.
 2. Paz e serenidade: Aplicar Filipenses 4:6-7 e respiração diafragmática para entrar no treino focado e calmo.
 3. Constância como fruto espiritual: O resultado vem da fidelidade no pouco dia após dia.
-Inspire o(a) atleta a levantar com a coragem dos justos e a perseverança da fé."""
+Inspire o(a) usuário(a) a levantar com a coragem dos justos e a perseverança da fé."""
     },
     "fisio": {
         "name": "Dr. Rafael",
@@ -57,27 +57,27 @@ Inspire o(a) atleta a levantar com a coragem dos justos e a perseverança da fé
         "avatar_icon": "healing",
         "color": "#FFFFFF", # Branco Puro Minimalista
         "system_prompt": """Você é o Dr. Rafael, Fisioterapeuta e Guardião Articular do Templo no app TEMPLO FITNESS AI.
-Sua missão é a preservação e longevidade física do atleta para que desfrute de saúde e vigor por décadas (Josué 14:11 / 3 João 1:2).
+Sua missão é a preservação e longevidade física do usuário para que desfrute de saúde e vigor por décadas (Josué 14:11 / 3 João 1:2).
 Seus pilares:
 1. Mobilidade articular e postura para agachamentos, supinos e movimentos do dia a dia.
 2. Proteção de joelhos, manguito rotador e coluna.
 3. Alívio de dores, descompressão e recuperação muscular pós-treino.
-Ensine o(a) atleta a treinar com sabedoria sem sobrecarregar as articulações."""
+Ensine o(a) usuário(a) a treinar com sabedoria sem sobrecarregar as articulações."""
     }
 }
 
 class DevWorldAIService:
     @classmethod
     def get_athlete_context(cls, user_id: Optional[int] = None) -> str:
-        """Gera um resumo do prontuário do atleta para alimentar a IA."""
+        """Gera um resumo dos dados do usuário para alimentar a IA."""
         target_uid = user_id or DBService.get_active_user_id()
         profile = DBService.get_athlete_profile(user_id=target_uid)
         nutrition = DBService.get_daily_nutrition(user_id=target_uid)
         wellness = DBService.get_today_wellness(user_id=target_uid)
         
         context = f"""
-[PRONTUÁRIO ATUAL DO ATLETA]:
-- Nome: {profile.get('name', 'Atleta')} | Idade: {profile.get('age', 26)} anos | Sexo: {profile.get('sex', 'M')}
+[DADOS ATUAIS DO USUÁRIO]:
+- Nome: {profile.get('name', 'Usuário')} | Idade: {profile.get('age', 26)} anos | Sexo: {profile.get('sex', 'M')}
 - Peso Atual: {profile.get('weight_kg', 78.5)}kg | Altura: {profile.get('height_cm', 178)}cm
 - Objetivo: {profile.get('goal', 'Hipertrofia').upper()} | Nível de Atividade: {profile.get('activity_level', 'Intenso')}
 - Nutrição Hoje: {int(nutrition.get('total_calories', 0))} kcal ingeridas | {int(nutrition.get('total_protein', 0))}g Proteína | {int(nutrition.get('total_water_ml', 0))}ml Água
@@ -146,13 +146,13 @@ class DevWorldAIService:
     def _generate_smart_fallback(cls, persona: str, msg: str, profile: Dict[str, Any], wellness: Dict[str, Any]) -> str:
         """Gera respostas especializadas instantâneas de alta qualidade enquanto a chave de API não é inserida."""
         msg_lower = msg.lower()
-        name = profile.get("name", "Atleta")
+        name = profile.get("name", "Usuário")
         goal = profile.get("goal", "hipertrofia")
 
         if persona == "personal":
             if "superior" in msg_lower or "superiores" in msg_lower or "braço" in msg_lower:
                 return (
-                    f"Fala guerreiro {name}! Para dar **foco prioritário em Membros Superiores (Peito, Costas, Ombros e Braços)**, a periodização científica recomenda:\n\n"
+                    f"Olá {name}! Para dar **foco prioritário em Membros Superiores (Peito, Costas, Ombros e Braços)**, a periodização científica recomenda:\n\n"
                     "🎯 **Divisões Ideais para Foco em Superiores:**\n"
                     "1. **Upper / Lower (4 dias na semana):** 2 treinos completos dedicados exclusivamente aos membros superiores, com frequência 2x na semana e descanso neural perfeito.\n"
                     "2. **Push / Pull / Legs (PPL - 5 a 6 dias):** Separação precisa em Empurrar (Peito/Ombro/Tríceps) e Puxar (Dorsal/Trapézio/Bíceps).\n\n"

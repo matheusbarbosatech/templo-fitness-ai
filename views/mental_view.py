@@ -1,5 +1,5 @@
 """
-Módulo de Saúde Mental, Mindset do Atleta & Sono - Templo Fitness AI.
+Módulo de Saúde Mental, Mindset & Sono - Templo Fitness AI.
 Diário de humor, score de recuperação e respiração guiada diafragmática (Box Breathing).
 """
 import flet as ft
@@ -101,7 +101,7 @@ class MentalView:
             content=ft.Column([
                 SportStyles.section_header("PROTOCOLO DE RESPIRAÇÃO (BOX BREATHING)", "4s Inspira • 4s Segura • 4s Expira • 4s Segura", icon=Icons.AIR),
                 ft.Text(
-                    "Técnica usada por forças especiais e atletas de elite para desacelerar o ritmo cardíaco, reduzir o cortisol e restaurar o foco total.",
+                    "Técnica usada por forças especiais e pessoas de alta performance para desacelerar o ritmo cardíaco, reduzir o cortisol e restaurar o foco total.",
                     size=12,
                     color=SportColors.TEXT_SECONDARY
                 ),

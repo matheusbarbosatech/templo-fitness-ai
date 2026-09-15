@@ -1,12 +1,12 @@
 """
 Módulo Oficial de Execução de Treino - Templo Fitness AI.
-Design Ultra-Clean inspirado no SCA Fit / SCA Aluno (o aplicativo padrão das academias brasileiras).
-Princípios:
-- Zero Poluição Visual: sem caixas aninhadas, sem cartões duplicados.
-- Foco Total no Exercício Atual: GIF limpo, nome claro, prescrição e séries diretas.
-- Controle Rápido de Cargas: botões [-] e [+] táteis além de digitação direta.
-- Cronômetro de Descanso Sutil: surge automaticamente ao marcar a série como feita.
-- Navegação Rápida entre Exercícios: estilo passar página com 1 toque.
+Design Ultra-Clean 100% Encaixotado (Zero Rolagem de Tela).
+Tudo contido em uma única seção do celular:
+1. A Foto / GIF compacto
+2. O Nome do Exercício e detalhes
+3. O Quadro de Repetição Otimizado
+4. O Cronômetro de Descanso
+5. O Botão de Avançar
 """
 import flet as ft
 import time
@@ -37,11 +37,10 @@ class WorkoutView:
         self.rest_seconds_left = 0
         self.timer_running = False
         self.timer_thread = None
-        self.timer_text = ft.Text("00:00", size=13, weight=ft.FontWeight.BOLD, color=SportColors.PRIMARY_NEON)
-        self.timer_progress = ft.ProgressBar(value=0.0, color=SportColors.PRIMARY_NEON, bgcolor="#181824", height=2)
+        self.timer_text = ft.Text("00:00", size=12, weight=ft.FontWeight.BOLD, color=SportColors.PRIMARY_NEON)
         
-        # Elementos reativos
-        self.exercise_content_area = ft.Container()
+        # Área de exibição dinâmica do card encaixotado
+        self.boxed_section_area = ft.Container()
 
     def build(self) -> ft.Control:
         uid = self.user_id or DBService.get_active_user_id()
@@ -66,31 +65,29 @@ class WorkoutView:
         if self.selected_routine_index >= len(self.routines):
             self.selected_routine_index = 0
 
-        # Inicializa o estado se ainda não estiver carregado
+        # Inicializa o estado de séries
         self._initialize_exercise_state()
-        self._render_active_exercise()
+        self._render_boxed_card()
 
-        # 1. Barra Superior Minimalista (Apenas Abas de Ficha [A] [B] [C] e Progresso 1/5)
+        # Barra Superior Minimalista (Abas de Ficha [A] [B] [C] e Progresso 1/5)
         top_header = self._build_top_header()
 
-        # Layout centralizado Mobile First sem poluição visual
-        content_wrapper = ft.Container(
+        # Encaixotamento perfeito: 1 única coluna centralizada, sem ListView, SEM ROLAGEM!
+        content_box = ft.Container(
             content=ft.Column([
                 top_header,
-                ft.Container(height=2),
-                self.exercise_content_area
-            ], spacing=8, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                ft.Container(height=4),
+                self.boxed_section_area
+            ], spacing=0, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             col={"xs": 12, "sm": 12, "md": 9, "lg": 7, "xl": 5}
         )
 
-        responsive_row = ft.ResponsiveRow([content_wrapper], alignment=ft.MainAxisAlignment.CENTER)
+        responsive_row = ft.ResponsiveRow([content_box], alignment=ft.MainAxisAlignment.CENTER)
 
+        # Retorna container fixo com expand=True (ZERO rolagem)
         return ft.Container(
-            content=ft.ListView([
-                ft.Container(height=4),
-                responsive_row,
-                ft.Container(height=20)
-            ], spacing=0, padding=AppPadding.symmetric(horizontal=8, vertical=4)),
+            content=responsive_row,
+            padding=AppPadding.symmetric(horizontal=8, vertical=4),
             bgcolor=SportColors.BG_DARK,
             expand=True
         )
@@ -142,13 +139,12 @@ class WorkoutView:
             }
 
     def _build_top_header(self) -> ft.Control:
-        """Topo minimalista SCA Fit: Abas de Fichas e Progresso do Exercício."""
+        """Topo minimalista: Abas das Fichas, Progresso e Ações."""
         current_routine = self.routines[self.selected_routine_index] if self.routines else {}
         exercises = current_routine.get("exercises", [])
         total_ex = len(exercises)
         curr_num = self.current_exercise_index + 1 if total_ex > 0 else 0
 
-        # Abas das Fichas em pílulas compactas (Treino A, Treino B...)
         routine_pills = []
         for idx, r in enumerate(self.routines):
             is_sel = idx == self.selected_routine_index
@@ -163,50 +159,57 @@ class WorkoutView:
                         color=SportColors.BG_DARK if is_sel else SportColors.TEXT_WHITE
                     ),
                     bgcolor=SportColors.PRIMARY_NEON if is_sel else SportColors.BG_SURFACE_ALT,
-                    padding=AppPadding.symmetric(horizontal=10, vertical=5),
-                    border_radius=12,
+                    padding=AppPadding.symmetric(horizontal=10, vertical=4),
+                    border_radius=10,
                     border=AppBorder.all(1, SportColors.PRIMARY_NEON if is_sel else SportColors.BORDER_DEFAULT),
                     on_click=lambda _, i=idx: self._select_routine(i),
                     ink=True
                 )
             )
 
-        # Botões de atalho discretos (Índice da Ficha e Prescrições)
         return ft.Row([
-            ft.Row(routine_pills, spacing=6, scroll=ft.ScrollMode.AUTO, expand=True),
+            ft.Row(routine_pills, spacing=4, scroll=ft.ScrollMode.AUTO, expand=True),
             ft.Row([
                 ft.Container(
-                    content=ft.Text(f"{curr_num}/{total_ex}", size=12, weight=ft.FontWeight.BOLD, color=SportColors.PRIMARY_NEON),
+                    content=ft.Text(f"{curr_num}/{total_ex}", size=11, weight=ft.FontWeight.BOLD, color=SportColors.PRIMARY_NEON),
                     bgcolor="#181824",
-                    padding=AppPadding.symmetric(horizontal=8, vertical=4),
-                    border_radius=8,
+                    padding=AppPadding.symmetric(horizontal=7, vertical=3),
+                    border_radius=6,
                     border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-                    tooltip="Progresso de exercícios na ficha"
+                    tooltip="Progresso do exercício"
                 ),
                 ft.IconButton(
                     icon=Icons.VIEW_LIST,
                     icon_color=SportColors.TEXT_WHITE,
-                    icon_size=18,
-                    tooltip="Ver lista de exercícios da ficha",
+                    icon_size=17,
+                    tooltip="Ver lista completa de exercícios",
                     on_click=lambda _: self._show_all_exercises_modal()
+                ),
+                ft.IconButton(
+                    icon=Icons.CHECK_CIRCLE_OUTLINE,
+                    icon_color=SportColors.PRIMARY_NEON,
+                    icon_size=17,
+                    tooltip="Finalizar e Salvar Treino Agora",
+                    on_click=lambda _: self._finish_workout_session()
                 ),
                 ft.IconButton(
                     icon=Icons.TUNE,
                     icon_color=SportColors.TEXT_MUTED,
-                    icon_size=17,
+                    icon_size=16,
                     tooltip="Mudar divisão de treino",
                     on_click=lambda _: self._show_coach_presets_dialog()
                 )
-            ], spacing=2, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+            ], spacing=1, vertical_alignment=ft.CrossAxisAlignment.CENTER)
         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, vertical_alignment=ft.CrossAxisAlignment.CENTER)
 
-    def _render_active_exercise(self):
-        """Renderiza a tela do exercício ativo com layout ultra-limpo estilo SCA Fit."""
+    def _render_boxed_card(self):
+        """Constrói a seção única encaixotada: Foto, Nome, Quadro Otimizado, Cronômetro e Botão."""
         current_routine = self.routines[self.selected_routine_index] if self.routines else {}
         exercises = current_routine.get("exercises", [])
+        total_ex = len(exercises)
         
         if not exercises or self.current_exercise_index >= len(exercises):
-            self.exercise_content_area.content = ft.Container(
+            self.boxed_section_area.content = ft.Container(
                 content=ft.Text("Nenhum exercício selecionado.", color=SportColors.TEXT_MUTED),
                 padding=AppPadding.all(16)
             )
@@ -219,7 +222,6 @@ class WorkoutView:
         target_reps = ex.get("target_reps", "10-12")
         target_weight = ex.get("target_weight", 20.0)
         rest_sec = ex.get("rest_seconds", 60)
-        
         p_muscle = ex.get("primary_muscle") or "Músculo Alvo"
         equipment = ex.get("equipment") or "Aparelho"
         guide = ex.get("execution_guide") or "Realize o movimento com postura firme e controle excêntrico."
@@ -227,33 +229,32 @@ class WorkoutView:
         why_do_it = ex.get("why_do_it") or "Exercício fundamental para força e hipertrofia."
         gif_url = ex.get("gif_url") or DBService.get_exercise_gif(ex_name)
 
-        # 1. Demonstração Visual / GIF do Movimento (Sem bordas pesadas)
+        # 1. A FOTO / GIF DO EXERCÍCIO (Compacto 120px)
         img_control = ft.Image(
             src=gif_url,
-            height=200,
+            height=120,
             fit="contain",
-            border_radius=12,
+            border_radius=8,
             error_content=ft.Container(
                 content=ft.Column([
-                    ft.Icon(Icons.FITNESS_CENTER, size=32, color=SportColors.TEXT_MUTED),
-                    ft.Text(f"{ex_name}", size=11, color=SportColors.TEXT_SECONDARY)
+                    ft.Icon(Icons.FITNESS_CENTER, size=26, color=SportColors.TEXT_MUTED),
+                    ft.Text(f"{ex_name}", size=10, color=SportColors.TEXT_SECONDARY)
                 ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-                height=160,
+                height=110,
                 alignment=AppAlignment.CENTER,
                 bgcolor="#121218"
             )
         )
-
-        visual_container = ft.Container(
+        photo_container = ft.Container(
             content=img_control,
             alignment=AppAlignment.CENTER,
-            height=200,
+            height=120,
             bgcolor="#0A0A10",
-            border_radius=12,
-            padding=AppPadding.all(2)
+            border_radius=8,
+            padding=2
         )
 
-        # 2. Identificação do Exercício Direto ao Ponto (Nome em destaque + Músculo e Prescrição)
+        # 2. O NOME DO EXERCÍCIO + PRESCRIÇÃO + AÇÕES
         def show_instructions_dialog(name=ex_name, g=guide, m=mistakes, w=why_do_it):
             dlg = ft.AlertDialog(
                 modal=True,
@@ -280,72 +281,86 @@ class WorkoutView:
             )
             UIHelper.open_dialog(self.page, dlg)
 
-        exercise_title_section = ft.Row([
+        title_row = ft.Row([
             ft.Column([
-                ft.Text(f"{ex_name}", size=17, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-                ft.Text(f"{p_muscle} • {equipment} • {target_sets} séries de {target_reps} reps", size=11, color=SportColors.TEXT_SECONDARY),
-            ], spacing=2, expand=True),
+                ft.Text(f"{ex_name}", size=14, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE, no_wrap=True, overflow=ft.TextOverflow.ELLIPSIS),
+                ft.Text(f"{p_muscle} • {equipment} • {target_sets}x {target_reps}", size=10, color=SportColors.TEXT_SECONDARY, no_wrap=True),
+            ], spacing=1, expand=True),
             ft.Row([
                 ft.IconButton(
                     icon=Icons.INFO_OUTLINE,
                     icon_color=SportColors.CYAN_ELECTRIC,
-                    icon_size=19,
-                    tooltip="Ver postura e guia",
+                    icon_size=18,
+                    tooltip="Guia de postura",
                     on_click=lambda _, n=ex_name, g=guide, m=mistakes, w=why_do_it: show_instructions_dialog(n, g, m, w)
                 ),
                 ft.IconButton(
                     icon=Icons.SWAP_HORIZ,
                     icon_color=SportColors.TEXT_MUTED,
-                    icon_size=19,
+                    icon_size=18,
                     tooltip="Aparelho ocupado? Trocar exercício",
                     on_click=lambda _, name=ex_name, rid=current_routine["id"]: self._show_swap_exercise_dialog(rid, name)
                 )
             ], spacing=0)
         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, vertical_alignment=ft.CrossAxisAlignment.CENTER)
 
-        # 3. Lista Limpa de Séries com Ajuste Tátil [-] e [+] (Padrão SCA Fit)
-        table_header = ft.Row([
-            ft.Text("SET", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=28, text_align=ft.TextAlign.CENTER),
-            ft.Text("CARGA", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=102, text_align=ft.TextAlign.CENTER),
-            ft.Text("REPS", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=58, text_align=ft.TextAlign.CENTER),
-            ft.Text("FEITO", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=42, text_align=ft.TextAlign.CENTER),
-        ], spacing=4, alignment=ft.MainAxisAlignment.CENTER)
+        # 3. O QUADRO DE REPETIÇÃO OTIMIZADO (Harmonioso, limpo e profissional)
+        quadro_header = ft.Container(
+            content=ft.Row([
+                ft.Text("SÉRIE", size=8, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=32, text_align=ft.TextAlign.CENTER),
+                ft.Text("CARGA", size=8, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=96, text_align=ft.TextAlign.CENTER),
+                ft.Text("REPS", size=8, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=86, text_align=ft.TextAlign.CENTER),
+                ft.Text("FEITO", size=8, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED, width=38, text_align=ft.TextAlign.CENTER),
+            ], spacing=6, alignment=ft.MainAxisAlignment.CENTER),
+            bgcolor="#0F0F16",
+            padding=AppPadding.symmetric(horizontal=4, vertical=2),
+            border_radius=4
+        )
 
         sets_rows = []
         self.active_inputs[ex_name] = {}
         ex_state_sets = self.exercise_state.get(ex_name, {}).get("sets", [])
 
+        # Identifica primeira série pendente para destacar como ativa
+        active_set_num = None
+        for s in ex_state_sets:
+            if not s.get("completed", False):
+                active_set_num = s["set_num"]
+                break
+
         for s_data in ex_state_sets:
             s_num = s_data["set_num"]
             is_done = s_data.get("completed", False)
+            is_active = (s_num == active_set_num)
             curr_w = s_data.get("weight", target_weight)
             curr_r = s_data.get("reps", 10)
 
-            s_pill = ft.Container(
-                content=ft.Text(f"{s_num}", size=11, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-                bgcolor="#1C1C26",
-                border_radius=5,
-                width=28,
-                height=34,
+            # 1. Badge Série
+            s_badge = ft.Container(
+                content=ft.Text(
+                    f"{s_num}ª",
+                    size=10,
+                    weight=ft.FontWeight.BOLD,
+                    color=SportColors.PRIMARY_NEON if is_active else (SportColors.TEXT_WHITE if not is_done else "#22C55E")
+                ),
+                width=32,
                 alignment=AppAlignment.CENTER
             )
 
+            # 2. Stepper Carga (Capsule Integrado)
             w_input = ft.TextField(
                 value=str(int(curr_w)) if curr_w == int(curr_w) else str(curr_w),
-                width=54,
-                height=34,
-                text_size=12,
+                width=36,
+                height=28,
+                text_size=11,
                 text_align=ft.TextAlign.CENTER,
-                suffix=ft.Text("kg", size=9, color=SportColors.TEXT_MUTED),
+                border=ft.InputBorder.NONE,
+                content_padding=AppPadding.symmetric(0, 0),
+                dense=True,
                 keyboard_type=ft.KeyboardType.NUMBER,
-                bgcolor=SportColors.BG_INPUT,
-                border_color=SportColors.BORDER_DEFAULT,
-                focused_border_color=SportColors.PRIMARY_NEON,
-                color=SportColors.TEXT_WHITE,
-                content_padding=AppPadding.symmetric(horizontal=2, vertical=2)
+                color=SportColors.TEXT_WHITE
             )
 
-            # Botões rápidos [-] e [+] de ajuste de peso
             def make_adjust_w(name=ex_name, s_idx=s_num - 1, w_inp=w_input):
                 def adjust(delta: float):
                     def handler(_):
@@ -362,51 +377,104 @@ class WorkoutView:
                     return handler
                 return adjust
 
-            btn_minus = ft.Container(
-                content=ft.Text("-", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-                bgcolor="#1C1C26",
-                border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-                border_radius=4,
-                width=22,
-                height=34,
+            btn_minus_w = ft.Container(
+                content=ft.Text("-", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                width=18,
+                height=28,
                 alignment=AppAlignment.CENTER,
                 tooltip="Diminuir 1 kg",
                 on_click=make_adjust_w()( -1.0 ),
                 ink=True
             )
 
-            btn_plus = ft.Container(
-                content=ft.Text("+", size=13, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-                bgcolor="#1C1C26",
-                border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-                border_radius=4,
-                width=22,
-                height=34,
+            btn_plus_w = ft.Container(
+                content=ft.Text("+", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                width=18,
+                height=28,
                 alignment=AppAlignment.CENTER,
                 tooltip="Aumentar 1 kg",
                 on_click=make_adjust_w()( 1.0 ),
                 ink=True
             )
 
-            weight_control_row = ft.Row([
-                btn_minus,
-                w_input,
-                btn_plus
-            ], spacing=2, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+            carga_capsule = ft.Container(
+                content=ft.Row([
+                    btn_minus_w,
+                    w_input,
+                    ft.Text("kg", size=8, color=SportColors.TEXT_MUTED),
+                    btn_plus_w
+                ], spacing=1, alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                bgcolor="#161622" if not is_done else "#0E1812",
+                border=AppBorder.all(1, "#262638" if not is_done else "#1D3B28"),
+                border_radius=6,
+                width=96,
+                height=28,
+                alignment=AppAlignment.CENTER
+            )
 
+            # 3. Stepper Repetições (Capsule Integrado)
             r_input = ft.TextField(
                 value=str(curr_r),
-                width=58,
-                height=34,
-                text_size=12,
+                width=32,
+                height=28,
+                text_size=11,
                 text_align=ft.TextAlign.CENTER,
-                suffix=ft.Text("reps", size=9, color=SportColors.TEXT_MUTED),
+                border=ft.InputBorder.NONE,
+                content_padding=AppPadding.symmetric(0, 0),
+                dense=True,
                 keyboard_type=ft.KeyboardType.NUMBER,
-                bgcolor=SportColors.BG_INPUT,
-                border_color=SportColors.BORDER_DEFAULT,
-                focused_border_color=SportColors.PRIMARY_NEON,
-                color=SportColors.TEXT_WHITE,
-                content_padding=AppPadding.symmetric(horizontal=2, vertical=2)
+                color=SportColors.TEXT_WHITE
+            )
+
+            def make_adjust_r(name=ex_name, s_idx=s_num - 1, r_inp=r_input):
+                def adjust(delta: int):
+                    def handler(_):
+                        try:
+                            current_val = int(r_inp.value or 0)
+                        except Exception:
+                            current_val = 10
+                        new_val = max(1, current_val + delta)
+                        r_inp.value = str(new_val)
+                        if name in self.exercise_state and s_idx < len(self.exercise_state[name]["sets"]):
+                            self.exercise_state[name]["sets"][s_idx]["reps"] = new_val
+                        if self.page:
+                            self.page.update()
+                    return handler
+                return adjust
+
+            btn_minus_r = ft.Container(
+                content=ft.Text("-", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                width=18,
+                height=28,
+                alignment=AppAlignment.CENTER,
+                tooltip="Diminuir 1 repetição",
+                on_click=make_adjust_r()( -1 ),
+                ink=True
+            )
+
+            btn_plus_r = ft.Container(
+                content=ft.Text("+", size=12, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                width=18,
+                height=28,
+                alignment=AppAlignment.CENTER,
+                tooltip="Aumentar 1 repetição",
+                on_click=make_adjust_r()( 1 ),
+                ink=True
+            )
+
+            reps_capsule = ft.Container(
+                content=ft.Row([
+                    btn_minus_r,
+                    r_input,
+                    ft.Text("x", size=8, color=SportColors.TEXT_MUTED),
+                    btn_plus_r
+                ], spacing=1, alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                bgcolor="#161622" if not is_done else "#0E1812",
+                border=AppBorder.all(1, "#262638" if not is_done else "#1D3B28"),
+                border_radius=6,
+                width=86,
+                height=28,
+                alignment=AppAlignment.CENTER
             )
 
             def make_w_change(name=ex_name, s_idx=s_num - 1):
@@ -432,19 +500,20 @@ class WorkoutView:
             w_input.on_change = make_w_change()
             r_input.on_change = make_r_change()
 
+            # 4. Botão Check de Série
             check_btn = ft.Container(
                 content=ft.Icon(
                     Icons.CHECK,
-                    size=16 if is_done else 15,
+                    size=15 if is_done else 14,
                     color=SportColors.PRIMARY_TEXT_ON_NEON if is_done else SportColors.TEXT_MUTED
                 ),
-                bgcolor=SportColors.PRIMARY_NEON if is_done else SportColors.BG_SURFACE_ALT,
-                border=AppBorder.all(1, SportColors.PRIMARY_NEON if is_done else SportColors.BORDER_DEFAULT),
+                bgcolor=SportColors.PRIMARY_NEON if is_done else "#181824",
+                border=AppBorder.all(1, SportColors.PRIMARY_NEON if is_done else "#2A2A3C"),
                 border_radius=6,
-                width=42,
-                height=34,
+                width=38,
+                height=28,
                 alignment=AppAlignment.CENTER,
-                tooltip="Concluir série e iniciar descanso" if not is_done else "Série já concluída",
+                tooltip="Concluir série" if not is_done else "Série concluída",
                 ink=True
             )
 
@@ -453,11 +522,6 @@ class WorkoutView:
 
             def make_on_check(btn=check_btn, w_inp=w_input, r_inp=r_input, s=s_num, name=ex_name, r_time=rest_sec, s_idx=s_num - 1):
                 def handler(_):
-                    btn.content = ft.Icon(Icons.CHECK, size=18, color=SportColors.PRIMARY_TEXT_ON_NEON)
-                    btn.bgcolor = SportColors.PRIMARY_NEON
-                    btn.border = AppBorder.all(1, SportColors.PRIMARY_NEON)
-                    btn.on_click = None
-                    
                     try:
                         w_val = float(w_inp.value or 0)
                     except Exception:
@@ -482,6 +546,7 @@ class WorkoutView:
                     
                     UIHelper.show_toast(self.page, f"Série #{s} concluída! Descanso ({r_time}s).", color=SportColors.PRIMARY_NEON)
                     self._start_timer(r_time)
+                    self._render_boxed_card()
                     if self.page:
                         self.page.update()
                 return handler
@@ -489,130 +554,131 @@ class WorkoutView:
             if not is_done:
                 check_btn.on_click = make_on_check()
 
+            # Linha da Série Unificada
+            row_bg = "#0D1612" if is_done else ("#141822" if is_active else "#12121A")
+            row_border_color = "#1A3D28" if is_done else (SportColors.PRIMARY_NEON if is_active else "#1E1E2A")
+
             sets_rows.append(
-                ft.Row([
-                    s_pill,
-                    weight_control_row,
-                    r_input,
-                    check_btn
-                ], spacing=4, alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+                ft.Container(
+                    content=ft.Row([
+                        s_badge,
+                        carga_capsule,
+                        reps_capsule,
+                        check_btn
+                    ], spacing=6, alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                    bgcolor=row_bg,
+                    border=AppBorder.all(1, row_border_color),
+                    border_radius=6,
+                    padding=AppPadding.symmetric(horizontal=4, vertical=2),
+                    height=34
+                )
             )
 
-        sets_section = ft.Container(
+        quadro_repeticoes = ft.Container(
             content=ft.Column([
-                table_header,
-                ft.Column(sets_rows, spacing=5)
-            ], spacing=6),
-            bgcolor="#111118",
+                quadro_header,
+                ft.Column(sets_rows, spacing=3)
+            ], spacing=3),
+            bgcolor="#101018",
             border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-            border_radius=10,
-            padding=AppPadding.symmetric(horizontal=6, vertical=8)
+            border_radius=8,
+            padding=AppPadding.symmetric(horizontal=4, vertical=4)
         )
 
-        # 4. Barra de Descanso Sutil (Surge com o cronômetro sem poluir)
-        rest_strip = ft.Container(
+        # 4. O CRONÔMETRO DE DESCANSO SUTIL
+        cronometro_bar = ft.Container(
             content=ft.Row([
                 ft.Row([
-                    ft.Icon(Icons.TIMER_OUTLINED, color=SportColors.PRIMARY_NEON, size=15),
-                    ft.Text("Descanso:", size=11, color=SportColors.TEXT_SECONDARY),
+                    ft.Icon(Icons.TIMER_OUTLINED, color=SportColors.PRIMARY_NEON, size=14),
+                    ft.Text("Descanso:", size=10, color=SportColors.TEXT_SECONDARY),
                     self.timer_text,
-                ], spacing=4),
+                ], spacing=3),
                 ft.Row([
                     ft.Container(
-                        content=ft.Text("+30s", size=10, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
-                        bgcolor="#1E1E2A",
-                        padding=AppPadding.symmetric(horizontal=8, vertical=4),
-                        border_radius=5,
+                        content=ft.Text("+30s", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_WHITE),
+                        bgcolor="#1C1C28",
+                        padding=AppPadding.symmetric(horizontal=7, vertical=3),
+                        border_radius=4,
                         on_click=lambda _: self._add_rest_time(30),
                         ink=True
                     ),
                     ft.Container(
-                        content=ft.Text("Pular", size=10, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED),
-                        bgcolor="#1E1E2A",
-                        padding=AppPadding.symmetric(horizontal=8, vertical=4),
-                        border_radius=5,
+                        content=ft.Text("Pular", size=9, weight=ft.FontWeight.BOLD, color=SportColors.TEXT_MUTED),
+                        bgcolor="#1C1C28",
+                        padding=AppPadding.symmetric(horizontal=7, vertical=3),
+                        border_radius=4,
                         on_click=lambda _: self._stop_timer(),
                         ink=True
                     )
-                ], spacing=6)
+                ], spacing=4)
             ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, vertical_alignment=ft.CrossAxisAlignment.CENTER),
-            bgcolor="#111118",
+            bgcolor="#0E0E16",
             border=AppBorder.all(1, SportColors.BORDER_DEFAULT),
-            border_radius=8,
-            padding=AppPadding.symmetric(horizontal=10, vertical=6)
+            border_radius=6,
+            padding=AppPadding.symmetric(horizontal=8, vertical=3),
+            height=30
         )
 
-        # 5. Rodapé de Navegação com Botão de Avançar
-        total_ex = len(exercises)
+        # 5. O BOTÃO DE AVANÇAR
         has_prev = self.current_exercise_index > 0
         is_last = self.current_exercise_index >= total_ex - 1
 
         prev_btn = ft.IconButton(
             icon=Icons.ARROW_BACK_IOS_NEW,
             icon_color=SportColors.TEXT_WHITE if has_prev else SportColors.TEXT_MUTED,
-            icon_size=18,
+            icon_size=16,
             disabled=not has_prev,
             tooltip="Exercício Anterior",
             on_click=lambda _: self._navigate_exercise(-1)
         )
 
         if not is_last:
-            action_btn = ft.ElevatedButton(
+            next_btn = ft.ElevatedButton(
                 "PRÓXIMO EXERCÍCIO ➔",
                 icon=Icons.ARROW_FORWARD,
                 style=ft.ButtonStyle(
                     bgcolor=SportColors.PRIMARY_NEON,
                     color=SportColors.PRIMARY_TEXT_ON_NEON,
-                    text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD),
-                    shape=ft.RoundedRectangleBorder(radius=10) if hasattr(ft, "RoundedRectangleBorder") else None
+                    text_style=ft.TextStyle(size=13, weight=ft.FontWeight.BOLD),
+                    shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
                 ),
-                height=46,
+                height=42,
                 expand=True,
                 on_click=lambda _: self._navigate_exercise(1)
             )
         else:
-            action_btn = ft.ElevatedButton(
+            next_btn = ft.ElevatedButton(
                 "FINALIZAR TREINO & SALVAR ✓",
                 icon=Icons.CHECK_CIRCLE,
                 style=ft.ButtonStyle(
                     bgcolor=SportColors.PRIMARY_NEON,
                     color=SportColors.PRIMARY_TEXT_ON_NEON,
-                    text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD),
-                    shape=ft.RoundedRectangleBorder(radius=10) if hasattr(ft, "RoundedRectangleBorder") else None
+                    text_style=ft.TextStyle(size=13, weight=ft.FontWeight.BOLD),
+                    shape=ft.RoundedRectangleBorder(radius=8) if hasattr(ft, "RoundedRectangleBorder") else None
                 ),
-                height=48,
+                height=42,
                 expand=True,
                 on_click=lambda _: self._finish_workout_session()
             )
 
-        bottom_navigation = ft.Row([
+        action_row = ft.Row([
             prev_btn,
-            action_btn
-        ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+            next_btn
+        ], spacing=6, vertical_alignment=ft.CrossAxisAlignment.CENTER)
 
-        early_finish_link = ft.Row([
-            ft.TextButton(
-                "Finalizar treino agora",
-                style=ft.ButtonStyle(color=SportColors.TEXT_MUTED),
-                on_click=lambda _: self._finish_workout_session()
-            )
-        ], alignment=ft.MainAxisAlignment.CENTER) if not is_last else ft.Container()
-
-        # Montagem do Card Único Limpo (SCA Fit Style)
-        self.exercise_content_area.content = SportStyles.card_container(
+        # ENCAIXOTAMENTO TOTAL NUMA SEÇÃO SÓ (ZERO SCROLL)
+        self.boxed_section_area.content = SportStyles.card_container(
             content=ft.Column([
-                visual_container,
-                exercise_title_section,
-                sets_section,
-                rest_strip,
-                ft.Container(height=2),
-                bottom_navigation,
-                early_finish_link
-            ], spacing=10),
+                photo_container,
+                title_row,
+                quadro_repeticoes,
+                cronometro_bar,
+                action_row
+            ], spacing=5),
             bgcolor=SportColors.BG_SURFACE,
             border_color=SportColors.BORDER_DEFAULT,
-            padding=12,
-            radius=14
+            padding=8,
+            radius=10
         )
 
     def _select_routine(self, index: int):
@@ -622,11 +688,8 @@ class WorkoutView:
         self.exercise_state.clear()
         self.completed_sets.clear()
         self._initialize_exercise_state()
+        self._render_boxed_card()
         if self.page:
-            self.page.views.clear() if hasattr(self.page, "views") else None
-        self._render_active_exercise()
-        if self.page:
-            # Reconstroi o build
             self.page.update()
 
     def _navigate_exercise(self, delta: int):
@@ -636,7 +699,7 @@ class WorkoutView:
         new_idx = self.current_exercise_index + delta
         if 0 <= new_idx < len(exercises):
             self.current_exercise_index = new_idx
-            self._render_active_exercise()
+            self._render_boxed_card()
             if self.page:
                 self.page.update()
 
@@ -662,7 +725,7 @@ class WorkoutView:
                 def handler(_):
                     UIHelper.close_dialog(self.page, dialog)
                     self.current_exercise_index = target_idx
-                    self._render_active_exercise()
+                    self._render_boxed_card()
                     if self.page:
                         self.page.update()
                 return handler
@@ -717,13 +780,11 @@ class WorkoutView:
         self._stop_timer()
         self.rest_seconds_left = seconds
         self.timer_running = True
-        total_time = max(seconds, 1)
 
         def countdown():
             while self.timer_running and self.rest_seconds_left > 0:
                 mins, secs = divmod(self.rest_seconds_left, 60)
                 self.timer_text.value = f"{mins:02d}:{secs:02d}"
-                self.timer_progress.value = 1.0 - (self.rest_seconds_left / total_time)
                 if self.page:
                     try:
                         self.page.update()
@@ -734,7 +795,6 @@ class WorkoutView:
 
             if self.timer_running and self.rest_seconds_left <= 0:
                 self.timer_text.value = "PRONTO!"
-                self.timer_progress.value = 1.0
                 if self.page:
                     try:
                         self.page.update()
@@ -758,7 +818,6 @@ class WorkoutView:
         self.timer_running = False
         self.rest_seconds_left = 0
         self.timer_text.value = "00:00"
-        self.timer_progress.value = 0.0
         if self.page:
             try:
                 self.page.update()
@@ -824,7 +883,7 @@ class WorkoutView:
         self.current_exercise_index = 0
         self._initialize_exercise_state()
         self._stop_timer()
-        self._render_active_exercise()
+        self._render_boxed_card()
 
         # 4. Modal de Sucesso Limpo e Confortável
         dialog = ft.AlertDialog(
@@ -942,7 +1001,7 @@ class WorkoutView:
             UIHelper.show_toast(self.page, f"Substituído com sucesso para: {new_ex}!", color=SportColors.PRIMARY_NEON)
             self.exercise_state.clear()
             self._initialize_exercise_state()
-            self._render_active_exercise()
+            self._render_boxed_card()
             if self.page:
                 self.page.update()
 
@@ -956,7 +1015,7 @@ class WorkoutView:
             self.current_exercise_index = 0
             self.exercise_state.clear()
             self._initialize_exercise_state()
-            self._render_active_exercise()
+            self._render_boxed_card()
             if self.page:
                 self.page.update()
         dialog = GoalSettingDialog(self.page, on_saved=on_saved, user_id=self.user_id)
@@ -1024,7 +1083,7 @@ class WorkoutView:
         self.exercise_state.clear()
         self._initialize_exercise_state()
         UIHelper.show_toast(self.page, f"Prescrição {preset_key} aplicada com sucesso!", color=SportColors.PRIMARY_NEON)
-        self._render_active_exercise()
+        self._render_boxed_card()
         if self.page:
             self.page.update()
 
